@@ -1,0 +1,130 @@
+@{
+    ViewBag.Title = "Inicio";
+}
+<style>
+header, footer, #menu {
+	display: none !important;
+}
+.banner {
+	width: 100%;
+	height: 100vh;
+	background: #200122;
+	background: -webkit-linear-gradient(to right, #6f0000, #200122);
+	background: linear-gradient(to right, #6f0000, #200122);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+form {
+    width: 100%;
+    height: 450px;
+    max-width: 600px;
+    min-height: auto;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 60px 0 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    color: #f0f0f0;
+}
+.title-login {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.title-login p {
+    font-size: 14px;
+}
+.credentials-login {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.form-group {
+    width: 80%;
+    display: flex;
+    flex-wrap: wrap;
+}
+.form-group i {
+    flex: 1;
+    color: #f0f0f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-right: 10px;
+}
+.form-group input[type=text], .form-group input[type=password] {
+    flex: 10;
+    background: none;
+    color: #f0f0f0;
+    border-bottom: solid 1px #333;
+}
+.form-group input::placeholder {
+    color: #f0f0f0;
+}
+.form-control-sm {
+    margin: 5px 0;
+    padding: 10px 0;
+    border: 0;
+    border-bottom: solid 1px #c1c1c1;
+    border-radius: 0;
+}
+.form-label-error {
+    width: 100%;
+    font-size: 12px;
+    color: #ca1d1d;
+    display: none;
+}
+#error.form-label-error {
+    display: block;
+}
+</style>
+<section class="container-fluid banner">
+	<form action="/Account/Login" method="post" onsubmit="return checkForm()">
+		<div class="title-login">
+			<h1 class="text-center">DataMaster</h1>
+			<p class="text-center" style="font-size: 16px;">Gestion de Pedidos</p>
+		</div>
+		<div class="credentials-login">
+			<div class="form-group">
+				<i class="fas fa-user"></i>
+				<input type="text" id="username" name="username" class="form-control-sm" placeholder="Usuario" autocomplete="off" onkeypress="$('.form-label-error').css('display', 'none');" />
+				<label class="form-label-error">* Debes ingresar usuario</label>
+			</div>
+			<div class="form-group">
+				<i class="fas fa-lock"></i>
+				<input type="password" id="password" name="password" class="form-control-sm" placeholder="Clave" autocomplete="off" onkeypress="$('.form-label-error').css('display', 'none');" />
+				<label class="form-label-error">* Debes ingresar clave</label>
+			</div>
+			<button class="btn btn-info mt-5" style="width: 80%;">Iniciar Sesion</button>
+			@{
+				if (!string.IsNullOrEmpty(ViewBag.message))
+				{
+					<label id="error" class="form-label-error mt-2 text-center">@ViewBag.message</label>
+				}
+			}
+		</div>
+	</form>
+</section>
+<script>
+	function checkForm() {
+
+		var send = true;
+
+		if ($("#username").val() == "") {
+			$(".form-label-error").first().css("display", "block");
+			send = false;
+		}
+
+		if ($("#password").val() == "") {
+			$(".form-label-error").eq(1).css("display", "block");
+			send = false;
+		}
+
+		return send;
+	}
+</script>
