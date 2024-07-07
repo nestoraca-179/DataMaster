@@ -1,15 +1,19 @@
-﻿using System;
+﻿using System.Linq;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace DataMaster.Models
 {
 	public class MyUser
 	{
+		private static readonly DataMasterEntities db = new DataMasterEntities();
+
+		public static Usuario GetUserByID(int id)
+		{
+			return db.Usuario.AsNoTracking().Single(u => u.ID == id);
+		}
+
 		public static List<Usuario> GetAllUsers()
 		{
-			DataMasterEntities db = new DataMasterEntities();
 			return db.Usuario.AsNoTracking().ToList(); ;
 		}
 	}

@@ -151,7 +151,7 @@
 						</button>
 					</div>
 					<div class="col buttons-save-cancel" ng-show="editing">
-						<button type="button" class="btn btn-danger" ng-click="editing = false">
+						<button type="button" class="btn btn-danger" ng-click="editing = false; order = orders_orig[index]">
 							<i class="fas fa-times"></i>
 							Cancelar
 						</button>
@@ -166,11 +166,11 @@
 							<i class="fas fa-plus"></i> Nuevo
 						</button>
 						<div style="width: 10px;"></div>
-						<button type="button" class="btn btn-warning" ng-disabled="true" ng-click="editing = true">
+						<button type="button" class="btn btn-warning" ng-disabled="order.saldo < order.total_neto" ng-click="editing = true">
 							<i class="fas fa-file-edit"></i> Modificar
 						</button>
 						<div style="width: 10px;"></div>
-						<button type="button" class="btn btn-danger" ng-disabled="true" onclick="$('#modalDelete').modal('show')">
+						<button type="button" class="btn btn-danger" ng-disabled="order.saldo < order.total_neto" onclick="$('#modalDelete').modal('show')">
 							<i class="fas fa-times"></i> Eliminar
 						</button>
 					</div>
@@ -404,6 +404,26 @@
 			</div>
 		</form>
 	</div>
+	<!-- Modal Eliminar Pedido -->
+	<div class="modal fade modal-info" id="modalDelete" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+			<div class="modal-content">
+				@*<div class="modal-header">
+					<h3 class="modal-title">Eliminar Pedido</h3>
+				</div>*@
+				<div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+					<div style="display: flex; justify-content: center;">
+						<i class="fas fa-exclamation-triangle" style="color: var(--bs-yellow)"></i>
+					</div>
+					<h2 class="text-center">¿Desea eliminar el pedido {{ order.doc_num }}?</h2>
+				</div>
+				<div class="modal-footer" style="justify-content: center">
+					<button type="button" style="width: 70px;" class="btn btn-danger" data-dismiss="modal">No</button>
+					<button type="button" style="width: 70px;" class="btn btn-success" ng-click="deleteOrder(order.doc_num)">Sí</button>
+				</div>
+			</div>
+		</div>
+	</div>
 	<!-- Modal Confirm -->
 	<div class="modal fade modal-info" id="modalConfirm" tabindex="-1" role="dialog" aria-hidden="true">
 		<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
@@ -484,8 +504,8 @@
 							<div class="controls">
 								<label>Articulo</label>
 								<div class="input-search">
-									<input type="text" class="form-control" id="art" ng-model="reng.co_art" ng-disabled="!adding" ng-required="true" style="flex: 1;" onkeydown="return false;" />
-									<input type="text" class="form-control" id="des_art" ng-disabled="!adding" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
+									<input type="text" class="form-control" id="art" ng-model="reng.co_art" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" onkeydown="return false;" />
+									<input type="text" class="form-control" id="des_art" ng-disabled="!adding && !editing" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
 									<i class="fas fa-search" role="button" onclick="openModal(this, 'modalArts')" data-name="art"></i>
 								</div>
 							</div>
@@ -494,8 +514,8 @@
 							<div class="controls">
 								<label>Almacen</label>
 								<div class="input-search">
-									<input type="text" class="form-control" id="alm" ng-model="reng.co_alma" ng-disabled="!adding" ng-required="true" style="flex: 1;" onkeydown="return false;" />
-									<input type="text" class="form-control" id="des_alm" ng-disabled="!adding" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
+									<input type="text" class="form-control" id="alm" ng-model="reng.co_alma" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" onkeydown="return false;" />
+									<input type="text" class="form-control" id="des_alm" ng-disabled="!adding && !editing" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
 									<i class="fas fa-search" role="button" onclick="openModal(this, 'modalAlms')" data-name="alm"></i>
 								</div>
 							</div>
@@ -505,25 +525,25 @@
 						<div class="col-sm-12 col-md-3">
 							<div class="controls">
 								<label>Cantidad</label>
-								<input type="number" class="form-control" id="quantity" ng-model="reng.total_art" ng-disabled="!adding" ng-required="true" ng-change="updatePriceItem()" onkeydown="return onlyNumbers(event)" />
+								<input type="number" class="form-control" id="quantity" ng-model="reng.total_art" ng-disabled="!adding && !editing" ng-required="true" ng-change="updatePriceItem()" onkeydown="return onlyNumbers(event)" />
 							</div>
 						</div>
 						<div class="col-sm-12 col-md-3">
 							<div class="controls">
 								<label>Precio Unit. $USD</label>
-								<input type="text" class="form-control" id="price_usd" ng-model="reng.prec_vta_om" ng-disabled="!adding" ng-required="true" ng-change="updatePriceItem()" onkeydown="return onlyNumbers(event)" />
+								<input type="text" class="form-control" id="price_usd" ng-model="reng.prec_vta_om" ng-disabled="!adding && !editing" ng-required="true" ng-change="updatePriceItem()" onkeydown="return onlyNumbers(event)" />
 							</div>
 						</div>
 						<div class="col-sm-12 col-md-3">
 							<div class="controls">
 								<label>Total $USD (Sin IVA)</label>
-								<input type="text" class="form-control" id="total_usd" ng-model="reng.reng_neto_om" ng-disabled="!adding" ng-required="true" ng-readonly="true" />
+								<input type="text" class="form-control" id="total_usd" ng-model="reng.reng_neto_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" />
 							</div>
 						</div>
 						<div class="col-sm-12 col-md-3">
 							<div class="controls">
 								<label>Monto IVA $USD</label>
-								<input type="text" class="form-control" id="iva_usd" ng-model="reng.monto_imp_om" ng-disabled="!adding" ng-required="true" ng-readonly="false" />
+								<input type="text" class="form-control" id="iva_usd" ng-model="reng.monto_imp_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="false" />
 							</div>
 						</div>
 					</div>
@@ -751,6 +771,7 @@
 <script>
 	var app = angular.module("Orders", []);
     var orders = @Html.Raw(ViewBag.orders);
+    var orders_orig = @Html.Raw(ViewBag.orders);
     var clients = @Html.Raw(ViewBag.obj_client);
     var conds = @Html.Raw(Json.Encode(ViewBag.conds));
 	var sellers = @Html.Raw(Json.Encode(ViewBag.sellers));
@@ -759,42 +780,8 @@
 	var alms = @Html.Raw(Json.Encode(ViewBag.alms));
     var arts = @Html.Raw(ViewBag.arts);
 
-	for (var item of orders) {
-
-		// TOTALES OM
-		item.total_bruto_om = setSeparator(parseFloat((item.total_bruto / item.tasa).toFixed(3)).toFixed(2));
-		item.total_bruto = setSeparator(item.total_bruto.toFixed(2));
-
-		item.monto_imp_om = setSeparator(parseFloat((item.monto_imp / item.tasa).toFixed(3)).toFixed(2));
-		item.monto_imp = setSeparator(item.monto_imp.toFixed(2));
-
-		item.total_neto_om = setSeparator(parseFloat((item.total_neto / item.tasa).toFixed(3)).toFixed(2));
-		item.total_neto = setSeparator(item.total_neto.toFixed(2));
-
-		item.saldo_om = setSeparator(parseFloat((item.saldo / item.tasa).toFixed(3)).toFixed(2));
-		item.saldo = setSeparator(item.saldo.toFixed(2));
-
-		for (var r of item.saPedidoVentaReng) {
-			r.monto_imp_om = setSeparator(parseFloat((r.monto_imp / item.tasa).toFixed(3)).toFixed(2));
-			r.monto_imp = setSeparator(r.monto_imp.toFixed(2));
-
-			r.reng_neto_om = setSeparator(parseFloat((r.reng_neto / item.tasa).toFixed(3)).toFixed(2));
-			r.reng_neto = setSeparator(r.reng_neto.toFixed(2));
-		}
-
-		// FECHAS
-		item.fec_emis = new Date(parseInt(item.fec_emis.substr(6)));
-		item.fec_venc = new Date(parseInt(item.fec_venc.substr(6)));
-		item.fec_reg = new Date(parseInt(item.fec_reg.substr(6)));
-		item.fe_us_in = new Date(parseInt(item.fe_us_in.substr(6)));
-		item.fe_us_mo = new Date(parseInt(item.fe_us_mo.substr(6)));
-
-		// DATOS
-		item.estatus = setStatus(item.status);
-		item.des_cli = searchCli(item.co_cli);
-		item.des_cond = searchCond(item.co_cond);
-		item.des_ven = searchVen(item.co_ven);
-    }
+	orders = parseItems(orders);
+	orders_orig = parseItems(orders_orig);
 
 	$(document).ready(function () {
 		$(".container-orders").removeAttr("style");
@@ -807,6 +794,7 @@
 		$scope.index = 0;
 		$scope.numberI = 200;
 		$scope.orders = orders;
+		$scope.orders_orig = orders_orig;
 		$scope.order = orders[$scope.index];
 		$scope.clients = clients;
 		$scope.conds = conds;
@@ -845,11 +833,17 @@
 
 		$scope.selectOrder = function (id) {
 
-			$scope.order = orders.find(o => o.doc_num == id);
-			$scope.index = orders.indexOf($scope.order);
-			$scope.orders = orders;
-			$("#input-orders").val("");
-			searchOrder();
+			if ($scope.adding) {
+				alert("Debes terminar de agregar el pedido");
+			} else if ($scope.editing) {
+				alert("Debes terminar de modificar el pedido " + $scope.order.doc_num);
+			} else {
+				$scope.order = orders.find(o => o.doc_num == id);
+				$scope.index = orders.indexOf($scope.order);
+				$scope.orders = orders;
+				$("#input-orders").val("");
+				searchOrder();
+			}
 		}
 
 		$scope.margin = function (p) {
@@ -975,6 +969,17 @@
 
 			if (action != 3) {
 
+				$scope.searching = true;
+				var req = await $http.get("/api/DataMasterApi/GetStock/" + r.co_art.trim() + "/" + r.co_alma.trim());
+				$scope.searching = false;
+				if (req.data.Result <= 0 || req.data.Result < parseInt(r.total_art)) {
+					$("#modalError").modal("show");
+					$scope.searching = false;
+					$scope.errorMessage = `No hay stock disponible del articulo ${r.co_art.trim()} en el almacen ${r.co_alma.trim()} (DISPONIBLE ${req.data.Result}, SOLICITADA ${r.total_art})`;
+					$scope.$digest();
+					return -1;
+				}
+
 				if (action == 1) {
 					r.reng_num = $scope.order.saPedidoVentaReng.length + 1;
 					r.co_uni = "UND";
@@ -1005,17 +1010,6 @@
 				r.prec_vta_om = setSeparator(parseFloat(parseFloat(r.prec_vta_om).toFixed(3)).toFixed(2));
 				r.reng_neto_om = setSeparator(parseFloat(parseFloat(r.reng_neto_om).toFixed(3)).toFixed(2));
 				r.monto_imp_om = setSeparator(parseFloat(parseFloat(r.monto_imp_om).toFixed(3)).toFixed(2));
-
-				$scope.searching = true;
-				var req = await $http.get("/api/DataMasterApi/GetStock/" + r.co_art.trim() + "/" + r.co_alma.trim());
-				$scope.searching = false;
-				if (req.data.Result <= 0 || req.data.Result < parseInt(r.total_art)) {
-					$("#modalError").modal("show");
-					$scope.searching = false;
-					$scope.errorMessage = `No hay stock disponible del articulo ${r.co_art.trim()} en el almacen ${r.co_alma.trim()} (DISPONIBLE ${req.data.Result}, SOLICITADA ${r.total_art})`;
-					$scope.$digest();
-					return -1;
-				}
 			}
 
 			let ind = rengs.indexOf(rengs.find(i => i.reng_num == r.reng_num));
@@ -1158,19 +1152,16 @@
 
 		$scope.deleteOrder = function (id) {
 
-			$("#modalConfirm").modal("hide");
+			$("#modalDelete").modal("hide");
 			$("#modalWaiting").modal("show");
 
-			$http.get("/api/ProfitTMApi/DeleteOrder/" + id)
+			$http.get("/api/DataMasterApi/DeleteOrder/" + id)
 				.then(function (response) {
 
-					console.log(response.data);
 					var res = response.data;
-
-					$("#modalWaiting").modal("hide");
 					if (res.Status == "OK") {
 						$("#modalSuccess").modal("show");
-						$scope.successMessage = "La preliquidación " + res.Result + " se ha eliminado con éxito";
+						$scope.successMessage = "El pedido " + res.Result + " se ha eliminado con éxito";
 						orders = orders.filter(o => o != $scope.order);
 						$scope.orders = orders;
 						$scope.order = $scope.orders[0];
@@ -1269,9 +1260,9 @@
 		i.fe_us_in = new Date(i.fe_us_in);
 		i.fe_us_mo = new Date(i.fe_us_mo);
 		i.estatus = setStatus(i.status);
-		i.des_cli = searchCli(item.co_cli);
-		i.des_cond = searchCond(item.co_cond);
-		i.des_ven = searchVen(item.co_ven);
+		i.des_cli = searchCli(i.co_cli);
+		i.des_cond = searchCond(i.co_cond);
+		i.des_ven = searchVen(i.co_ven);
 
 		return i;
 	}
@@ -1286,6 +1277,53 @@
 
 	function parse(value) {
 		return parseFloat(value.replaceAll(',', ''));
+	}
+
+	function parseItems(items_c) {
+
+		var items = items_c;
+
+		for (var item of items) {
+
+			// TOTALES OM
+			item.total_bruto_om = setSeparator(parseFloat((item.total_bruto / item.tasa).toFixed(3)).toFixed(2));
+			item.total_bruto = setSeparator(item.total_bruto.toFixed(2));
+
+			item.monto_imp_om = setSeparator(parseFloat((item.monto_imp / item.tasa).toFixed(3)).toFixed(2));
+			item.monto_imp = setSeparator(item.monto_imp.toFixed(2));
+
+			item.total_neto_om = setSeparator(parseFloat((item.total_neto / item.tasa).toFixed(3)).toFixed(2));
+			item.total_neto = setSeparator(item.total_neto.toFixed(2));
+
+			item.saldo_om = setSeparator(parseFloat((item.saldo / item.tasa).toFixed(3)).toFixed(2));
+			item.saldo = setSeparator(item.saldo.toFixed(2));
+
+			for (var r of item.saPedidoVentaReng) {
+				r.prec_vta_om = setSeparator(parseFloat((r.prec_vta / item.tasa).toFixed(3)).toFixed(2));
+				r.prec_vta = setSeparator(r.prec_vta.toFixed(2));
+
+				r.monto_imp_om = setSeparator(parseFloat((r.monto_imp / item.tasa).toFixed(3)).toFixed(2));
+				r.monto_imp = setSeparator(r.monto_imp.toFixed(2));
+
+				r.reng_neto_om = setSeparator(parseFloat((r.reng_neto / item.tasa).toFixed(3)).toFixed(2));
+				r.reng_neto = setSeparator(r.reng_neto.toFixed(2));
+			}
+
+			// FECHAS
+			item.fec_emis = new Date(parseInt(item.fec_emis.substr(6)));
+			item.fec_venc = new Date(parseInt(item.fec_venc.substr(6)));
+			item.fec_reg = new Date(parseInt(item.fec_reg.substr(6)));
+			item.fe_us_in = new Date(parseInt(item.fe_us_in.substr(6)));
+			item.fe_us_mo = new Date(parseInt(item.fe_us_mo.substr(6)));
+
+			// DATOS
+			item.estatus = setStatus(item.status);
+			item.des_cli = searchCli(item.co_cli);
+			item.des_cond = searchCond(item.co_cond);
+			item.des_ven = searchVen(item.co_ven);
+		}
+
+		return items;
 	}
 
 	function setSeparator(value) {

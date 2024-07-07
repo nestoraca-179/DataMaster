@@ -1,16 +1,14 @@
 ﻿using System;
 using System.Linq;
-using System.Globalization;
 using System.Collections.Generic;
 using DataMaster.Controllers;
 
 namespace DataMaster.Models
 {
-    public class Client
-    {
+	public class Client : ProfitAdmManager
+	{
         public saCliente GetClientByID(string id)
         {
-            ProfitAdmEntities db = new ProfitAdmEntities();
             saCliente client;
 
             try
@@ -37,22 +35,9 @@ namespace DataMaster.Models
             return client;
         }
 
-        public List<saCliente> GetAllClients(bool full)
+        public List<saCliente> GetAllClients()
         {
-			ProfitAdmEntities db = new ProfitAdmEntities();
-			List<saCliente> clients;
-
-			try
-			{
-				clients = db.saCliente.AsNoTracking().ToList();
-			}
-			catch (Exception ex)
-			{
-				clients = null;
-				IncidentController.CreateIncident("ERROR BUSCANDO CLIENTES", ex);
-			}
-
-			return clients;
+			return db.saCliente.AsNoTracking().ToList();
         }
     }
 }

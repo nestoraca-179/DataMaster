@@ -1,13 +1,9 @@
 ﻿using DataMaster.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace DataMaster.Controllers
 {
-    public class UserController : Controller
+	public class UserController : Controller
     {
         public ActionResult Index()
         {
@@ -18,6 +14,16 @@ namespace DataMaster.Controllers
 
 			ViewBag.usuario = (Session["USER"] as Usuario);
 			ViewBag.users = MyUser.GetAllUsers();
+			return View();
+		}
+
+		public ActionResult Agregar()
+		{
+			return View();
+		}
+
+		public ActionResult Editar()
+		{
 			return View();
 		}
     }

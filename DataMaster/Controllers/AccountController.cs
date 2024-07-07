@@ -1,15 +1,13 @@
 ﻿using DataMaster.Models;
 using System;
-using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 
 namespace DataMaster.Controllers
 {
-    public class AccountController : Controller
+	public class AccountController : Controller
     {
 		[HttpPost]
 		public ActionResult Login(string username, string password)
@@ -38,6 +36,7 @@ namespace DataMaster.Controllers
 						if (DateTime.Compare(user.fec_camb, DateTime.Now) < 0)
 							return RedirectToAction("CambiarClave", "Home");
 
+						LogController.CreateLog(user.username, "LOGIN", user.ID.ToString(), "L", null);
 						return RedirectToAction("Dashboard", "Home");
 					}
 				}
@@ -74,6 +73,7 @@ namespace DataMaster.Controllers
 						db.Entry(user).State = EntityState.Modified;
 						db.SaveChanges();
 
+						LogController.CreateLog(user.username, "LOGIN", user.ID.ToString(), "CP", null);
 						return RedirectToAction("Dashboard", "Home");
 					}
 				}

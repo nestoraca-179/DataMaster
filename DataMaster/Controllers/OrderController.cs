@@ -18,13 +18,35 @@ namespace DataMaster.Controllers
 
 			ViewBag.usuario = (Session["USER"] as Usuario);
 			ViewBag.orders = serializer.Serialize(new Order().GetAllOrders(30));
-			ViewBag.arts = serializer.Serialize(new Product().GetAllArts());
-			ViewBag.clients = new Client().GetAllClients(false);
-			ViewBag.conds = new Cond().GetAllConds();
-			ViewBag.sellers = new Seller().GetAllSellers();
-			ViewBag.currencies = new Currency().GetAllCurrencies();
-			ViewBag.transports = new Transport().GetAllTransports();
-			ViewBag.alms = new Storage().GetAllAlms();
+
+			if (Session["ARTS"] == null)
+				Session["ARTS"] = serializer.Serialize(new Product().GetAllArts());
+
+			if (Session["CLIENTS"] == null)
+				Session["CLIENTS"] = new Client().GetAllClients();
+
+			if (Session["CONDS"] == null)
+				Session["CONDS"] = new Cond().GetAllConds();
+
+			if (Session["SELLERS"] == null)
+				Session["SELLERS"] = new Seller().GetAllSellers();
+
+			if (Session["CURRENCIES"] == null)
+				Session["CURRENCIES"] = new Currency().GetAllCurrencies();
+
+			if (Session["TRANSPORTS"] == null)
+				Session["TRANSPORTS"] = new Transport().GetAllTransports();
+
+			if (Session["ALMS"] == null)
+				Session["ALMS"] = new Storage().GetAllAlms();
+
+			ViewBag.arts = Session["ARTS"];
+			ViewBag.clients = Session["CLIENTS"];
+			ViewBag.conds = Session["CONDS"];
+			ViewBag.sellers = Session["SELLERS"];
+			ViewBag.currencies = Session["CURRENCIES"];
+			ViewBag.transports = Session["TRANSPORTS"];
+			ViewBag.alms = Session["ALMS"];
 			ViewBag.obj_client = serializer.Serialize(ViewBag.clients);
 
 			return View();
