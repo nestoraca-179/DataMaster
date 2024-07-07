@@ -110,7 +110,7 @@
 					</thead>
 					<tr ng-repeat="order in orders" ng-class="{ active: orders[index].doc_num == order.doc_num }" ng-click="selectOrder(order.doc_num)" style="cursor: pointer;">
 						<td><i class="fas fa-caret-right mx-1" ng-show="orders[index].doc_num == order.doc_num"></i>{{ order.doc_num }}</td>
-						<td>{{ order.co_cli }}</td>
+						<td>{{ order.saCliente.cli_des }}</td>
 					</tr>
 				</table>
 			</div>
@@ -976,6 +976,9 @@
 					$("#modalError").modal("show");
 					$scope.searching = false;
 					$scope.errorMessage = `No hay stock disponible del articulo ${r.co_art.trim()} en el almacen ${r.co_alma.trim()} (DISPONIBLE ${req.data.Result}, SOLICITADA ${r.total_art})`;
+					if ($scope.editing)
+						r.total_art = $scope.orders_orig[$scope.index].saPedidoVentaReng[r.reng_num - 1].total_art;
+
 					$scope.$digest();
 					return -1;
 				}
@@ -1248,6 +1251,8 @@
 				reng.monto_imp = (reng.reng_neto * 0.16);
 			}
 
+			reng.prec_vta_om = setSeparator(parseFloat((reng.prec_vta / i.tasa).toFixed(3)).toFixed(2));
+			reng.prec_vta = setSeparator(reng.prec_vta.toFixed(2));
 			reng.monto_imp_om = setSeparator((reng.monto_imp / i.tasa).toFixed(2));
 			reng.monto_imp = setSeparator(reng.monto_imp.toFixed(2));
 			reng.reng_neto_om = setSeparator((reng.reng_neto / i.tasa).toFixed(2));

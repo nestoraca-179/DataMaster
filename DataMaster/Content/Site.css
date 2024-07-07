@@ -112,7 +112,7 @@ body footer {
     border-top: solid 1px #d5cece;
 }
 body footer > .container {
-    justify-content: end !important;
+    justify-content: space-between !important;
 }
 .shadow-tm {
     box-shadow: 0 0.46875rem 2.1875rem rgb(4 9 20 / 3%), 0 0.9375rem 1.40625rem rgb(4 9 20 / 3%), 
@@ -378,11 +378,11 @@ ul.menu li a p {
 
 /* BOTONES */
 .btn-info, .btn-info:hover, .btn-info:active, .btn-info:focus {
-    background: #c0392b;
-    border: solid 1px #c0392b;
-    color: #FFF;
+    background: #c0392b !important;
+    border: solid 1px #c0392b !important;
+    color: #FFF !important;
 }
 .btn-info:hover, .btn-info:active, .btn-info:focus, .btn-info:active:focus {
-    outline: 0;
-    box-shadow: 0 0 0 0.25rem rgba(192, 57, 43, .5);
+    outline: 0 !important;
+    box-shadow: 0 0 0 0.25rem rgba(192, 57, 43, .5) !important;
 }

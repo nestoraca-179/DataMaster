@@ -2,6 +2,7 @@
 using System.Web;
 using System.Web.Http;
 using DataMaster.Models;
+using static DevExpress.XtraExport.Helpers.TableCellCss;
 
 namespace DataMaster.Controllers
 {
@@ -35,11 +36,12 @@ namespace DataMaster.Controllers
 		{
 			DataMasterResponse response = new DataMasterResponse();
 			Usuario u = (HttpContext.Current.Session["USER"] as Usuario);
+			string s = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur;
 
 			try
 			{
-				saPedidoVenta new_order = new Order().AddOrder(order, u.username);
-				LogController.CreateLog(u.username, "PEDIDO", u.ID.ToString(), "I", null);
+				saPedidoVenta new_order = new Order().AddOrder(order, u.username, s);
+				LogController.CreateLog(u.username, "PEDIDO", new_order.doc_num, "I", null);
 
 				response.Status = "OK";
 				response.Result = new_order;
@@ -60,11 +62,12 @@ namespace DataMaster.Controllers
 		{
 			DataMasterResponse response = new DataMasterResponse();
 			Usuario u = (HttpContext.Current.Session["USER"] as Usuario);
+			string s = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur;
 
 			try
 			{
-				saPedidoVenta edit_order = new Order().EditOrder(order, u.username);
-				LogController.CreateLog(u.username, "PEDIDO", u.ID.ToString(), "M", edit_order.comentario);
+				saPedidoVenta edit_order = new Order().EditOrder(order, u.username, s);
+				LogController.CreateLog(u.username, "PEDIDO", edit_order.doc_num, "M", edit_order.comentario);
 
 				response.Status = "OK";
 				response.Result = edit_order;
@@ -85,10 +88,12 @@ namespace DataMaster.Controllers
 		{
 			DataMasterResponse response = new DataMasterResponse();
 			Usuario u = (HttpContext.Current.Session["USER"] as Usuario);
+			string s = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur;
 
 			try
 			{
-				saPedidoVenta del_order = new Order().DeleteOrder(id, u.username);
+				saPedidoVenta del_order = new Order().DeleteOrder(id, u.username, s);
+				LogController.CreateLog(u.username, "PEDIDO", del_order.doc_num, "E", null);
 
 				response.Status = "OK";
 				response.Result = del_order.doc_num.Trim();
@@ -98,6 +103,81 @@ namespace DataMaster.Controllers
 				response.Status = "ERROR";
 				response.Message = ex.Message;
 				IncidentController.CreateIncident("ERROR ELIMINANDO PEDIDO " + id.ToString(), ex);
+			}
+
+			return response;
+		}
+
+		[HttpPost]
+		[Route("api/DataMasterApi/AddUser/")]
+		public DataMasterResponse AddUser(Usuario user)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+			Usuario u = (HttpContext.Current.Session["USER"] as Usuario);
+
+			try
+			{
+				Usuario new_user = MyUser.Add(user, u.username);
+				LogController.CreateLog(u.username, "USUARIO", new_user.ID.ToString(), "I", null);
+
+				response.Status = "OK";
+				response.Result = new_user.ID;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR AGREGANDO USUARIO " + user.username, ex);
+			}
+
+			return response;
+		}
+
+		[HttpPost]
+		[Route("api/DataMasterApi/EditUser/")]
+		public DataMasterResponse EditUser(Usuario user)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+			Usuario u = (HttpContext.Current.Session["USER"] as Usuario);
+
+			try
+			{
+				Usuario edit_user = MyUser.Edit(user, u.username);
+				LogController.CreateLog(u.username, "USUARIO", edit_user.ID.ToString(), "E", edit_user.password);
+
+				response.Status = "OK";
+				response.Result = edit_user.ID;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR EDITANDO USUARIO " + user.username, ex);
+			}
+
+			return response;
+		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/DeleteUser/{id}/")]
+		public DataMasterResponse DeleteUser(int id)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+			Usuario u = (HttpContext.Current.Session["USER"] as Usuario);
+
+			try
+			{
+				Usuario del_user = MyUser.Delete(id);
+				LogController.CreateLog(u.username, "USUARIO", id.ToString(), "E", null);
+
+				response.Status = "OK";
+				response.Result = del_user.ID;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR ELIMINANDO USUARIO " + id.ToString(), ex);
 			}
 
 			return response;

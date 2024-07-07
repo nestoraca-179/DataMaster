@@ -37,7 +37,7 @@ namespace DataMaster.Controllers
 							return RedirectToAction("CambiarClave", "Home");
 
 						LogController.CreateLog(user.username, "LOGIN", user.ID.ToString(), "L", null);
-						return RedirectToAction("Dashboard", "Home");
+						return RedirectToAction("SeleccionEmpresa", "Home");
 					}
 				}
 			}
@@ -73,8 +73,8 @@ namespace DataMaster.Controllers
 						db.Entry(user).State = EntityState.Modified;
 						db.SaveChanges();
 
-						LogController.CreateLog(user.username, "LOGIN", user.ID.ToString(), "CP", null);
-						return RedirectToAction("Dashboard", "Home");
+						LogController.CreateLog(user.username, "LOGIN", user.ID.ToString(), "C", null);
+						return RedirectToAction("SeleccionEmpresa", "Home");
 					}
 				}
 			}

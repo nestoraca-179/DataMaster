@@ -31,7 +31,12 @@
 	<div class="col-2" id="menu">
 		<ul class="menu">
 			<li><a href="/Order/Index"><i class="fas fa-file-invoice"></i><p class="m-0">Pedidos</p></a></li>
-			<li><a href="/User/Index"><i class="fas fa-user"></i><p class="m-0">Usuarios</p></a></li>
+			@{
+				if (ViewBag.usuario.admin)
+				{
+					<li><a href="/User/Index"><i class="fas fa-user"></i><p class="m-0">Usuarios</p></a></li>
+				}
+			}
 		</ul>
 	</div>
 	<div class="col-10 container-fluid p-0">
@@ -40,6 +45,18 @@
 </section>
 <footer>
 	<div class="container">
+		@{ 
+			if (!string.IsNullOrEmpty(ViewBag.empresa))
+			{
+				string name_suc = ViewBag.empresa;
+				if (!string.IsNullOrEmpty(ViewBag.sucur))
+				{
+					name_suc += (" / Sucursal: " + ViewBag.sucur);
+				}
+
+				<p class="m-0">@name_suc</p>
+			}
+		}
 		<p style="margin: 0;">DataMaster Ver. 1.0 &copy; 2024 - AC Solutions</p>
 	</div>
 </footer>

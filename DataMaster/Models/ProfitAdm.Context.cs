@@ -17,12 +17,13 @@ namespace DataMaster.Models
     
     public partial class ProfitAdmEntities : DbContext
     {
-        public ProfitAdmEntities() : base("name=ProfitAdmEntities")
-        {
-            Configuration.ProxyCreationEnabled = false;
-        }
-    
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+		public ProfitAdmEntities(string conn) : base(conn)
+		{
+			Configuration.ProxyCreationEnabled = false;
+			((IObjectContextAdapter)this).ObjectContext.CommandTimeout = 180;
+		}
+
+		protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             throw new UnintentionalCodeFirstException();
         }

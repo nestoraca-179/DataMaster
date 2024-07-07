@@ -1,5 +1,176 @@
 ﻿@{
-    ViewBag.Title = "Editar";
+    ViewBag.Title = "Editar Usuario";
 }
+<style>
+	input:invalid {
+		border: 1px solid #fcc;
+	}
+	.modal-info .fas {
+		font-size: 6em;
+		padding: 5%;
+	}
+</style>
+<div class="container-fluid" ng-app="EditUser" ng-controller="controller">
+	<div class="row mt-4">
+		<div class="col d-flex justify-content-center align-items-center">
+			<a href="/User/Index" class="btn btn-primary w-50"><i class="fas fa-arrow-left"></i> Volver</a>
+		</div>
+		<div class="col">
+			<h2 class="text-center">Editar Usuario</h2>
+		</div>
+		<div class="col d-flex justify-content-center align-items-center">
+			<button type="button" class="btn btn-success w-50" ng-click="sendUser()"><i class="fas fa-save"></i> Guardar</button>
+		</div>
+	</div>
+	<hr />
+	<form action="" method="post" id="form" class="mt-5" onsubmit="return false;">
+		<div class="row">
+			<div class="col-sm-6">
+				<div class="form-group row">
+					<label class="col-sm-4">Nombre *</label>
+					<div class="col-sm-8">
+						<input type="text" name="name" class="form-control" autofocus ng-model="user.des_usuario" ng-required="true" />
+					</div>
+				</div>
+				<div class="form-group row mt-2">
+					<label class="col-sm-4">Usuario *</label>
+					<div class="col-sm-8">
+						<input type="text" class="form-control" autocomplete="false" ng-model="user.username" ng-disabled="true" />
+					</div>
+				</div>
+				<div class="form-group row mt-2">
+					<label class="col-sm-4">Clave *</label>
+					<div class="col-sm-8">
+						<input type="password" class="form-control" autocomplete="false" ng-model="user.password" ng-disabled="true" />
+					</div>
+				</div>
+			</div>
+			<div class="col-sm-6">
+				<div class="form-group row">
+					<label class="col-sm-4">Email *</label>
+					<div class="col-sm-8">
+						<input type="email" class="form-control" autocomplete="false" autofocus ng-model="user.email" required />
+						<small class="text-secondary mx-2">Recuerda colocar formato de correo (someone@example.com)</small>
+					</div>
+				</div>
+				<div class="form-check row mt-2" style="height: 38px;">
+					<div class="col">
+						<input class="form-check-input" type="checkbox" ng-model="user.activo">
+						<label class="form-check-label ml-3">Activo</label>
+					</div>
+				</div>
+				<div class="form-check row mt-2" style="height: 38px;">
+					<div class="col">
+						<input class="form-check-input" type="checkbox" ng-model="user.admin">
+						<label class="form-check-label ml-3">Administrador</label>
+					</div>
+				</div>
+			</div>
+		</div>
+	</form>
+	<div ng-if="invalid" class="mt-3">
+		<p class="text-danger">Debes llenar todos los campos requeridos (*)</p>
+	</div>
+	<!-- Modal Waiting -->
+	<div class="modal fade modal-info" id="modalWaiting" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+			<div class="modal-content">
+				@*<div class="modal-header"></div>*@
+				<div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+					<div style="display: flex; justify-content: center;">
+						<i class="fas fa-spinner fa-spin" style="color: #01579b;"></i>
+					</div>
+					<h2 class="text-center">Procesando...</h2>
+				</div>
+				@*<div class="modal-footer"></div>*@
+			</div>
+		</div>
+	</div>
+	<!-- Modal Success -->
+	<div class="modal fade modal-info" id="modalSuccess" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+			<div class="modal-content">
+				@*<div class="modal-header"></div>*@
+				<div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+					<div style="display: flex; justify-content: center;">
+						<i class="fas fa-check-circle" style="color: var(--bs-green)"></i>
+					</div>
+					<h2 class="text-center">{{ successMessage }}</h2>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="closeModal()" onclick="location.href = '/User/'">Aceptar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	<!-- Modal Error -->
+	<div class="modal fade modal-info" id="modalError" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+		<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+			<div class="modal-content">
+				@*<div class="modal-header"></div>*@
+				<div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+					<div style="display: flex; justify-content: center;">
+						<i class="fas fa-exclamation-triangle" style="color: var(--bs-red)"></i>
+					</div>
+					<h2 class="text-center">Ha ocurrido un error</h2>
+					<p class="text-center">{{ errorMessage }}</p>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-primary" data-dismiss="modal" ng-click="closeModal()">Aceptar</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script src="~/Scripts/angular-min.js"></script>
+<script>
+	var app = angular.module("EditUser", []);
+    var user = @Html.Raw(Json.Encode(ViewBag.user_edit));
 
-<h2>Editar</h2>
+	app.controller("controller", function ($scope, $http) {
+
+		$scope.invalid = false;
+		$scope.user = user;
+
+		$scope.sendUser = function () {
+
+			$scope.invalid = false;
+			if ($("#form")[0].checkValidity()) {
+
+				$("#form input").change();
+				$("#modalWaiting").modal("show");
+
+				var req = {
+					method: 'POST',
+					url: '/api/DataMasterApi/EditUser/',
+					data: $scope.user,
+					headers: {
+						'Content-Type': 'application/json'
+					},
+				}
+
+				$http(req).then(function (response) {
+
+					var res = response.data;
+					if (res.Status == "OK") {
+						$("#modalWaiting").modal("hide");
+						$("#modalSuccess").modal("show");
+						$scope.successMessage = "El usuario se ha modificado con éxito";
+					} else {
+						$("#modalWaiting").modal("hide");
+						$("#modalError").modal("show");
+						$scope.errorMessage = res.Message;
+					}
+
+				});
+
+			} else {
+				$scope.invalid = true;
+			}
+		}
+
+		$scope.closeModal = function () {
+			$("#modalWaiting").modal("hide");
+		}
+	});
+</script>

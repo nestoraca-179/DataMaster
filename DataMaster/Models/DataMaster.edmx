@@ -4,7 +4,23 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="DataMasterModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="DataMasterModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="Empresa">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="des_con" Type="varchar" MaxLength="100" />
+          <Property Name="rif" Type="varchar" MaxLength="20" />
+          <Property Name="direc" Type="varchar(max)" />
+          <Property Name="tel" Type="varchar" MaxLength="50" />
+          <Property Name="img" Type="varchar(max)" />
+          <Property Name="server" Type="varchar" MaxLength="100" />
+          <Property Name="database" Type="varchar" MaxLength="80" />
+          <Property Name="username" Type="varchar" MaxLength="50" />
+          <Property Name="password" Type="varchar" MaxLength="50" />
+          <Property Name="type" Type="varchar" MaxLength="3" />
+        </EntityType>
         <EntityType Name="Incidente">
           <Key>
             <PropertyRef Name="ID" />
@@ -44,12 +60,12 @@
           <Property Name="fe_us_mo" Type="datetime" Nullable="false" />
         </EntityType>
         <EntityContainer Name="DataMasterModelStoreContainer">
+          <EntitySet Name="Empresa" EntityType="Self.Empresa" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Incidente" EntityType="Self.Incidente" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Log" EntityType="Self.Log" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Usuario" EntityType="Self.Usuario" Schema="dbo" store:Type="Tables" />
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="DataMasterModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -95,7 +111,24 @@
           <EntitySet Name="Incidente" EntityType="Self.Incidente" />
           <EntitySet Name="Log" EntityType="Self.Log" />
           <EntitySet Name="Usuario" EntityType="Self.Usuario" />
+          <EntitySet Name="Empresa" EntityType="DataMasterModel.Empresa" />
         </EntityContainer>
+        <EntityType Name="Empresa">
+          <Key>
+            <PropertyRef Name="ID" />
+          </Key>
+          <Property Name="ID" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="des_con" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="rif" Type="String" MaxLength="20" FixedLength="false" Unicode="false" />
+          <Property Name="direc" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="tel" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="img" Type="String" MaxLength="Max" FixedLength="false" Unicode="false" />
+          <Property Name="server" Type="String" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="database" Type="String" MaxLength="80" FixedLength="false" Unicode="false" />
+          <Property Name="username" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="password" Type="String" MaxLength="50" FixedLength="false" Unicode="false" />
+          <Property Name="type" Type="String" MaxLength="3" FixedLength="false" Unicode="false" />
+        </EntityType>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -140,6 +173,23 @@
                 <ScalarProperty Name="fe_us_in" ColumnName="fe_us_in" />
                 <ScalarProperty Name="co_us_mo" ColumnName="co_us_mo" />
                 <ScalarProperty Name="fe_us_mo" ColumnName="fe_us_mo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Empresa">
+            <EntityTypeMapping TypeName="DataMasterModel.Empresa">
+              <MappingFragment StoreEntitySet="Empresa">
+                <ScalarProperty Name="type" ColumnName="type" />
+                <ScalarProperty Name="password" ColumnName="password" />
+                <ScalarProperty Name="username" ColumnName="username" />
+                <ScalarProperty Name="database" ColumnName="database" />
+                <ScalarProperty Name="server" ColumnName="server" />
+                <ScalarProperty Name="img" ColumnName="img" />
+                <ScalarProperty Name="tel" ColumnName="tel" />
+                <ScalarProperty Name="direc" ColumnName="direc" />
+                <ScalarProperty Name="rif" ColumnName="rif" />
+                <ScalarProperty Name="des_con" ColumnName="des_con" />
+                <ScalarProperty Name="ID" ColumnName="ID" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

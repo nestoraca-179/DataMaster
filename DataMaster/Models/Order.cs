@@ -10,14 +10,14 @@ namespace DataMaster.Models
 {
 	public class Order : ProfitAdmManager
 	{
-		public List<saPedidoVenta> GetAllOrders(int number)
+		public List<saPedidoVenta> GetAllOrders(int number, string sucur)
 		{
 			List<saPedidoVenta> orders = new List<saPedidoVenta>();
 
 			try
 			{
-				orders = db.saPedidoVenta.AsNoTracking().Include("saPedidoVentaReng").Include("saCliente").Include("saVendedor")
-					.Include("saCondicionPago").OrderByDescending(i => i.fec_emis).ThenBy(i => i.doc_num).Take(number).ToList();
+				orders = db.saPedidoVenta.AsNoTracking().Where(o => o.co_sucu_in == sucur).Include("saPedidoVentaReng").Include("saCliente")
+					.Include("saVendedor").Include("saCondicionPago").OrderByDescending(i => i.fec_emis).ThenBy(i => i.doc_num).Take(number).ToList();
 
 				foreach (saPedidoVenta order in orders)
 				{
@@ -39,10 +39,10 @@ namespace DataMaster.Models
 			return orders;
 		}
 
-		public saPedidoVenta AddOrder(saPedidoVenta order, string user)
+		public saPedidoVenta AddOrder(saPedidoVenta order, string user, string sucur)
 		{
 			saPedidoVenta new_order = new saPedidoVenta();
-			using (ProfitAdmEntities context = new ProfitAdmEntities())
+			using (ProfitAdmEntities context = new ProfitAdmEntities(entity.ToString()))
 			{
 				using (DbContextTransaction tran = context.Database.BeginTransaction())
 				{
@@ -50,7 +50,6 @@ namespace DataMaster.Models
 					{
 						string n_ord = "";
 						bool uso_suc = false;
-						string sucur = context.saSucursal.AsNoTracking().First().co_sucur; // CAMBIAR
 
 						// SERIE USA SUCURSAL
 						var sp_1 = context.pSeleccionarUsoSucursalConsecutivoTipo("PCLI_NUM").GetEnumerator();
@@ -107,9 +106,9 @@ namespace DataMaster.Models
 			return new_order;
 		}
 
-		public saPedidoVenta EditOrder(saPedidoVenta order, string user)
+		public saPedidoVenta EditOrder(saPedidoVenta order, string user, string sucur)
 		{
-			using (ProfitAdmEntities context = new ProfitAdmEntities())
+			using (ProfitAdmEntities context = new ProfitAdmEntities(entity.ToString()))
 			{
 				using (DbContextTransaction tran = context.Database.BeginTransaction())
 				{
@@ -170,8 +169,6 @@ namespace DataMaster.Models
 						//	context.saPedidoVentaReng.Add(r);
 						//}
 						#endregion
-
-						string sucur = context.saSucursal.AsNoTracking().First().co_sucur; // CAMBIAR
 
 						// Obtener el pedido incluyendo los renglones
 						saPedidoVenta existing = context.saPedidoVenta.Include(o => o.saPedidoVentaReng)
@@ -270,16 +267,15 @@ namespace DataMaster.Models
 			return order;
 		}
 
-		public saPedidoVenta DeleteOrder(string id, string user)
+		public saPedidoVenta DeleteOrder(string id, string user, string sucur)
 		{
 			saPedidoVenta order = new saPedidoVenta();
-			using (ProfitAdmEntities context = new ProfitAdmEntities())
+			using (ProfitAdmEntities context = new ProfitAdmEntities(entity.ToString()))
 			{
 				using (DbContextTransaction tran = context.Database.BeginTransaction()) 
 				{
 					try
 					{
-						string sucur = context.saSucursal.AsNoTracking().First().co_sucur; // CAMBIAR
 						order = context.saPedidoVenta.AsNoTracking().Single(o => o.doc_num == id);
 						order.saPedidoVentaReng = context.saPedidoVentaReng.AsNoTracking().Where(r => r.doc_num == id).ToList();
 

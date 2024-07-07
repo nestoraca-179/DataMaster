@@ -311,6 +311,8 @@
     <Content Include="Views\Order\Index.cshtml" />
     <Content Include="Views\User\Agregar.cshtml" />
     <Content Include="Views\User\Editar.cshtml" />
+    <Content Include="Views\Home\SeleccionEmpresa.cshtml" />
+    <Content Include="Views\Home\SeleccionSucursal.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -324,6 +326,7 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\DataMasterApiController.cs" />
+    <Compile Include="Controllers\EntityController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IncidentController.cs" />
     <Compile Include="Controllers\LogController.cs" />
@@ -333,8 +336,10 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\Branch.cs" />
     <Compile Include="Models\Client.cs" />
     <Compile Include="Models\Cond.cs" />
+    <Compile Include="Models\Connection.cs" />
     <Compile Include="Models\Currency.cs" />
     <Compile Include="Models\DataMaster.Context.cs">
       <AutoGen>True</AutoGen>
@@ -352,6 +357,9 @@
       <DependentUpon>DataMaster.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\DataMasterResponse.cs" />
+    <Compile Include="Models\Empresa.cs">
+      <DependentUpon>DataMaster.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\Incidente.cs">
       <DependentUpon>DataMaster.tt</DependentUpon>
     </Compile>
