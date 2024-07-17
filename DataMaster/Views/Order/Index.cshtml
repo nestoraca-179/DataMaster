@@ -208,7 +208,7 @@
 						<div class="controls">
 							<label>Cliente</label>
 							<div class="input-search">
-								<input type="text" class="form-control" id="client" ng-model="order.co_cli" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" onkeydown="return false;" />
+								<input type="text" class="form-control" id="client" ng-model="order.co_cli" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setClient(order.co_cli, false)" ng-blur="setClient(order.co_cli, true)" />
 								<input type="text" class="form-control" id="des_client" ng-model="order.des_cli" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
 								<i class="fas fa-search" role="button" onclick="openModal(this, 'modalClients')" data-name="client"></i>
 							</div>
@@ -218,7 +218,7 @@
 						<div class="controls">
 							<label>Vendedor</label>
 							<div class="input-search">
-								<input type="text" class="form-control" id="seller" ng-model="order.co_ven" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" onkeydown="return false;" />
+								<input type="text" class="form-control" id="seller" ng-model="order.co_ven" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setSeller(order.co_ven, false)" ng-blur="setSeller(order.co_ven, true)" />
 								<input type="text" class="form-control" id="des_seller" ng-model="order.des_ven" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
 								<i class="fas fa-search" role="button" onclick="openModal(this, 'modalSellers')" data-name="seller"></i>
 							</div>
@@ -239,7 +239,7 @@
 						<div class="controls">
 							<label>Cond. Pago</label>
 							<div class="input-search">
-								<input type="text" class="form-control" id="cond" ng-model="order.co_cond" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" onkeydown="return false;" />
+								<input type="text" class="form-control" id="cond" ng-model="order.co_cond" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setCond(order.co_cond, false)" ng-blur="setCond(order.co_cond, true)" />
 								<input type="text" class="form-control" id="des_cond" ng-model="order.des_cond" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
 								<i class="fas fa-search" role="button" onclick="openModal(this, 'modalConds')" data-name="cond"></i>
 							</div>
@@ -504,7 +504,7 @@
 							<div class="controls">
 								<label>Articulo</label>
 								<div class="input-search">
-									<input type="text" class="form-control" id="art" ng-model="reng.co_art" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" onkeydown="return false;" />
+									<input type="text" class="form-control" id="art" ng-model="reng.co_art" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setArt(reng.co_art, false)" ng-blur="setArt(reng.co_art, true)" />
 									<input type="text" class="form-control" id="des_art" ng-disabled="!adding && !editing" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
 									<i class="fas fa-search" role="button" onclick="openModal(this, 'modalArts')" data-name="art"></i>
 								</div>
@@ -514,7 +514,7 @@
 							<div class="controls">
 								<label>Almacen</label>
 								<div class="input-search">
-									<input type="text" class="form-control" id="alm" ng-model="reng.co_alma" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" onkeydown="return false;" />
+									<input type="text" class="form-control" id="alm" ng-model="reng.co_alma" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setAlm(reng.co_alma, false)" ng-blur="setAlm(reng.co_alma, true)" />
 									<input type="text" class="form-control" id="des_alm" ng-disabled="!adding && !editing" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
 									<i class="fas fa-search" role="button" onclick="openModal(this, 'modalAlms')" data-name="alm"></i>
 								</div>
@@ -969,9 +969,22 @@
 
 			if (action != 3) {
 
+				if (r.total_art <= 0) {
+					$("#modalError").modal("show");
+					$scope.errorMessage = "La cantidad del item debe ser mayor a 0";
+					return -1;
+				}
+
+				if (parseFloat(r.prec_vta_om) <= 0) {
+					$("#modalError").modal("show");
+					$scope.errorMessage = "El precio unitario del item debe ser mayor a 0";
+					return -1;
+				}
+
 				$scope.searching = true;
 				var req = await $http.get("/api/DataMasterApi/GetStock/" + r.co_art.trim() + "/" + r.co_alma.trim());
 				$scope.searching = false;
+
 				if (req.data.Result <= 0 || req.data.Result < parseInt(r.total_art)) {
 					$("#modalError").modal("show");
 					$scope.searching = false;
@@ -994,18 +1007,6 @@
 				r.porc_imp = parseFloat(r.monto_imp_om) > 0 ? 16.00 : 0;
 				r.total_art = parseInt(r.total_art);
 				r.pendiente = parseInt(r.total_art);
-
-				if (r.total_art <= 0) {
-					$("#modalError").modal("show");
-					$scope.errorMessage = "La cantidad del item debe ser mayor a 0";
-					return -1;
-				}
-
-				if (parseFloat(r.prec_vta_om) <= 0) {
-					$("#modalError").modal("show");
-					$scope.errorMessage = "El precio unitario del item debe ser mayor a 0";
-					return -1;
-				}
 
 				r.prec_vta = setSeparator((parseFloat((parseFloat(r.prec_vta_om) * parseFloat(i.tasa ?? 1)).toFixed(3))).toFixed(2));
 				r.reng_neto = setSeparator((parseFloat((parseFloat(r.reng_neto_om) * parseFloat(i.tasa ?? 1)).toFixed(3))).toFixed(2));
@@ -1047,6 +1048,82 @@
 				$scope.$digest();
 
 			return 1;
+		}
+
+		$scope.setClient = function (value, del) {
+
+			let cli = clients.find(c => c.co_cli.trim() == value);
+			if (cli != null) {
+				$("#des_client").val(cli.cli_des);
+
+				$scope.order.co_ven = cli.co_ven;
+				$("#des_seller").val(searchVen($scope.order.co_ven));
+				$scope.order.co_cond = cli.cond_pag;
+				$("#des_cond").val(searchCond($scope.order.co_cond));
+
+			} else {
+				$("#des_client").val("");
+				if (del) {
+					$("#client").val("");
+					$scope.order.co_cli = "";
+				}
+			}
+		}
+
+		$scope.setSeller = function (value, del) {
+
+			let sel = sellers.find(s => s.co_ven.trim() == value);
+			if (sel != null) {
+				$("#des_seller").val(sel.ven_des);
+			} else {
+				$("#des_seller").val("");
+				if (del) {
+					$("#seller").val("");
+					$scope.order.co_ven = "";
+				}
+			}
+		}
+
+		$scope.setCond = function (value, del) {
+
+			let cond = conds.find(c => c.co_cond.trim() == value);
+			if (cond != null) {
+				$("#des_cond").val(cond.cond_des);
+			} else {
+				$("#des_cond").val("");
+				if (del) {
+					$("#cond").val("");
+					$scope.order.co_cond = "";
+				}
+			}
+		}
+
+		$scope.setArt = function (value, del) {
+
+			let art = arts.find(a => a.co_art.trim() == value);
+			if (art != null) {
+				$("#des_art").val(art.art_des);
+			} else {
+				$("#des_art").val("");
+				if (del) {
+					$("#art").val("");
+					$scope.reng.co_art = "";
+				}
+			}
+		}
+
+		$scope.setAlm = function (value, del) {
+
+			let alm = alms.find(a => a.co_alma.trim() == value);
+			if (alm != null) {
+				$("#des_alm").val(alm.des_alma);
+			} else {
+				$("#des_alm").val("");
+				if (del) {
+					$("#alm").val("");
+					$scope.reng.co_alma = "";
+				}
+			}
 		}
 
 		$scope.addOrder = function () {
