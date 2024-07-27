@@ -388,6 +388,10 @@
     <Compile Include="Models\pInsertarRenglonesPedidoVenta_Result.cs">
       <DependentUpon>ProfitAdm.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\pObtenerFechaImpuestoSobreVenta_Result.cs">
+      <DependentUpon>ProfitAdm.tt</DependentUpon>
+    </Compile>
+    <Compile Include="Models\Price.cs" />
     <Compile Include="Models\Product.cs" />
     <Compile Include="Models\ProfitAdm.Context.cs">
       <AutoGen>True</AutoGen>

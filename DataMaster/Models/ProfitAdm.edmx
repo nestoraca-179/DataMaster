@@ -14563,6 +14563,10 @@ advertencia 6035: La relación 'FK_stgFacturaVentaExt_stgFactLoteGen' tiene colu
           <Parameter Name="sTRASNFE" Type="char" Mode="In" />
           <Parameter Name="sMaquina" Type="varchar" Mode="In" />
         </Function>
+        <Function Name="pObtenerFechaImpuestoSobreVenta" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="dtFecha" Type="smalldatetime" Mode="In" />
+          <Parameter Name="bVentas" Type="bit" Mode="In" />
+        </Function>
         <Function Name="pSeleccionarUsoSucursalConsecutivoTipo" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
           <Parameter Name="sCo_Consecutivo" Type="char" Mode="In" />
         </Function>
@@ -34246,6 +34250,10 @@ advertencia 6035: La relación 'FK_stgFacturaVentaExt_stgFactLoteGen' tiene colu
             <Parameter Name="sCo_Sucu_Mo" Mode="In" Type="String" />
             <Parameter Name="gRowguid" Mode="In" Type="Guid" />
           </FunctionImport>
+          <FunctionImport Name="pObtenerFechaImpuestoSobreVenta" ReturnType="Collection(ProfitAdmModel.pObtenerFechaImpuestoSobreVenta_Result)">
+            <Parameter Name="dtFecha" Mode="In" Type="DateTime" />
+            <Parameter Name="bVentas" Mode="In" Type="Boolean" />
+          </FunctionImport>
         </EntityContainer>
         <ComplexType Name="pConsultarStockxAlmacen_Result">
           <Property Type="String" Name="CO_ART" Nullable="false" MaxLength="30" />
@@ -34289,6 +34297,12 @@ advertencia 6035: La relación 'FK_stgFacturaVentaExt_stgFactLoteGen' tiene colu
           <Property Type="DateTime" Name="fe_us_in" Nullable="true" Precision="23" />
           <Property Type="DateTime" Name="fe_us_mo" Nullable="true" Precision="23" />
           <Property Type="Guid" Name="rowguid" Nullable="true" />
+        </ComplexType>
+        <ComplexType Name="pObtenerFechaImpuestoSobreVenta_Result">
+          <Property Type="DateTime" Name="fecha" Nullable="false" Precision="16" />
+          <Property Type="String" Name="tipo_imp" Nullable="false" MaxLength="1" />
+          <Property Type="Decimal" Name="porc_tasa" Nullable="false" Precision="18" Scale="5" />
+          <Property Type="Decimal" Name="porc_suntuario" Nullable="false" Precision="18" Scale="5" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -42868,6 +42882,16 @@ advertencia 6035: La relación 'FK_stgFacturaVentaExt_stgFactLoteGen' tiene colu
           </FunctionImportMapping>
           <FunctionImportMapping FunctionImportName="pEliminarPedidoVenta" FunctionName="ProfitAdmModel.Store.pEliminarPedidoVenta" />
           <FunctionImportMapping FunctionImportName="pEliminarRenglonesPedidoVenta" FunctionName="ProfitAdmModel.Store.pEliminarRenglonesPedidoVenta" />
+          <FunctionImportMapping FunctionImportName="pObtenerFechaImpuestoSobreVenta" FunctionName="ProfitAdmModel.Store.pObtenerFechaImpuestoSobreVenta">
+            <ResultMapping>
+              <ComplexTypeMapping TypeName="ProfitAdmModel.pObtenerFechaImpuestoSobreVenta_Result">
+                <ScalarProperty Name="fecha" ColumnName="fecha" />
+                <ScalarProperty Name="tipo_imp" ColumnName="tipo_imp" />
+                <ScalarProperty Name="porc_tasa" ColumnName="porc_tasa" />
+                <ScalarProperty Name="porc_suntuario" ColumnName="porc_suntuario" />
+              </ComplexTypeMapping>
+            </ResultMapping>
+          </FunctionImportMapping>
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

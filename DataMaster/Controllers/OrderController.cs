@@ -44,6 +44,12 @@ namespace DataMaster.Controllers
 			if (Session["ALMS"] == null)
 				Session["ALMS"] = new Storage().GetAllAlms();
 
+			if (Session["PRICES"] == null)
+				Session["PRICES"] = new Price().GetAllPrices();
+
+			if (Session["IMPS"] == null)
+				Session["IMPS"] = new Price().GetAllImps();
+
 			ViewBag.arts = Session["ARTS"];
 			ViewBag.clients = Session["CLIENTS"];
 			ViewBag.conds = Session["CONDS"];
@@ -51,6 +57,9 @@ namespace DataMaster.Controllers
 			ViewBag.currencies = Session["CURRENCIES"];
 			ViewBag.transports = Session["TRANSPORTS"];
 			ViewBag.alms = Session["ALMS"];
+			ViewBag.prices = Session["PRICES"];
+			ViewBag.imps = Session["IMPS"];
+			ViewBag.rate = new Price().GetRateUSD().ToString().Replace(",", ".");
 			ViewBag.obj_client = serializer.Serialize(ViewBag.clients);
 
 			return View();

@@ -1033,5 +1033,18 @@ namespace DataMaster.Models
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("pEliminarRenglonesPedidoVenta", sDoc_NumOriParameter, iReng_NumOriParameter, sCo_Us_MoParameter, sMaquinaParameter, sCo_Sucu_MoParameter, gRowguidParameter);
         }
+    
+        public virtual ObjectResult<pObtenerFechaImpuestoSobreVenta_Result> pObtenerFechaImpuestoSobreVenta(Nullable<System.DateTime> dtFecha, Nullable<bool> bVentas)
+        {
+            var dtFechaParameter = dtFecha.HasValue ?
+                new ObjectParameter("dtFecha", dtFecha) :
+                new ObjectParameter("dtFecha", typeof(System.DateTime));
+    
+            var bVentasParameter = bVentas.HasValue ?
+                new ObjectParameter("bVentas", bVentas) :
+                new ObjectParameter("bVentas", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<pObtenerFechaImpuestoSobreVenta_Result>("pObtenerFechaImpuestoSobreVenta", dtFechaParameter, bVentasParameter);
+        }
     }
 }

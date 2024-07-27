@@ -487,7 +487,7 @@
 			</div>
 		</div>
 	</div>
-	<!-- Modal Agregar Item Factura -->
+	<!-- Modal Agregar Item Pedido -->
 	<div class="modal fade" id="modalItem" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 1051;">
 		<form class="modal-dialog" role="document" style="max-width: 800px;" onsubmit="return false;">
 			<div class="modal-content">
@@ -522,28 +522,46 @@
 						</div>
 					</div>
 					<div class="row">
-						<div class="col-sm-12 col-md-3">
+						<div class="col-sm-12 col-md-4">
 							<div class="controls">
 								<label>Cantidad</label>
 								<input type="number" class="form-control" id="quantity" ng-model="reng.total_art" ng-disabled="!adding && !editing" ng-required="true" ng-change="updatePriceItem()" onkeydown="return onlyNumbers(event)" />
 							</div>
 						</div>
-						<div class="col-sm-12 col-md-3">
+						<div class="col-sm-12 col-md-4">
 							<div class="controls">
-								<label>Precio Unit. $USD</label>
-								<input type="text" class="form-control" id="price_usd" ng-model="reng.prec_vta_om" ng-disabled="!adding && !editing" ng-required="true" ng-change="updatePriceItem()" onkeydown="return onlyNumbers(event)" />
+								<label>Tipo de Precio</label>
+								<select class="form-select" id="tip_precio" ng-model="reng.co_precio" ng-disabled="!selectedArt">
+									<option ng-repeat="price in prices_filter" ng-click="setPrice(price)" value="{{ price.co_precio.trim() }}">{{ price.co_precio.trim() }}</option>
+								</select>
 							</div>
 						</div>
-						<div class="col-sm-12 col-md-3">
+						<div class="col-sm-12 col-md-4">
+							<div class="controls">
+								<label>Precio Unit. $USD</label>
+								<input type="text" class="form-control" id="price_usd" ng-model="reng.prec_vta_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" />
+							</div>
+						</div>
+					</div>
+					<div class="row">
+						<div class="col-sm-12 col-md-4">
 							<div class="controls">
 								<label>Total $USD (Sin IVA)</label>
 								<input type="text" class="form-control" id="total_usd" ng-model="reng.reng_neto_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" />
 							</div>
 						</div>
-						<div class="col-sm-12 col-md-3">
+						<div class="col-sm-12 col-md-4">
+							<div class="controls">
+								<label>Porc. Tasa</label>
+								<select class="form-select" id="tip_imp" ng-model="reng.tipo_imp">
+									<option ng-repeat="imp in imps" ng-click="setImp(imp)" value="{{ imp.tipo_imp.trim() }}">{{ imp.porc_tasa.toFixed(2) }}% ({{ imp.tipo_imp.trim() }})</option>
+								</select>
+							</div>
+						</div>
+						<div class="col-sm-12 col-md-4">
 							<div class="controls">
 								<label>Monto IVA $USD</label>
-								<input type="text" class="form-control" id="iva_usd" ng-model="reng.monto_imp_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="false" />
+								<input type="text" class="form-control" id="iva_usd" ng-model="reng.monto_imp_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" />
 							</div>
 						</div>
 					</div>
@@ -778,10 +796,17 @@
 	var currencies = @Html.Raw(Json.Encode(ViewBag.currencies));
 	var transports = @Html.Raw(Json.Encode(ViewBag.transports));
 	var alms = @Html.Raw(Json.Encode(ViewBag.alms));
-    var arts = @Html.Raw(ViewBag.arts);
+	var arts = @Html.Raw(ViewBag.arts);
+	var prices = @Html.Raw(Json.Encode(ViewBag.prices));
+	var imps = @Html.Raw(Json.Encode(ViewBag.imps));
+	var rate = parseFloat('@ViewBag.rate');
 
 	orders = parseItems(orders);
 	orders_orig = parseItems(orders_orig);
+
+	for (var item of prices) {
+		item.desde = new Date(parseInt(item.desde.substr(6)));
+	}
 
 	$(document).ready(function () {
 		$(".container-orders").removeAttr("style");
@@ -803,9 +828,13 @@
 		$scope.transports = transports;
 		$scope.alms = alms;
 		$scope.arts = arts;
+		$scope.prices = prices;
+		$scope.prices_filter = null;
+		$scope.imps = imps;
 		$scope.adding = false;
 		$scope.converted = false;
 		$scope.editItem = false;
+		$scope.selectedArt = false;
 
 		$scope.next = function () {
 			if ($scope.index == (orders.length - 1)) {
@@ -868,6 +897,8 @@
 				fec_emis: new Date(Date.now()),
 				fec_venc: new Date(Date.now()),
 				fec_reg: new Date(Date.now()),
+				co_mone: currencies.find(c => c.co_mone.includes("US")).co_mone.trim(),
+				tasa: rate,
 				status: 0,
 				estatus: "NO PROCESADA",
 				total_bruto: "0.00",
@@ -894,11 +925,14 @@
 				$scope.reng = {
 					co_art: "",
 					total_art: 1,
+					tipo_imp: "1",
+					porc_imp: 16.00,
 					prec_vta_om: "0.00",
 					reng_neto_om: "0.00",
 					monto_imp_om: "0.00"
 				};
 
+				$scope.selectedArt = false;
 				$("#art").val("");
 				$("#des_art").val("");
 				$("#alm").val("");
@@ -960,9 +994,10 @@
 
 			var cant = parseFloat($scope.reng.total_art ?? 0);
 			var price = parseFloat($scope.reng.prec_vta_om ?? 0);
+			var imp = parseFloat($scope.reng.porc_imp ?? 0) / 100;
 
 			$scope.reng.reng_neto_om = (cant * price).toFixed(3);
-			$scope.reng.monto_imp_om = ((cant * price) * 0.16).toFixed(3);
+			$scope.reng.monto_imp_om = ((cant * price) * imp).toFixed(3);
 		}
 
 		$scope.updateAmounts = async function (i, r, rengs, action) {
@@ -1000,11 +1035,11 @@
 					r.reng_num = $scope.order.saPedidoVentaReng.length + 1;
 					r.co_uni = "UND";
 					// r.co_alma = sucur;
-					r.co_precio = "001";
+					// r.co_precio = "001";
 				}
 
-				r.tipo_imp = parseFloat(r.monto_imp_om) > 0 ? 1.00 : 7;
-				r.porc_imp = parseFloat(r.monto_imp_om) > 0 ? 16.00 : 0;
+				// r.tipo_imp = parseFloat(r.monto_imp_om) > 0 ? 1 : 7;
+				// r.porc_imp = parseFloat(r.monto_imp_om) > 0 ? 16.00 : 0;
 				r.total_art = parseInt(r.total_art);
 				r.pendiente = parseInt(r.total_art);
 
@@ -1102,8 +1137,14 @@
 
 			let art = arts.find(a => a.co_art.trim() == value);
 			if (art != null) {
+				$scope.selectedArt = true;
+				$scope.prices_filter = $scope.getFilterPrices(art.co_art.trim());
+				$scope.setPrice($scope.prices_filter[0]);
 				$("#des_art").val(art.art_des);
 			} else {
+				$scope.selectedArt = false;
+				$scope.prices_filter = null;
+				$scope.reng.co_precio = null;
 				$("#des_art").val("");
 				if (del) {
 					$("#art").val("");
@@ -1124,6 +1165,39 @@
 					$scope.reng.co_alma = "";
 				}
 			}
+		}
+
+		$scope.getFilterPrices = function (art) {
+
+			var pricesArt = prices.filter(p => p.co_art.trim() == art && p.co_alma == null);
+			var filtered = pricesArt.reduce((acc, current) => {
+
+				var existing = acc.find(item => item.co_precio === current.co_precio);
+				if (existing) {
+					if (new Date(current.desde) > new Date(existing.desde)) {
+						acc[acc.indexOf(existing)] = current;
+					}
+				} else {
+					acc.push(current);
+				}
+
+				return acc;
+
+			}, []);
+
+			return filtered;
+		}
+
+		$scope.setPrice = function (obj_price) {
+			$scope.reng.co_precio = obj_price.co_precio.trim();
+			$scope.reng.prec_vta_om = obj_price.precioOm ? obj_price.monto : (obj_price.monto / ($scope.order.tasa ?? 1)).toFixed(3);
+			$scope.updatePriceItem();
+		}
+
+		$scope.setImp = function (obj_imp) {
+			$scope.reng.tipo_imp = obj_imp.tipo_imp.trim();
+			$scope.reng.porc_imp = obj_imp.porc_tasa;
+			$scope.updatePriceItem();
 		}
 
 		$scope.addOrder = function () {
@@ -1476,6 +1550,12 @@
 				case "client":
 					$("#des_client").val(searchCli(value));
 					search("modalClients");
+
+					let cli = clients.find(c => c.co_cli == value);
+					$("#seller").val(cli.co_ven);
+					$("#des_seller").val(searchVen(cli.co_ven));
+					$("#cond").val(cli.cond_pag);
+					$("#des_cond").val(searchCond(cli.cond_pag));
 					break;
 				case "cond":
 					$("#des_cond").val(searchCond(value));
@@ -1490,6 +1570,8 @@
 					search("modalAlms");
 					break;
 				case "art":
+					$("#art").change();
+					$("#art").keyup();
 					$("#des_art").val(searchArt(value));
 					search("modalArts");
 					break;
