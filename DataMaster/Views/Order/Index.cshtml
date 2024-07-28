@@ -52,7 +52,7 @@
     .btn-convert {
         display: flex;
         justify-content: center;
-        align-items: end;
+        align-items: flex-end;
     }
     .btn-convert button {
         width: 100%;
@@ -199,7 +199,7 @@
 					<div class="col-sm-12 col-md-3">
 						<div class="controls">
 							<label>Fec. Venc</label>
-							<input type="date" class="form-control" id="fec_emis" ng-model="order.fec_venc" ng-disabled="!adding" ng-required="true" />
+							<input type="date" class="form-control" id="fec_venc" ng-model="order.fec_venc" ng-disabled="!adding" ng-required="true" />
 						</div>
 					</div>
 				</div>
@@ -531,7 +531,7 @@
 						<div class="col-sm-12 col-md-4">
 							<div class="controls">
 								<label>Tipo de Precio</label>
-								<select class="form-select" id="tip_precio" ng-model="reng.co_precio" ng-disabled="!selectedArt">
+								<select class="form-select" id="tip_precio" ng-model="reng.co_precio" ng-change="receptPrice(reng.co_precio)" ng-disabled="!selectedArt">
 									<option ng-repeat="price in prices_filter" ng-click="setPrice(price)" value="{{ price.co_precio.trim() }}">{{ price.co_precio.trim() }}</option>
 								</select>
 							</div>
@@ -553,7 +553,7 @@
 						<div class="col-sm-12 col-md-4">
 							<div class="controls">
 								<label>Porc. Tasa</label>
-								<select class="form-select" id="tip_imp" ng-model="reng.tipo_imp">
+								<select class="form-select" id="tip_imp" ng-model="reng.tipo_imp" ng-change="receptImp(reng.tipo_imp)">
 									<option ng-repeat="imp in imps" ng-click="setImp(imp)" value="{{ imp.tipo_imp.trim() }}">{{ imp.porc_tasa.toFixed(2) }}% ({{ imp.tipo_imp.trim() }})</option>
 								</select>
 							</div>
@@ -1188,10 +1188,20 @@
 			return filtered;
 		}
 
+		$scope.receptPrice = function (value) {
+			var price = prices.find(p => p.co_precio.trim() == value);
+			$scope.setPrice(price);
+		}
+
 		$scope.setPrice = function (obj_price) {
 			$scope.reng.co_precio = obj_price.co_precio.trim();
 			$scope.reng.prec_vta_om = obj_price.precioOm ? obj_price.monto : (obj_price.monto / ($scope.order.tasa ?? 1)).toFixed(3);
 			$scope.updatePriceItem();
+		}
+
+		$scope.receptImp = function (value) {
+			var imp = imps.find(i => i.tipo_imp.trim() == value);
+			$scope.setImp(imp);
 		}
 
 		$scope.setImp = function (obj_imp) {
