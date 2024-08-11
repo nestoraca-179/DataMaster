@@ -1095,6 +1095,7 @@
 				$("#des_seller").val(searchVen($scope.order.co_ven));
 				$scope.order.co_cond = cli.cond_pag;
 				$("#des_cond").val(searchCond($scope.order.co_cond));
+				$scope.updateExpDate(conds.find(c => c.co_cond == cli.cond_pag) ?? conds[0]);
 
 			} else {
 				$("#des_client").val("");
@@ -1124,6 +1125,7 @@
 			let cond = conds.find(c => c.co_cond.trim() == value);
 			if (cond != null) {
 				$("#des_cond").val(cond.cond_des);
+				$scope.updateExpDate(cond);
 			} else {
 				$("#des_cond").val("");
 				if (del) {
@@ -1202,6 +1204,13 @@
 		$scope.receptImp = function (value) {
 			var imp = imps.find(i => i.tipo_imp.trim() == value);
 			$scope.setImp(imp);
+		}
+
+		$scope.updateExpDate = function (cond) {
+			var today = new Date(Date.now());
+			$scope.order.fec_venc = today;
+			$scope.order.fec_venc.setDate(today.getDate() + cond.dias_cred);
+			$("#fec_venc").val($scope.order.fec_venc.toISOString().substr(0, 10));
 		}
 
 		$scope.setImp = function (obj_imp) {
@@ -1566,10 +1575,20 @@
 					$("#des_seller").val(searchVen(cli.co_ven));
 					$("#cond").val(cli.cond_pag);
 					$("#des_cond").val(searchCond(cli.cond_pag));
+
+					var cond = conds.find(c => c.co_cond == cli.cond_pag);
+					var today = new Date(Date.now());
+					today.setDate(today.getDate() + cond.dias_cred);
+					$("#fec_venc").val(today.toISOString().substr(0, 10));
 					break;
 				case "cond":
 					$("#des_cond").val(searchCond(value));
 					search("modalConds");
+
+					var cond = conds.find(c => c.co_cond == value);
+					var today = new Date(Date.now());
+					today.setDate(today.getDate() + cond.dias_cred);
+					$("#fec_venc").val(today.toISOString().substr(0, 10));
 					break;
 				case "seller":
 					$("#des_seller").val(searchVen(value));
