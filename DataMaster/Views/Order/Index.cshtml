@@ -811,7 +811,9 @@
 	$(document).ready(function () {
 		$(".container-orders").removeAttr("style");
 		$(".panel-loading").css("display", "none");
-		$(".fas.fa-bars").trigger("click");
+		if (screen.availWidth > 767) {
+			$(".fas.fa-bars").first().trigger("click");
+		}
     });
 
     app.controller("controller", function ($scope, $http) {
