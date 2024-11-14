@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
 using System.Web.Http;
 using DataMaster.Models;
@@ -8,6 +9,9 @@ namespace DataMaster.Controllers
 {
     public class DataMasterApiController : ApiController
     {
+		// UTILS
+		private readonly UtilsController utils = new UtilsController();
+
 		[HttpGet]
 		[Route("api/DataMasterApi/GetStock/{art}/{alm}")]
 		public DataMasterResponse GetStock(string art, string alm)
@@ -178,6 +182,143 @@ namespace DataMaster.Controllers
 				response.Status = "ERROR";
 				response.Message = ex.Message;
 				IncidentController.CreateIncident("ERROR ELIMINANDO USUARIO " + id.ToString(), ex);
+			}
+
+			return response;
+		}
+
+		// ESTADISTICAS DASHBOARD ADMIN
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetStatsInvoices/{fec_d}/{fec_h}")]
+		public DataMasterResponse GetStatsInvoices(string fec_d, string fec_h)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				DateTime fecha_d = utils.FormatDate(fec_d);
+				DateTime fecha_h = utils.FormatDate(fec_h);
+				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+
+				object stats = new Invoice().GetStatsInvoices(fecha_d, fecha_h, sucur);
+
+				response.Status = "OK";
+				response.Result = stats;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR OBTENIENDO ESTADISTICAS DE VENTAS", ex);
+			}
+
+			return response;
+		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetMostSaleProducts/{fec_d}/{fec_h}/{number}/{suc}")]
+		public DataMasterResponse GetMostSaleProducts(string fec_d, string fec_h, int number, int suc)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				DateTime fecha_d = utils.FormatDate(fec_d);
+				DateTime fecha_h = utils.FormatDate(fec_h);
+				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+
+				List<saArticulo> arts = new Product().GetMostProducts(fecha_d, fecha_h, number, true, suc == 1 ? sucur : null);
+
+				response.Status = "OK";
+				response.Result = arts;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR OBTENIENDO PRODUCTOS MAS VENDIDOS", ex);
+			}
+
+			return response;
+		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetMostPurchaseProducts/{fec_d}/{fec_h}/{number}/{suc}")]
+		public DataMasterResponse GetMostPurchaseProducts(string fec_d, string fec_h, int number, int suc)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				DateTime fecha_d = utils.FormatDate(fec_d);
+				DateTime fecha_h = utils.FormatDate(fec_h);
+				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+
+				List<saArticulo> arts = new Product().GetMostProducts(fecha_d, fecha_h, number, false, suc == 1 ? sucur : null);
+
+				response.Status = "OK";
+				response.Result = arts;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR OBTENIENDO PRODUCTOS MAS COMPRADOS", ex);
+			}
+
+			return response;
+		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetMostActiveClients/{fec_d}/{fec_h}/{number}/{suc}")]
+		public DataMasterResponse GetMostActiveClients(string fec_d, string fec_h, int number, int suc)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				DateTime fecha_d = utils.FormatDate(fec_d);
+				DateTime fecha_h = utils.FormatDate(fec_h);
+				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+
+				List<saCliente> clients = new Client().GetMostActiveClients(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
+
+				response.Status = "OK";
+				response.Result = clients;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR OBTENIENDO CLIENTES MAS ACTIVOS", ex);
+			}
+
+			return response;
+		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetMostActiveSuppliers/{fec_d}/{fec_h}/{number}/{suc}")]
+		public DataMasterResponse GetMostActiveSuppliers(string fec_d, string fec_h, int number, int suc)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				DateTime fecha_d = utils.FormatDate(fec_d);
+				DateTime fecha_h = utils.FormatDate(fec_h);
+				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+
+				List<saProveedor> suppliers = new Supplier().GetMostActiveSuppliers(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
+
+				response.Status = "OK";
+				response.Result = suppliers;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR OBTENIENDO PROVEEDORES MAS ACTIVOS", ex);
 			}
 
 			return response;

@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using DataMaster.Controllers;
+using System.Globalization;
 
 namespace DataMaster.Models
 {
@@ -39,5 +40,65 @@ namespace DataMaster.Models
         {
 			return db.saCliente.AsNoTracking().ToList();
         }
-    }
+
+		public List<saCliente> GetMostActiveClients(DateTime fec_d, DateTime fec_h, int number, string sucur)
+		{
+			List<saCliente> clientes = new List<saCliente>();
+
+			var sp = db.RepClienteMasVenta(fec_d, fec_h, null, null, null, null, null, null, null, number, sucur, null, null, null);
+			var enumerator = sp.GetEnumerator();
+
+			while (enumerator.MoveNext())
+			{
+				saCliente cliente = new saCliente();
+
+				cliente.co_cli = enumerator.Current.co_cli.Trim();
+				cliente.cli_des = enumerator.Current.cli_des.Trim();
+				cliente.campo1 = Convert.ToDouble(enumerator.Current.Venta).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
+				cliente.campo2 = Math.Round(Convert.ToDouble((enumerator.Current.Venta * 100) / enumerator.Current.Venta_total), 2).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
+
+				clientes.Add(cliente);
+			}
+
+			return clientes;
+		}
+
+		public List<saCliente> GetMostMorousClients(int number)
+		{
+			List<saCliente> clients = new List<saCliente>();
+
+			DateTime fec_h = DateTime.Now;
+			DateTime fec_d = fec_h.AddDays(-(fec_h.Day - 1));
+
+			var sp = db.RepEstadoCuentaCli(fec_d, fec_h, null, null, null, null, null, null, null, null, null, null, null, null, null);
+			var enumerator = sp.GetEnumerator();
+
+			while (enumerator.MoveNext())
+			{
+				saCliente client = new saCliente();
+
+				client.co_cli = enumerator.Current.co_prov;
+				client.cli_des = enumerator.Current.prov_des;
+				client.campo1 = ((enumerator.Current.tot_debe ?? 0) - (enumerator.Current.tot_haber ?? 0)).ToString();
+
+				clients.Add(client);
+			}
+
+			clients = (from c in clients
+					   group c.campo1 by (c.co_cli, c.cli_des) into g
+					   select new saCliente
+					   {
+						   co_cli = g.Key.co_cli,
+						   cli_des = g.Key.co_cli + " - " + g.Key.cli_des,
+						   campo1 = Math.Round(g.Select(x => double.Parse(x)).Sum(), 2).ToString()
+
+					   }).OrderByDescending(x => double.Parse(x.campo1)).ToList();
+
+			if (clients.Count > number)
+				clients.RemoveRange(number, clients.Count - number);
+
+			return clients;
+		}
+
+	}
 }

@@ -1,21 +1,632 @@
 ﻿@{
-    ViewBag.Title = "Dashboard";
+	ViewBag.Title = "Dashboard";
 }
 <style>
-	.container-dash {
-		height: 100%;
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		position: relative;
-	}
-	.container-dash h2 {
-		position: absolute;
-		top: 0;
-		left: 10px;
-	}
+text, tspan {
+	font-family: 'Raleway', sans-serif !important;
+}
+.container-dash {
+	flex: auto;
+	height: 100%;
+	background: #f4f4f8;
+	overflow-y: auto;
+	position: relative;
+	padding: 0;
+}
+.container-dash h2 {
+	position: absolute;
+	top: 0;
+	left: 10px;
+}
+.fa-sync-alt {
+    font-size: 30px !important;
+}
+.highcharts-figure, .highcharts-data-table table {
+    min-width: 320px;
+    max-width: 800px;
+    margin: 1em auto;
+}
+.highcharts-data-table table {
+    font-family: Verdana, sans-serif;
+    border-collapse: collapse;
+    border: 1px solid #EBEBEB;
+    margin: 10px auto;
+    text-align: center;
+    width: 100%;
+    max-width: 500px;
+}
+.highcharts-data-table caption {
+    padding: 1em 0;
+    font-size: 1.2em;
+    color: #555;
+}
+.highcharts-data-table th {
+    font-weight: 600;
+    padding: 0.5em;
+}
+.highcharts-data-table td, .highcharts-data-table th, .highcharts-data-table caption {
+    padding: 0.5em;
+}
+.highcharts-data-table thead tr, .highcharts-data-table tr:nth-child(even) {
+    background: #f8f8f8;
+}
+.highcharts-data-table tr:hover {
+    background: #f1f7ff;
+}
+.highcharts-credits {
+    display: none;
+}
+.row.mt-3 {
+    /*align-items: center;*/
+}
+.table.borderless {
+    border-collapse: collapse;
+    border-radius: 1em;
+    overflow: hidden;
+}
+.table.borderless thead {
+    background: #c0392b;
+    color: #FFF;
+}
+.table.borderless td {
+    border: none;
+    padding: 10px;
+    font-size: 14px;
+}
+.table.borderless th {
+    border-top: none;
+    padding: 10px;
+}
+#cont-msp, #cont-mpp, #cont-mac, #cont-mas {
+    height: 100%;
+    position: relative;
+    min-height: 40px;
+}
+#cont-mac {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    padding: 0 10px;
+}
+h5.no-data {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+@@media (max-width: 575px) {
+    .table.borderless th {
+        font-size: 13px;
+    }
+    .table.borderless td {
+        font-size: 12px;
+    }
+}
+@@media (min-width: 576px) {
+    .col-stat {
+        padding: 5px;
+    }
+    .col-graph {
+        padding: 5px /*15px*/;
+    }
+}
+@@media (max-width: 767px) {
+    .direct.shadow-tm {
+        margin: 5px 0;
+    }
+    .col-graph {
+        margin: 5px 0;
+    }
+    .first-item {
+        display: none;
+    }
+}
+@@media (min-width: 768px) and (max-width: 991px) {
+    .col-stat {
+        padding: 0;
+    }
+    .direct {
+        width: 100%;
+        max-width: 100%;
+        margin: 5px 0;
+    }
+    .col-stat:nth-child(odd) {
+        padding-right: 5px;
+    }
+    .col-stat:nth-child(even) {
+        padding-left: 5px;
+    }
+    .col-graph {
+        margin: 5px 0;
+    }
+}
+@@media (max-width: 1199px) {
+    h5.no-data {
+        position: relative;
+        padding: 20px 0;
+    }
+}
+@@media (min-width: 992px) and (max-width: 1399px) {
+    .col-graph {
+        margin: 5px 0;
+    }
+}
 </style>
-<div class="container-fluid container-dash">
-	<h2 class="m-2">Bienvenido!</h2>
-	@*<img src="/images/profit.png" alt="profit" width="250" />*@
+<div class="container-fluid container-dash" ng-app="DashboardAdmin" ng-controller="controller">
+	<!-- Start Rounded switch -->
+	<div class="d-flex justify-content-end px-4 pt-3">
+		<!--<div>
+			<input type="date" id="fec_d" ng-disabled="true" ng-readonly="true" ng-model="fec_d" />
+			<input type="date" id="fec_h" ng-disabled="true" ng-readonly="true" ng-model="fec_h" />
+		</div>-->
+		<div class="d-flex">
+			<label class="d-flex align-items-center mx-3">Mostrar info. Sucursal actual</label>
+			<label class="switch">
+				<input type="checkbox" ng-disabled="!show_all" ng-model="bySucur" ng-change="changeSuc(bySucur)">
+				<span class="slider round"></span>
+			</label>
+		</div>
+	</div>
+	<!-- End Rounded switch -->
+	<hr />
+	<div class="row justify-content-between" style="margin: 0;">
+		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
+			<div class="direct shadow-tm" style="border-bottom: solid 5px #1565C0;">
+				<h5>Facturas de Venta del Mes</h5>
+				<span ng-show="stats" class="stat-number">{{ stats.totalCountSale }}</span>
+				<i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
+				<i class="fas fa-file-invoice" style="color: #1565C0;"></i>
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
+			<div class="direct shadow-tm" style="border-bottom: solid 5px #2E7D32;">
+				<h5>Total Ventas del Mes</h5>
+				<span ng-show="stats" class="stat-number">{{ stats.totalAmountSale.toLocaleString('es-ES') }}</span>
+				<i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
+				<i style="color: #2E7D32; font-size: 28px; font-weight: bold; font-style: normal;">Bs. D</i>
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
+			<div class="direct shadow-tm" style="border-bottom: solid 5px #EF6C00;">
+				<h5>Facturas de Compra del Mes</h5>
+				<span ng-show="stats" class="stat-number">{{ stats.totalCountBuy }}</span>
+				<i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
+				<i class="fas fa-file-invoice" style="color: #EF6C00;"></i>
+			</div>
+		</div>
+		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
+			<div class="direct shadow-tm" style="border-bottom: solid 5px #D84315;">
+				<h5>Total Compras del Mes</h5>
+				<span ng-show="stats" class="stat-number">{{ stats.totalAmountBuy.toLocaleString('es-ES') }}</span>
+				<i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
+				<i style="color: #D84315; font-size: 28px; font-weight: bold; font-style: normal;">Bs. D</i>
+			</div>
+		</div>
+	</div>
+	<div class="row mt-3" style="margin: 0;">
+		<div class="col-md-12 col-xl-6 col-xxl-8 col-graph">
+			<div class="container-chart shadow-tm">
+				<i ng-if="!msp || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+				<div id="cont-msp" style="display: none;">
+					<figure ng-if="msp.length > 0" class="highcharts-figure">
+						<div id="container-msp"></div>
+					</figure>
+					<h5 ng-if="msp.length == 0" class="text-center no-data">Servicios más vendidos (Sin datos)</h5>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12 col-xl-6 col-xxl-4 col-graph">
+			<div class="container-chart shadow-tm">
+				<i ng-if="!mpp || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+				<div id="cont-mpp" style="display: none;">
+					<figure ng-if="mpp.length > 0" class="highcharts-figure">
+						<div id="container-mpp"></div>
+					</figure>
+					<h5 ng-if="mpp.length == 0" class="text-center no-data">Servicios más comprados (Sin datos)</h5>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row mt-3" style="margin: 0; align-items: stretch;">
+		<div class="col-md-12 col-xl-7 col-graph">
+			<div class="container-chart shadow-tm pl-3 pr-3 d-flex" style="height: 100%;">
+				<i ng-if="!mac || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+				<div id="cont-mac" style="display: none;">
+					<h5 ng-if="mac.length > 0" class="text-center mt-3 mb-3">Clientes más activos</h5>
+					<table ng-if="mac.length > 0" class="table table-hover borderless">
+						<thead>
+							<tr>
+								<th class="first-item"></th>
+								<th>Cliente</th>
+								<th>Total</th>
+								<th style="text-align: right;">Porcentaje</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr ng-repeat="client in mac">
+								<td class="first-item" style="vertical-align: middle;"><i class="fas fa-user-alt" style="color: #5e5d5d;"></i></td>
+								<td>{{ client.cli_des }}</td>
+								<td>{{ client.campo1 }}</td>
+								<td style="text-align: right;">{{ client.campo2 }} %</td>
+							</tr>
+						</tbody>
+					</table>
+					<h5 ng-if="mac.length == 0" class="text-center no-data">Clientes más activos (Sin datos)</h5>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-12 col-xl-5 col-graph">
+			<div class="container-chart shadow-tm">
+				<i ng-if="!mas || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+				<div id="cont-mas" style="display: none;">
+					<figure ng-if="mas.length > 0" class="highcharts-figure">
+						<div id="container-mas"></div>
+					</figure>
+					<h5 ng-if="mas.length == 0" class="text-center no-data">Proveedores más activos (Sin datos)</h5>
+				</div>
+			</div>
+		</div>
+	</div>
+	<hr />
 </div>
+<script src="~/Scripts/angular-min.js"></script>
+<script>
+	var app = angular.module("DashboardAdmin", []);
+	var graphs = ['msp', 'mpp', 'mac', 'mas'];
+	var responsive = screen.availWidth <= 767 ? true : false;
+	var capitalize = str => str.substring(0, 1).toLocaleUpperCase() + str.substring(1).toLocaleLowerCase();
+
+	var fec_d = new Date(), fec_h = new Date();
+	fec_d.setDate(1);
+	fec_d.setHours(0);
+	fec_d.setMinutes(0);
+	fec_d.setSeconds(0);
+
+	var fecha_d = fec_d.toLocaleDateString().replaceAll("/", "-");
+	var fecha_h = fec_h.toLocaleDateString().replaceAll("/", "-");
+
+	app.controller("controller", function ($scope, $http) {
+
+		$scope.bySucur = false;
+		$scope.show_all = false;
+
+		// ESTADISTICAS
+		$http.get(`../../api/DataMasterApi/GetStatsInvoices/${fecha_d}/${fecha_h}`)
+			.then(function (response) {
+
+				$scope.allStats = response.data.Result;
+				$scope.stats = $scope.allStats.all;
+				console.log(response.data);
+				$("span.stat-number").css('opacity', '1');
+
+			}, function (error) { console.log("Ha ocurrido un error (STATS) ->"); console.log(error); });
+
+		// SERVICIOS MAS VENDIDOS
+		$http.get(`../../api/DataMasterApi/GetMostSaleProducts/${fecha_d}/${fecha_h}/5/0`)
+			.then(function (response) {
+
+				$scope.all_msp = response.data.Result;
+				$scope.msp = $scope.all_msp;
+				$scope.validate('msp');
+
+			}, function (error) { console.log("Ha ocurrido un error (MSP) ->"); console.log(error); });
+
+		// SUCURSAL
+		$http.get(`../../api/DataMasterApi/GetMostSaleProducts/${fecha_d}/${fecha_h}/5/1`)
+			.then(function (response) {
+
+				$scope.suc_msp = response.data.Result;
+
+			}, function (error) { console.log("Ha ocurrido un error (MSP-S) ->"); console.log(error); });
+
+		// SERVICIOS MAS COMPRADOS
+		$http.get(`../../api/DataMasterApi/GetMostPurchaseProducts/${fecha_d}/${fecha_h}/5/0`)
+			.then(function (response) {
+
+				$scope.all_mpp = response.data.Result;
+				$scope.mpp = $scope.all_mpp;
+				$scope.validate('mpp');
+
+			}, function (error) { console.log("Ha ocurrido un error (MPP) ->"); console.log(error); });
+
+		// SUCURSAL
+		$http.get(`../../api/DataMasterApi/GetMostPurchaseProducts/${fecha_d}/${fecha_h}/5/1`)
+			.then(function (response) {
+
+				$scope.suc_mpp = response.data.Result;
+
+			}, function (error) { console.log("Ha ocurrido un error (MPP) ->"); console.log(error); });
+
+		// CLIENTES CON MAS VENTAS
+		$http.get(`../../api/DataMasterApi/GetMostActiveClients/${fecha_d}/${fecha_h}/7/0`)
+			.then(function (response) {
+
+				$scope.all_mac = response.data.Result;
+				$scope.mac = $scope.all_mac;
+				$scope.validate('mac');
+
+			}, function (error) { console.log("Ha ocurrido un error (MAC) ->"); console.log(error); });
+
+		// SUCURSAL
+		$http.get(`../../api/DataMasterApi/GetMostActiveClients/${fecha_d}/${fecha_h}/7/1`)
+			.then(function (response) {
+
+				$scope.suc_mac = response.data.Result;
+
+			}, function (error) { console.log("Ha ocurrido un error (MAC) ->"); console.log(error); });
+
+		// PROVEEDORES CON MAS COMPRAS
+		$http.get(`../../api/DataMasterApi/GetMostActiveSuppliers/${fecha_d}/${fecha_h}/5/0`)
+			.then(function (response) {
+
+				$scope.all_mas = response.data.Result;
+				$scope.mas = $scope.all_mas;
+				$scope.validate('mas');
+
+			}, function (error) { console.log("Ha ocurrido un error (MAS) ->"); console.log(error); });
+
+		// SUCURSAL
+		$http.get(`../../api/DataMasterApi/GetMostActiveSuppliers/${fecha_d}/${fecha_h}/5/1`)
+			.then(function (response) {
+
+				$scope.suc_mas = response.data.Result;
+
+			}, function (error) { console.log("Ha ocurrido un error (MAS) ->"); console.log(error); });
+
+		$scope.validate = function (item) {
+
+			graphs = graphs.filter(x => x != item);
+
+			if (graphs.length == 0) {
+
+				$("#cont-msp").removeAttr("style");
+				$("#cont-mpp").removeAttr("style");
+				$("#cont-mas").removeAttr("style");
+				$scope.show_all = true;
+
+				setTimeout(function () {
+
+					initMSP($scope.msp);
+					initMPP($scope.mpp);
+					$("#cont-mac").removeAttr("style");
+					initMAS($scope.mas);
+
+					if (responsive) {
+						$("table.borderless").addClass("table-sm");
+						/*$("table.borderless th").first().remove();
+						$("table.borderless tr").each(function () {
+							$(this).find("td").first().remove();
+						});*/
+					}
+
+				}, 0.05);
+			}
+		}
+
+		$scope.changeSuc = function (value) {
+
+			if (value) {
+				$scope.stats = $scope.allStats.suc;
+				$scope.msp = $scope.suc_msp;
+				$scope.mpp = $scope.suc_mpp;
+				$scope.mac = $scope.suc_mac;
+				$scope.mas = $scope.suc_mas;
+			} else {
+				$scope.stats = $scope.allStats.all;
+				$scope.msp = $scope.all_msp;
+				$scope.mpp = $scope.all_mpp;
+				$scope.mac = $scope.all_mac;
+				$scope.mas = $scope.all_mas;
+			}
+
+			setTimeout(function () {
+				initMSP($scope.msp);
+				initMPP($scope.mpp);
+				initMAS($scope.mas);
+			}, 0.05);
+		}
+	});
+
+</script>
+@* GRAFICA ARTICULOS VENDIDOS *@
+<script>
+
+	function initMSP(msp) {
+
+		var productos = msp;
+		var objects = productos.map(function (x) {
+			return {
+				name: capitalize(x.art_des),
+				y: parseFloat(x.campo1)
+			};
+		}).reverse();
+
+		Highcharts.setOptions({
+			lang: {
+				decimalPoint: ",",
+				thousandsSep: "."
+			}
+		});
+
+		if (objects.length > 0) {
+			Highcharts.chart('container-msp', {
+				chart: {
+					type: 'column'
+				},
+				colors: ['#C0392B', '#971b0f'],
+				title: {
+					text: 'Servicios más vendidos'
+				},
+				accessibility: {
+					announceNewData: {
+						enabled: true
+					}
+				},
+				exporting: {
+					enabled: false,
+				},
+				xAxis: {
+					type: 'category',
+					labels: {
+						format: '<b style="font-family: \'Raleway\', sans-serif;">{value}</b>'
+					}
+				},
+				yAxis: {
+					title: {
+						text: responsive ? null : '<b style="font-family: \'Raleway\', sans-serif;">Cantidad</b>'
+					},
+				},
+				legend: {
+					enabled: false
+				},
+				plotOptions: {
+					series: {
+						borderWidth: 0,
+						dataLabels: {
+							enabled: true,
+							format: '{point.y} Unds'
+							// format: '{point.y:,.2f} Unds'
+						},
+					},
+				},
+				tooltip: {
+					pointFormat: '<span style="color:{point.color}">Cantidad</span>: <b>{point.y}</b> Unds<br/>'
+					// pointFormat: '<span style="color:{point.color}">Cantidad</span>: <b>{point.y:,.2f}</b> Unds<br/>'
+				},
+				series: [{
+					name: 'Cantidad',
+					colorByPoint: true,
+					data: objects,
+				}]
+			});
+		}
+	}
+
+</script>
+@* GRAFICA ARTICULOS COMPRADOS *@
+<script>
+
+	function initMPP(mpp) {
+
+		var productos = mpp;
+		var objects = productos.map(function (x) {
+			return {
+				name: capitalize(x.art_des),
+				y: parseFloat(x.campo1)
+			};
+		});
+
+		Highcharts.setOptions({
+			lang: {
+				decimalPoint: ",",
+				thousandsSep: "."
+			}
+		});
+
+		if (objects.length > 0) {
+			Highcharts.chart('container-mpp', {
+				chart: {
+					plotBackgroundColor: null,
+					plotBorderWidth: null,
+					plotShadow: false,
+					type: 'pie'
+				},
+				colors: ['#B81E0D', '#E32510', '#96190B', '#741308', '#520D06'],
+				title: {
+					text: 'Servicios más comprados'
+				},
+				tooltip: {
+					pointFormat: '{series.name}: <b>{point.y:,.2f} Unds</b>'
+				},
+				accessibility: {
+					point: {
+						valueSuffix: '%'
+					}
+				},
+				exporting: {
+					enabled: false,
+				},
+				plotOptions: {
+					pie: {
+						allowPointSelect: true,
+						cursor: 'pointer',
+						dataLabels: {
+							enabled: true,
+							format: '<span>{point.percentage:.2f} %</span>',
+							borderWidth: 0,
+							distance: -25
+						},
+						showInLegend: true
+					}
+				},
+				series: [{
+					name: 'Cantidad',
+					colorByPoint: true,
+					data: objects
+				}]
+			});
+		}
+	}
+
+</script>
+@* GRAFICA PROVEEDORES COMPRAS *@
+<script>
+
+	function initMAS(mas) {
+
+		var proveedores = mas;
+		var objects = proveedores.map(function (x) {
+			return [
+				capitalize(x.prov_des),
+				parseFloat(x.campo1)
+			];
+		});
+
+		Highcharts.setOptions({
+			lang: {
+				decimalPoint: ",",
+				thousandsSep: "."
+			}
+		});
+
+		if (objects.length > 0) {
+			Highcharts.chart('container-mas', {
+				chart: {
+					type: 'pie',
+					options3d: {
+						enabled: true,
+						alpha: 45
+					}
+				},
+				colors: ['#1565C0', '#2E7D32', '#EF6C00', '#D84315', '#6610F2'],
+				title: {
+					text: 'Proveedores más activos'
+				},
+				exporting: {
+					enabled: false,
+				},
+				plotOptions: {
+					pie: {
+						innerSize: 100,
+						depth: 45,
+						dataLabels: {
+							enabled: true,
+							format: '<span>{point.percentage:.2f} %</span>'
+						},
+						showInLegend: true
+					}
+				},
+				series: [{
+					name: 'Monto Total',
+					data: objects
+				}]
+			});
+		}
+	}
+
+</script>
