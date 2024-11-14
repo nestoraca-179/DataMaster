@@ -95,7 +95,7 @@ namespace DataMaster.Controllers
 			
 			ViewBag.usuario = (Session["USER"] as Usuario);
 			ViewBag.empresa = Session["NAME_CONN"];
-			ViewBag.sucur = (Session["BRANCH"] as saSucursal).sucur_des;
+			ViewBag.sucur = (Session["BRANCH"] as saSucursal)?.sucur_des;
 
 			return View();
 		}
