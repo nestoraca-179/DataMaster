@@ -797,7 +797,8 @@
 	var transports = @Html.Raw(Json.Encode(ViewBag.transports));
 	var alms = @Html.Raw(Json.Encode(ViewBag.alms));
 	var arts = @Html.Raw(ViewBag.arts);
-	var prices = @Html.Raw(Json.Encode(ViewBag.prices));
+	var prices = @Html.Raw(ViewBag.prices);
+	@*var prices = @Html.Raw(Json.Encode(ViewBag.prices));*@
 	var imps = @Html.Raw(Json.Encode(ViewBag.imps));
 	var rate = parseFloat('@ViewBag.rate');
 

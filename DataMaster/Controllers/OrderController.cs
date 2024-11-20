@@ -15,7 +15,8 @@ namespace DataMaster.Controllers
 				return RedirectToAction("Logout", "Account", new { msg = "Debes iniciar sesión" });
 
 			JavaScriptSerializer serializer = new JavaScriptSerializer();
-			serializer.MaxJsonLength = 50000000;
+			serializer.MaxJsonLength = 500000000;
+			// serializer.MaxJsonLength = 50000000;
 
 			saSucursal s = (Session["BRANCH"] as saSucursal);
 			ViewBag.usuario = (Session["USER"] as Usuario);
@@ -57,7 +58,7 @@ namespace DataMaster.Controllers
 			ViewBag.currencies = Session["CURRENCIES"];
 			ViewBag.transports = Session["TRANSPORTS"];
 			ViewBag.alms = Session["ALMS"];
-			ViewBag.prices = Session["PRICES"];
+			ViewBag.prices = serializer.Serialize(Session["PRICES"]);
 			ViewBag.imps = Session["IMPS"];
 			ViewBag.rate = new Price().GetRateUSD().ToString().Replace(",", ".");
 			ViewBag.obj_client = serializer.Serialize(ViewBag.clients);
