@@ -382,7 +382,7 @@ input:checked + .slider:before {
 }
 .container-list .table td, .table th {
     padding: 5px;
-    font-size: 14px;
+    font-size: 11px;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;

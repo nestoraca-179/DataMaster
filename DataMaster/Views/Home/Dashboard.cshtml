@@ -159,12 +159,15 @@ h5.no-data {
 </style>
 <div class="container-fluid container-dash" ng-app="DashboardAdmin" ng-controller="controller">
 	<!-- Start Rounded switch -->
-	<div ng-if="sucur != ''" class="d-flex justify-content-end px-4 pt-3">
+	<div class="d-flex justify-content-between px-4 pt-3">
 		<!--<div>
 			<input type="date" id="fec_d" ng-disabled="true" ng-readonly="true" ng-model="fec_d" />
 			<input type="date" id="fec_h" ng-disabled="true" ng-readonly="true" ng-model="fec_h" />
 		</div>-->
-		<div class="d-flex">
+		<div class="d-flex align-items-center">
+			<p class="m-0">Tasa del dia {{ getDate() }}: <b>{{ rate.toFixed(2).toLocaleString('es-ES') }} BSD/USD</b></p>
+		</div>
+		<div ng-if="sucur != ''" class="d-flex">
 			<label class="d-flex align-items-center mx-3">Mostrar info. Sucursal actual</label>
 			<label class="switch">
 				<input type="checkbox" ng-disabled="!show_all" ng-model="bySucur" ng-change="changeSuc(bySucur)">
@@ -173,8 +176,8 @@ h5.no-data {
 		</div>
 	</div>
 	<!-- End Rounded switch -->
-	<hr />
-	<div class="row justify-content-between" style="margin: 0;">
+	<hr class="mx-3" />
+	<div class="row justify-content-between mx-2" style="margin: 0;">
 		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
 			<div class="direct shadow-tm" style="border-bottom: solid 5px #1565C0;">
 				<h5>Facturas de Venta del Mes</h5>
@@ -186,9 +189,11 @@ h5.no-data {
 		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
 			<div class="direct shadow-tm" style="border-bottom: solid 5px #2E7D32;">
 				<h5>Total Ventas del Mes</h5>
-				<span ng-show="stats" class="stat-number">{{ stats.totalAmountSale.toLocaleString('es-ES') }}</span>
+				@*<span ng-show="stats" class="stat-number">{{ stats.totalAmountSale.toLocaleString('es-ES') }}</span>*@
+				<span ng-show="stats" class="stat-number">{{ formatNumber(stats.totalAmountSale / rate) }}$</span>
 				<i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
-				<i style="color: #2E7D32; font-size: 28px; font-weight: bold; font-style: normal;">Bs. D</i>
+				<i class="fa-solid fa-coins" style="color: #2E7D32;"></i>
+				@*<i style="color: #2E7D32; font-size: 28px; font-weight: bold; font-style: normal;"></i>*@
 			</div>
 		</div>
 		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
@@ -202,13 +207,15 @@ h5.no-data {
 		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
 			<div class="direct shadow-tm" style="border-bottom: solid 5px #D84315;">
 				<h5>Total Compras del Mes</h5>
-				<span ng-show="stats" class="stat-number">{{ stats.totalAmountBuy.toLocaleString('es-ES') }}</span>
+				@*<span ng-show="stats" class="stat-number">{{ stats.totalAmountBuy.toLocaleString('es-ES') }}$</span>*@
+				<span ng-show="stats" class="stat-number">{{ formatNumber(stats.totalAmountBuy / rate) }}$</span>
 				<i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
-				<i style="color: #D84315; font-size: 28px; font-weight: bold; font-style: normal;">Bs. D</i>
+				<i class="fa-solid fa-coins" style="color: #D84315;"></i>
+				@*<i style="color: #D84315; font-size: 28px; font-weight: bold; font-style: normal;"></i>*@
 			</div>
 		</div>
 	</div>
-	<div class="row mt-3" style="margin: 0;">
+	<div class="row mt-2 mx-2" style="margin: 0;">
 		<div class="col-md-12 col-xl-6 col-xxl-8 col-graph">
 			<div class="container-chart shadow-tm">
 				<i ng-if="!msp || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
@@ -232,7 +239,7 @@ h5.no-data {
 			</div>
 		</div>
 	</div>
-	<div class="row mt-3" style="margin: 0; align-items: stretch;">
+	<div class="row mt-1 mx-2" style="margin: 0; align-items: stretch;">
 		<div class="col-md-12 col-xl-7 col-graph">
 			<div class="container-chart shadow-tm pl-3 pr-3 d-flex" style="height: 100%;">
 				<i ng-if="!mac || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
@@ -272,7 +279,7 @@ h5.no-data {
 			</div>
 		</div>
 	</div>
-	<hr />
+	<hr class="mx-3" />
 </div>
 <script src="~/Scripts/angular-min.js"></script>
 <script>
@@ -280,6 +287,7 @@ h5.no-data {
 	var graphs = ['msp', 'mpp', 'mac', 'mas'];
 	var responsive = screen.availWidth <= 767 ? true : false;
 	var sucur = '@ViewBag.sucur';
+	var rate = parseFloat('@ViewBag.rate');
 	var capitalize = str => str.substring(0, 1).toLocaleUpperCase() + str.substring(1).toLocaleLowerCase();
 
 	var fec_d = new Date(), fec_h = new Date();
@@ -296,6 +304,7 @@ h5.no-data {
 		$scope.bySucur = false;
 		$scope.show_all = false;
 		$scope.sucur = sucur;
+		$scope.rate = rate;
 
 		// ESTADISTICAS
 		$http.get(`../../api/DataMasterApi/GetStatsInvoices/${fecha_d}/${fecha_h}`)
@@ -438,6 +447,32 @@ h5.no-data {
 				initMPP($scope.mpp);
 				initMAS($scope.mas);
 			}, 0.05);
+		}
+
+		$scope.getDate = function () {
+			// Obtener la fecha actual
+			const fechaActual = new Date();
+
+			// Extraer el día, el mes y el año
+			const dia = String(fechaActual.getDate()).padStart(2, '0'); // Obtener el día y asegurarse de que tenga 2 dígitos
+			const mes = String(fechaActual.getMonth() + 1).padStart(2, '0'); // Obtener el mes (0-11) y añadir 1, asegurando 2 dígitos
+			const anio = fechaActual.getFullYear(); // Obtener el año
+
+			// Formatear la fecha en DD/MM/YYYY
+			const fechaFormateada = `${dia}/${mes}/${anio}`;
+
+			return fechaFormateada; // Salida: "20/11/2024" (o la fecha actual)
+		}
+
+		$scope.formatNumber = function (number) {
+			// Crear un formateador para el formato deseado
+			const formatter = new Intl.NumberFormat('en-US', {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			});
+
+			// Formatear el número y retornarlo
+			return formatter.format(number);
 		}
 	});
 

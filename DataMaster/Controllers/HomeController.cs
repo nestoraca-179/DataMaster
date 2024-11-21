@@ -96,6 +96,7 @@ namespace DataMaster.Controllers
 			ViewBag.usuario = (Session["USER"] as Usuario);
 			ViewBag.empresa = Session["NAME_CONN"];
 			ViewBag.sucur = (Session["BRANCH"] as saSucursal)?.sucur_des;
+			ViewBag.rate = new Price().GetRateUSD().ToString().Replace(",", ".");
 
 			return View();
 		}

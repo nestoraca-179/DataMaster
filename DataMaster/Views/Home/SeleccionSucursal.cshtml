@@ -7,7 +7,7 @@ header, footer, #menu {
 }
 .banner {
 	width: 100%;
-	height: 100vh;
+	min-height: 100vh;
 	background: #200122;
 	background: -webkit-linear-gradient(to right, #6f0000, #200122);
 	background: linear-gradient(to right, #6f0000, #200122);
@@ -17,15 +17,17 @@ header, footer, #menu {
 }
 form {
     width: 100%;
-    height: 600px;
+    min-height: 600px !important;
     max-width: 1200px;
     min-height: auto;
     background: rgba(0, 0, 0, 0.5);
-    padding: 20px 0 0;
+	margin: 10px 0;
+    padding: 20px 0 10px 0;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    /*justify-content: center*/;
     color: #f0f0f0;
+	overflow-y: auto;
 }
 .title-login {
     flex: 1;
@@ -70,10 +72,13 @@ form {
 .card-prod.selected-card {
     outline: solid #FFF 5px;
 }
+.btn-info {
+	min-width: 275px;
+}
 </style>
 <section class="container-fluid banner">
 	<form action="/Home/Dashboard" method="post">
-		<div class="title-login">
+		<div class="title-login pt-4 pb-2">
 			<h1 class="text-center">Seleccionar Sucursal</h1>
 		</div>
 		<div class="container-cards px-3">
@@ -90,8 +95,8 @@ form {
 			}
 		</div>
 		<input type="hidden" id="sucur" name="sucur" value="" />
-		<div class="col-md-12 text-center pt-2 pb-5">
-			<button type="button" id="btn-send" class="btn btn-info w-50 px-5 py-3" onclick="send(this)" disabled>Seleccionar sucursal</button>
+		<div class="col-md-12 text-center pt-2 pb-4">
+			<button type="button" id="btn-send" class="btn btn-info w-75 px-5 py-3" onclick="send(this)" disabled>Seleccionar sucursal</button>
 		</div>
 	</form>
 </section>

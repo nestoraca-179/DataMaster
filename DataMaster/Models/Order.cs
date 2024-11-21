@@ -57,7 +57,7 @@ namespace DataMaster.Models
 							uso_suc = sp_1.Current.UsoSucursal;
 						sp_1.Dispose();
 
-						var sp_n_ord = context.pConsecutivoProximo(uso_suc ? sucur : null, "PCLI_NUM").GetEnumerator();
+						var sp_n_ord = context.pConsecutivoProximo(uso_suc ? sucur : "", "PCLI_NUM").GetEnumerator();
 						if (sp_n_ord.MoveNext())
 							n_ord = sp_n_ord.Current;
 						sp_n_ord.Dispose();

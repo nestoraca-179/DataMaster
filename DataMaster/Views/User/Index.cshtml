@@ -13,7 +13,8 @@ table thead {
     color: #FFF;
 }
 table thead th {
-    padding: 10px;
+    padding: 12px !important;
+	font-size: 14px !important;
 }
 table tbody td {
     font-size: 14px;
@@ -72,6 +73,15 @@ select[name="table-users_length"] {
     border: solid 2px #0d6efd;
     border-radius: 5px;
     color: #333 !important;
+}
+@@media screen and (max-width: 575px) {
+	.row.mt-3 {
+		flex-direction: column-reverse;
+	}
+	.btn.btn-success {
+		width: 100%;
+		margin-top: 10px;
+	}
 }
 </style>
 <link href="https://cdn.datatables.net/v/dt/dt-1.13.4/datatables.min.css" rel="stylesheet" />
