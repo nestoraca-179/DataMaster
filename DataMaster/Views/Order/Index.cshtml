@@ -797,7 +797,8 @@
 	var transports = @Html.Raw(Json.Encode(ViewBag.transports));
 	var alms = @Html.Raw(Json.Encode(ViewBag.alms));
 	var arts = @Html.Raw(ViewBag.arts);
-	var prices = @Html.Raw(Json.Encode(ViewBag.prices));
+	var prices = @Html.Raw(ViewBag.prices);
+	@*var prices = @Html.Raw(Json.Encode(ViewBag.prices));*@
 	var imps = @Html.Raw(Json.Encode(ViewBag.imps));
 	var rate = parseFloat('@ViewBag.rate');
 
@@ -1508,7 +1509,7 @@
 	}
 
 	function onlyNumbers(e) {
-		return (e.keyCode >= 46 && e.keyCode <= 57) || 
+		return (e.keyCode >= 46 && e.keyCode <= 57) ||
 			(e.keyCode >= 96 && e.keyCode <= 105) ||
 			(e.keyCode == 110) || (e.keyCode == 188) ||
 			(e.keyCode == 190) || (e.keyCode == 8);
