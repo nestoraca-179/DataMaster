@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<title>@ViewBag.Title | DataMaster</title>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.2/css/all.min.css" integrity="sha512-1sCRPdkRXhBV2PBLUdRb4tMg1w2YPf37qatUFeS7zlBy7jJI8Lf4VHwWfZZfpXtYSLy85pkm9GaYVYMfw5BC1A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link href="/Content/bootstrap-5.2.css" rel="stylesheet" />
+	<link href="/Content/Site.css" rel="stylesheet" />
+	<script src="/Scripts/jquery-3.6.0.min.js"></script>
+	<script src="/Scripts/bootstrap-5.2.js"></script>
+	<script src="~/Scripts/highcharts.js"></script>
+	<script src="~/Scripts/highcharts-3d.js"></script>
+	<script src="~/Scripts/drilldown.js"></script>
+	<script src="~/Scripts/module-exporting.js"></script>
+	<script src="~/Scripts/module-exportdata.js"></script>
+	<script src="~/Scripts/module-accesibility.js"></script>
+</head>
+<body>
+<header class="row">
+	<div class="col-3 col-lg-2 header-menu">
+		<i class="fas fa-bars"></i>
+		<a href="/Home/Dashboard" style="margin: 0; font-size: 24px; text-decoration: none; color: #f0f0f0;">DataMaster</a>
+	</div>
+	<div class="col-9 col-lg-10 container-fluid header-panel">
+		<div class="d-flex align-items-center icons">
+			<i class="fas fa-bars"></i>
+			<a href="/Home/Dashboard" class="text-light" style="text-decoration: none;"><i class="fas fa-home"></i></a>
+		</div>
+		<div class="info-user" id="info-user">
+			<i class="fas fa-user"></i>
+			<label>@ViewBag.usuario.des_usuario</label>
+			<div class="menu-login shadow-tm" id="menu-login">
+				<a href="/Account/Logout" class="btn-logout w-100" style="text-decoration: none;">Cerrar Sesión</a>
+			</div>
+		</div>
+	</div>
+</header>
+<section class="container-fluid row">
+	<div class="col-3 col-lg-2 section-menu" id="menu">
+		<ul class="menu">
+			<li><a href="/Order/Index"><i class="fas fa-file-invoice"></i><p class="m-0">Pedidos</p></a></li>
+			@{
+				if (ViewBag.usuario.admin)
+				{
+					<li><a href="/User/Index"><i class="fas fa-user"></i><p class="m-0">Usuarios</p></a></li>
+				}
+			}
+		</ul>
+		@*<img src="/images/pg.png" alt="pg" width="150" />*@
+	</div>
+	<div class="col-9 col-lg-10 container-fluid p-0 section-panel">
+		@RenderBody()
+	</div>
+</section>
+<footer>
+	<div class="container">
+		@{ 
+			if (!string.IsNullOrEmpty(ViewBag.empresa))
+			{
+				string name_suc = ViewBag.empresa;
+				if (!string.IsNullOrEmpty(ViewBag.sucur))
+				{
+					name_suc += (" / Sucursal: " + ViewBag.sucur);
+				}
+
+				<p class="m-0">@name_suc</p>
+			}
+		}
+		@*<p style="margin: 0;">DataMaster Ver. 1.0 &copy; 2024 - AC Solutions</p>*@
+	@*<p style="margin: 0;">Proceso Especial Profit Plus (Carga de Pedido - Stock Disponible)</p>*@
+	</div>
+</footer>
+<script>
+	$("#info-user").click(function () {
+		$("#menu-login").slideToggle();
+	});
+
+	$(".fas.fa-bars").click(function () {
+		if (screen.availWidth <= 767) {
+			$("#menu").slideToggle();
+		} else {
+			$("#menu").toggleClass("active");
+			$('#menu li a p').animate({ width: 'toggle' });
+		}
+	});
+</script>
+</body>
+</html>

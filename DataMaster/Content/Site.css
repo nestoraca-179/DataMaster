@@ -556,7 +556,7 @@ input:checked + .slider:before {
         display: none;
         position: absolute !important;
         top: 0;
-        z-index: 1;
+        z-index: 10;
     }
 }
 @media screen and (max-width: 1199px) {

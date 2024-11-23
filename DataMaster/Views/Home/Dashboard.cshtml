@@ -159,11 +159,7 @@ h5.no-data {
 </style>
 <div class="container-fluid container-dash" ng-app="DashboardAdmin" ng-controller="controller">
 	<!-- Start Rounded switch -->
-	<div class="d-flex justify-content-between px-4 pt-3">
-		<!--<div>
-			<input type="date" id="fec_d" ng-disabled="true" ng-readonly="true" ng-model="fec_d" />
-			<input type="date" id="fec_h" ng-disabled="true" ng-readonly="true" ng-model="fec_h" />
-		</div>-->
+	<div class="d-flex justify-content-between flex-wrap gap-3 px-4 pt-3">
 		<div class="d-flex align-items-center">
 			<p class="m-0">Tasa del dia {{ getDate() }}: <b>{{ rate.toFixed(2).toLocaleString('es-ES') }} BSD/USD</b></p>
 		</div>

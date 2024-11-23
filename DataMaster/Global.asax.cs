@@ -5,6 +5,7 @@ using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.SessionState;
 
+using System.Web.Optimization;
 namespace DataMaster
 {
 	// Note: For instructions on enabling IIS6 or IIS7 classic mode, 
@@ -14,6 +15,7 @@ namespace DataMaster
     {
         protected void Application_Start() 
         {
+            DevExtremeBundleConfig.RegisterBundles(BundleTable.Bundles);
             AreaRegistration.RegisterAllAreas();
 
             GlobalConfiguration.Configure(WebApiConfig.Register);
