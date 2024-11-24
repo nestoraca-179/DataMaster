@@ -16,9 +16,7 @@ body {
     flex-direction: column;
     justify-content: center;
 }
-body > div:not(.container-fluid) {
-    display: none !important;
-}
+
 body header {
     width: 100%;
     flex: 1.5;
@@ -556,7 +554,7 @@ input:checked + .slider:before {
         display: none;
         position: absolute !important;
         top: 0;
-        z-index: 1;
+        z-index: 10;
     }
 }
 @media screen and (max-width: 1199px) {

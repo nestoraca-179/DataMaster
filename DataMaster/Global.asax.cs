@@ -2,6 +2,7 @@ using System;
 using System.Web;
 using System.Web.Http;
 using System.Web.Mvc;
+using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.SessionState;
 
@@ -14,6 +15,7 @@ namespace DataMaster
     {
         protected void Application_Start() 
         {
+            // DevExtremeBundleConfig.RegisterBundles(BundleTable.Bundles);
             AreaRegistration.RegisterAllAreas();
 
             GlobalConfiguration.Configure(WebApiConfig.Register);

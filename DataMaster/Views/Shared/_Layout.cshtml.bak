@@ -41,7 +41,6 @@
 	<div class="col-3 col-lg-2 section-menu" id="menu">
 		<ul class="menu">
 			<li><a href="/Order/Index"><i class="fas fa-file-invoice"></i><p class="m-0">Pedidos</p></a></li>
-			<li><a href="/Report/RepStockArticulos"><i class="fas fa-file"></i><p class="m-0">Reporte de Stock</p></a></li>
 			@{
 				if (ViewBag.usuario.admin)
 				{
