@@ -6,6 +6,7 @@ using System.Web.Optimization;
 using System.Web.Routing;
 using System.Web.SessionState;
 
+using System.Web.Optimization;
 namespace DataMaster
 {
 	// Note: For instructions on enabling IIS6 or IIS7 classic mode, 

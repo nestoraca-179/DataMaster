@@ -4,7 +4,6 @@ using System.Data.Entity;
 using System.Collections.Generic;
 using System.Reflection;
 using DataMaster.Controllers;
-using DevExpress.DataProcessing;
 
 namespace DataMaster.Models
 {
@@ -252,7 +251,7 @@ namespace DataMaster.Models
 						context.SaveChanges();
 						tran.Commit();
 						order.comentario = GetChanges(existing, order); // CAMBIOS
-						order.saPedidoVentaReng.ForEach(delegate(saPedidoVentaReng r) { r.saPedidoVenta = null; });
+						order.saPedidoVentaReng.ToList().ForEach(delegate(saPedidoVentaReng r) { r.saPedidoVenta = null; });
 					}
 					catch (Exception ex)
 					{
