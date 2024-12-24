@@ -26,5 +26,7 @@ namespace DataMaster.Models
         public System.DateTime fe_us_in { get; set; }
         public string co_us_mo { get; set; }
         public System.DateTime fe_us_mo { get; set; }
+        public bool seller { get; set; }
+        public Nullable<int> id_emp { get; set; }
     }
 }

@@ -28,51 +28,68 @@
 		</div>
 	</div>
 	<hr />
-	<form action="" method="post" id="form" class="mt-5" onsubmit="return false;">
-		<div class="row">
-			<div class="col-sm-6">
-				<div class="form-group row">
-					<label class="col-sm-4">Nombre *</label>
-					<div class="col-sm-8">
-						<input type="text" name="name" class="form-control" autofocus ng-model="user.des_usuario" ng-required="true" />
-					</div>
-				</div>
-				<div class="form-group row mt-2">
-					<label class="col-sm-4">Usuario *</label>
-					<div class="col-sm-8">
-						<input type="text" class="form-control" autocomplete="false" ng-model="user.username" required />
-					</div>
-				</div>
-				<div class="form-group row mt-2">
-					<label class="col-sm-4">Clave *</label>
-					<div class="col-sm-8">
-						<input type="password" class="form-control" autocomplete="false" ng-model="user.password" required />
-					</div>
-				</div>
-			</div>
-			<div class="col-sm-6">
-				<div class="form-group row">
-					<label class="col-sm-4">Email *</label>
-					<div class="col-sm-8">
-						<input type="email" class="form-control" autocomplete="false" autofocus ng-model="user.email" required />
-						<small class="text-secondary mx-2">Recuerda colocar formato de correo (someone@example.com)</small>
-					</div>
-				</div>
-				<div class="form-check row mt-2" style="height: 38px;">
-					<div class="col">
-						<input class="form-check-input" type="checkbox" ng-model="user.activo">
-						<label class="form-check-label ml-3">Activo</label>
-					</div>
-				</div>
-				<div class="form-check row mt-2" style="height: 38px;">
-					<div class="col">
-						<input class="form-check-input" type="checkbox" ng-model="user.admin">
-						<label class="form-check-label ml-3">Administrador</label>
-					</div>
-				</div>
-			</div>
-		</div>
-	</form>
+    <form action="" method="post" id="form" class="mt-5" onsubmit="return false;">
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group row">
+                    <label class="col-sm-4">Nombre *</label>
+                    <div class="col-sm-8">
+                        <input type="text" name="name" class="form-control" autofocus ng-model="user.des_usuario" ng-required="true" />
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <label class="col-sm-4">Usuario *</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" autocomplete="false" ng-model="user.username" required />
+                    </div>
+                </div>
+                <div class="form-group row mt-2">
+                    <label class="col-sm-4">Clave *</label>
+                    <div class="col-sm-8">
+                        <input type="password" class="form-control" autocomplete="false" ng-model="user.password" required />
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group row">
+                    <label class="col-sm-4">Email *</label>
+                    <div class="col-sm-8">
+                        <input type="email" class="form-control" autocomplete="false" autofocus ng-model="user.email" required />
+                        <small class="text-secondary mx-2">Recuerda colocar formato de correo (someone@example.com)</small>
+                    </div>
+                </div>
+                <div class="form-check row mt-2" style="height: 38px;">
+                    <div class="col">
+                        <input class="form-check-input" type="checkbox" ng-model="user.activo">
+                        <label class="form-check-label ml-3">Activo</label>
+                    </div>
+                </div>
+                <div class="form-check row mt-2" style="height: 38px;">
+                    <div class="col">
+                        <input class="form-check-input" type="checkbox" ng-model="user.admin">
+                        <label class="form-check-label ml-3">Administrador</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-check d-flex row mt-2" style="height: 40px;">
+                    <div class="col-6 d-flex align-items-center">
+                        <input class="form-check-input" type="checkbox" ng-model="user.seller" ng-change="reset(user.seller)">
+                        <label class="form-check-label ms-3">Vendedor</label>
+                    </div>
+                    <div class="col-6">
+                        <select ng-model="user.id_emp" ng-required="user.seller" ng-disabled="!user.seller" class="form-control" style="-webkit-appearance: button; -moz-appearance: button;">
+							<option ng-repeat="conn in conns" value="{{ conn.ID }}">{{ conn.des_con }}</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6"></div>
+        </div>
+    </form>
 	<div ng-if="invalid" class="mt-3">
 		<p class="text-danger">Debes llenar todos los campos requeridos (*)</p>
 	</div>
@@ -130,13 +147,13 @@
 <script src="~/Scripts/angular-min.js"></script>
 <script>
 	var app = angular.module("AddUser", []);
+	var conns = @Html.Raw(Json.Encode(ViewBag.connections));
 
 	app.controller("controller", function ($scope, $http) {
 
 		$scope.invalid = false;
-		$scope.user = {
-			activo: true,
-		};
+		$scope.user = { activo: true };
+		$scope.conns = conns;
 
 		$scope.sendUser = function () {
 
@@ -146,7 +163,6 @@
 				if ($scope.user.password.length < 8) {
 					alert("La clave debe tener una longitud mínima de 8 caracteres");
 				} else {
-
 					$("#form input").change();
 					$("#modalWaiting").modal("show");
 
@@ -160,7 +176,6 @@
 					}
 
 					$http(req).then(function (response) {
-
 						var res = response.data;
 						if (res.Status == "OK") {
 							$("#modalWaiting").modal("hide");
@@ -171,7 +186,6 @@
 							$("#modalError").modal("show");
 							$scope.errorMessage = res.Message;
 						}
-
 					});
 				}
 			} else {
@@ -182,6 +196,13 @@
 		$scope.closeModal = function () {
 			$("#modalWaiting").modal("hide");
 		}
+
+        $scope.reset = function (value) {
+            if (!value) {
+                $scope.user.id_emp = null;
+            }
+        }
+
 	});
 
 </script>

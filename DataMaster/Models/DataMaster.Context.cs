@@ -15,9 +15,9 @@ namespace DataMaster.Models
     
     public partial class DataMasterEntities : DbContext
     {
-        public DataMasterEntities() : base("name=DataMasterEntities")
+        public DataMasterEntities()
+            : base("name=DataMasterEntities")
         {
-            Configuration.ProxyCreationEnabled = false;
         }
     
         protected override void OnModelCreating(DbModelBuilder modelBuilder)

@@ -26,6 +26,7 @@ namespace DataMaster.Controllers
 				return RedirectToAction("Logout", "Account", new { msg = "Debes iniciar sesión" });
 
 			ViewBag.usuario = (Session["USER"] as Usuario);
+			ViewBag.connections = Connection.GetAllConns();
 
 			return View();
 		}
@@ -38,6 +39,7 @@ namespace DataMaster.Controllers
 				return RedirectToAction("Logout", "Account", new { msg = "Debes iniciar sesión" });
 
 			ViewBag.usuario = (Session["USER"] as Usuario);
+			ViewBag.connections = Connection.GetAllConns();
 			ViewBag.user_edit = MyUser.GetUserByID(id);
 
 			return View();

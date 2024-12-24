@@ -54,6 +54,8 @@
           <Property Name="activo" Type="bit" Nullable="false" />
           <Property Name="admin" Type="bit" Nullable="false" />
           <Property Name="fec_camb" Type="datetime" Nullable="false" />
+          <Property Name="seller" Type="bit" Nullable="false" />
+          <Property Name="id_emp" Type="int" />
           <Property Name="co_us_in" Type="varchar" MaxLength="20" Nullable="false" />
           <Property Name="fe_us_in" Type="datetime" Nullable="false" />
           <Property Name="co_us_mo" Type="varchar" MaxLength="20" Nullable="false" />
@@ -106,6 +108,8 @@
           <Property Name="fe_us_in" Type="DateTime" Nullable="false" Precision="3" />
           <Property Name="co_us_mo" Type="String" MaxLength="20" FixedLength="false" Unicode="false" Nullable="false" />
           <Property Name="fe_us_mo" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="seller" Type="Boolean" Nullable="false" />
+          <Property Name="id_emp" Type="Int32" />
         </EntityType>
         <EntityContainer Name="DataMasterEntities" annotation:LazyLoadingEnabled="true">
           <EntitySet Name="Incidente" EntityType="Self.Incidente" />
@@ -161,6 +165,8 @@
           <EntitySetMapping Name="Usuario">
             <EntityTypeMapping TypeName="DataMasterModel.Usuario">
               <MappingFragment StoreEntitySet="Usuario">
+                <ScalarProperty Name="id_emp" ColumnName="id_emp" />
+                <ScalarProperty Name="seller" ColumnName="seller" />
                 <ScalarProperty Name="ID" ColumnName="ID" />
                 <ScalarProperty Name="username" ColumnName="username" />
                 <ScalarProperty Name="password" ColumnName="password" />

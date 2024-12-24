@@ -42,14 +42,16 @@ namespace DataMaster.Models
 		{
 			Usuario old_user = GetUserByID(user.ID);
 
-			user.username = old_user.username;
-			user.password = old_user.password;
-			user.fec_camb = old_user.fec_camb;
-			user.co_us_mo = u;
-			user.fe_us_mo = DateTime.Now;
-			db.Entry(user).State = EntityState.Modified;
-			db.SaveChanges();
-			db.Entry(user).State = EntityState.Detached;
+			using (DataMasterEntities context = new DataMasterEntities())
+			{
+				user.username = old_user.username;
+				user.password = old_user.password;
+				user.fec_camb = old_user.fec_camb;
+				user.co_us_mo = u;
+				user.fe_us_mo = DateTime.Now;
+				context.Entry(user).State = EntityState.Modified;
+				context.SaveChanges();
+			}
 
 			user.password = GetChanges(old_user, user);
 			return user;

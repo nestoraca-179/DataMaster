@@ -1174,7 +1174,8 @@
 
 		$scope.getFilterPrices = function (art) {
 
-			var pricesArt = prices.filter(p => p.co_art.trim() == art && p.co_alma == null);
+			// var pricesArt = prices.filter(p => p.co_art.trim() == art && p.co_alma == null);
+			var pricesArt = prices.filter(p => p.co_art.trim() == art);
 			var filtered = pricesArt.reduce((acc, current) => {
 
 				var existing = acc.find(item => item.co_precio === current.co_precio);
