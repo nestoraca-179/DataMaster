@@ -149,7 +149,7 @@
 	var app = angular.module("EditUser", []);
 	var conns = @Html.Raw(Json.Encode(ViewBag.connections));
 	var user = @Html.Raw(Json.Encode(ViewBag.user_edit));
-	user.id_emp = user.id_emp.toString();
+	user.id_emp = user.id_emp?.toString();
 
 	app.controller("controller", function ($scope, $http) {
 
