@@ -14579,6 +14579,11 @@ advertencia 6035: La relación 'FK_stgFacturaVentaExt_stgFactLoteGen' tiene colu
           <Parameter Name="bSumarStock" Type="bit" Mode="In" />
           <Parameter Name="bPermiteStockNegativo" Type="bit" Mode="In" />
         </Function>
+        <Function Name="pStockPendienteActualizar" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="false" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo">
+          <Parameter Name="uniRowGuidOri" Type="uniqueidentifier" Mode="In" />
+          <Parameter Name="deCantidad" Type="decimal" Mode="In" />
+          <Parameter Name="sTipoDocumento" Type="char" Mode="In" />
+        </Function>
         <EntityContainer Name="ProfitAdmModelStoreContainer">
           <EntitySet Name="par_emp" EntityType="Self.par_emp" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="pvArticuloExt" EntityType="Self.pvArticuloExt" Schema="dbo" store:Type="Tables" />
@@ -34254,6 +34259,11 @@ advertencia 6035: La relación 'FK_stgFacturaVentaExt_stgFactLoteGen' tiene colu
             <Parameter Name="dtFecha" Mode="In" Type="DateTime" />
             <Parameter Name="bVentas" Mode="In" Type="Boolean" />
           </FunctionImport>
+          <FunctionImport Name="pStockPendienteActualizar">
+            <Parameter Name="uniRowGuidOri" Mode="In" Type="Guid" />
+            <Parameter Name="deCantidad" Mode="In" Type="Decimal" />
+            <Parameter Name="sTipoDocumento" Mode="In" Type="String" />
+          </FunctionImport>
         </EntityContainer>
         <ComplexType Name="pConsultarStockxAlmacen_Result">
           <Property Type="String" Name="CO_ART" Nullable="false" MaxLength="30" />
@@ -42892,6 +42902,7 @@ advertencia 6035: La relación 'FK_stgFacturaVentaExt_stgFactLoteGen' tiene colu
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>
+          <FunctionImportMapping FunctionImportName="pStockPendienteActualizar" FunctionName="ProfitAdmModel.Store.pStockPendienteActualizar" />
         </EntityContainerMapping>
       </Mapping>
     </edmx:Mappings>

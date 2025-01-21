@@ -39,7 +39,7 @@ namespace DataMaster.Models
 			return orders;
 		}
 
-		public saPedidoVenta AddOrder(saPedidoVenta order, string user, string sucur)
+		public saPedidoVenta AddOrder(saPedidoVenta order, string user, string sucur, bool budget)
 		{
 			saPedidoVenta new_order = new saPedidoVenta();
 			using (ProfitAdmEntities context = new ProfitAdmEntities(entity.ToString()))
@@ -50,6 +50,14 @@ namespace DataMaster.Models
 					{
 						string n_ord = "";
 						bool uso_suc = false;
+
+						if (budget)
+						{
+							foreach (saPedidoVentaReng reng in order.saPedidoVentaReng)
+							{
+								context.pStockPendienteActualizar(reng.rowguid_doc, reng.total_art, "CCLI");
+							}
+						}
 
 						// SERIE USA SUCURSAL
 						var sp_1 = context.pSeleccionarUsoSucursalConsecutivoTipo("PCLI_NUM").GetEnumerator();

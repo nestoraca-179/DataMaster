@@ -17,13 +17,13 @@ namespace DataMaster.Models
     
     public partial class ProfitAdmEntities : DbContext
     {
-		public ProfitAdmEntities(string conn) : base(conn)
-		{
-			Configuration.ProxyCreationEnabled = false;
-			((IObjectContextAdapter)this).ObjectContext.CommandTimeout = 180;
-		}
-
-		protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        public ProfitAdmEntities(string conn) : base(conn)
+        {
+            Configuration.ProxyCreationEnabled = false;
+            ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = 180;
+        }
+    
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             throw new UnintentionalCodeFirstException();
         }
@@ -1045,6 +1045,23 @@ namespace DataMaster.Models
                 new ObjectParameter("bVentas", typeof(bool));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<pObtenerFechaImpuestoSobreVenta_Result>("pObtenerFechaImpuestoSobreVenta", dtFechaParameter, bVentasParameter);
+        }
+    
+        public virtual int pStockPendienteActualizar(Nullable<System.Guid> uniRowGuidOri, Nullable<decimal> deCantidad, string sTipoDocumento)
+        {
+            var uniRowGuidOriParameter = uniRowGuidOri.HasValue ?
+                new ObjectParameter("uniRowGuidOri", uniRowGuidOri) :
+                new ObjectParameter("uniRowGuidOri", typeof(System.Guid));
+    
+            var deCantidadParameter = deCantidad.HasValue ?
+                new ObjectParameter("deCantidad", deCantidad) :
+                new ObjectParameter("deCantidad", typeof(decimal));
+    
+            var sTipoDocumentoParameter = sTipoDocumento != null ?
+                new ObjectParameter("sTipoDocumento", sTipoDocumento) :
+                new ObjectParameter("sTipoDocumento", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("pStockPendienteActualizar", uniRowGuidOriParameter, deCantidadParameter, sTipoDocumentoParameter);
         }
     }
 }

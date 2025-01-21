@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Web;
 using System.Web.Http;
 using DataMaster.Models;
-using static DevExpress.XtraExport.Helpers.TableCellCss;
 
 namespace DataMaster.Controllers
 {
     public class DataMasterApiController : ApiController
     {
+		// PEDIDOS
+
 		[HttpGet]
 		[Route("api/DataMasterApi/GetStock/{art}/{alm}")]
 		public DataMasterResponse GetStock(string art, string alm)
@@ -32,7 +34,7 @@ namespace DataMaster.Controllers
 
 		[HttpPost]
 		[Route("api/DataMasterApi/AddOrder/")]
-		public DataMasterResponse Addorder(saPedidoVenta order)
+		public DataMasterResponse AddOrder(saPedidoVenta order)
 		{
 			DataMasterResponse response = new DataMasterResponse();
 			Usuario u = (HttpContext.Current.Session["USER"] as Usuario);
@@ -40,7 +42,7 @@ namespace DataMaster.Controllers
 
 			try
 			{
-				saPedidoVenta new_order = new Order().AddOrder(order, u.username, s);
+				saPedidoVenta new_order = new Order().AddOrder(order, u.username, s, false);
 				LogController.CreateLog(u.username, "PEDIDO", new_order.doc_num, "I", null);
 
 				response.Status = "OK";
@@ -51,6 +53,32 @@ namespace DataMaster.Controllers
 				response.Status = "ERROR";
 				response.Message = ex.Message;
 				IncidentController.CreateIncident("ERROR AGREGANDO PEDIDO", ex);
+			}
+
+			return response;
+		}
+
+		[HttpPost]
+		[Route("api/DataMasterApi/AddNewOrder/")]
+		public DataMasterResponse AddNewOrder(saPedidoVenta order)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+			Usuario u = (HttpContext.Current.Session["USER"] as Usuario);
+			string s = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur;
+
+			try
+			{
+				saPedidoVenta new_order = new Order().AddOrder(order, u.username, s, true);
+				LogController.CreateLog(u.username, "PEDIDO", new_order.doc_num, "I", null);
+
+				response.Status = "OK";
+				response.Result = new_order;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR AGREGANDO PEDIDO POR COTIZACION", ex);
 			}
 
 			return response;
@@ -107,6 +135,83 @@ namespace DataMaster.Controllers
 
 			return response;
 		}
+
+		// COTIZACIONES
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetBudget/{id}")]
+		public DataMasterResponse GetBudget(string id)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				saCotizacionCliente budget = new Budget().GetBudgetByID(id);
+
+				if (budget == null)
+				{
+					response.Status = "ERROR";
+					response.Message = "0"; // COTIZACION NO EXISTE
+				}
+				else
+				{
+					response.Status = budget.status == "0" ? "OK" : "ERROR";
+					response.Result = budget.status == "0" ? budget : null;
+					response.Message = budget.status == "0" ? null : "1"; // COTIZACION BLOQUEADA
+
+					//foreach (saCotizacionClienteReng reng in budget.saCotizacionClienteReng)
+					//{
+					//	decimal stock = Order.GetStock(reng.co_art, reng.co_alma);
+					//	if (stock <= 0 || stock < reng.total_art)
+					//		throw new Exception(string.Format(
+					//			"No hay stock disponible del articulo {0} en el almacen {1} (DISPONIBLE {2}, SOLICITADA {3})",
+					//			reng.co_art, reng.co_alma, stock, reng.total_art
+					//		));
+					//}
+				}
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message; // HA OCURRIDO UN ERROR
+				IncidentController.CreateIncident("ERROR BUSCANDO COTIZACION " + id, ex);
+			}
+
+			return response;
+		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetBudgets/{number}")]
+		public DataMasterResponse GetOrders(int number)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				List<saCotizacionCliente> budgets = new Budget().GetAllBudgets(number, true);
+
+				if (budgets.Count > 0)
+				{
+					response.Status = "OK";
+					response.Result = budgets;
+				}
+				else
+				{
+					response.Status = "ERROR";
+					response.Result = "No se encontraron cotizaciones sin procesar";
+				}
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR BUSCANDO COTIZACIONES", ex);
+			}
+
+			return response;
+		}
+
+		// USUARIOS
 
 		[HttpPost]
 		[Route("api/DataMasterApi/AddUser/")]

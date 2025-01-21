@@ -97,690 +97,754 @@
     }
 </style>
 <div class="container-fluid container-orders" id="container-orders" style="display: none;" ng-app="Orders" ng-controller="controller">
-	<div class="row">
-		<div class="col-md-12 col-xl-3 container-list">
-			<input type="text" id="input-orders" class="form-control" placeholder="Buscar pedido..." style="border: solid 1px #ced4da;" onkeyup="searchOrder()" />
-			<div class="list-table-orders">
-				<table class="table table-hover table-striped" id="table-orders">
-					<thead>
-						<tr>
-							<th class="text-white">Código</th>
-							<th class="text-white">Cliente</th>
-						</tr>
-					</thead>
-					<tr ng-repeat="order in orders" ng-class="{ active: orders[index].doc_num == order.doc_num }" ng-click="selectOrder(order.doc_num)" style="cursor: pointer;">
-						<td><i class="fas fa-caret-right mx-1" ng-show="orders[index].doc_num == order.doc_num"></i>{{ order.doc_num }}</td>
-						<td>{{ order.saCliente.cli_des }}</td>
-					</tr>
-				</table>
-			</div>
-		</div>
-		<hr class="divider" />
-		<form action="" method="post" id="form" class="col-md-12 col-xl-9 container-form" onsubmit="return false;">
-			<div class="form-header">
-				<h3 class="text-center text-white"><i class="fas fa-file-invoice"></i> Pedido</h3>
-			</div>
-			<div class="form-buttons">
-				<div class="row">
-					<div class="col buttons-next-prev" ng-show="!adding && !editing">
-						<button type="button" class="btn btn-primary" ng-click="margin('s')">
-							<i class="fas fa-backward-step"></i>
-						</button>
-						<div style="width: 10px;"></div>
-						<button type="button" class="btn btn-primary" ng-click="prev()">
-							<i class="fas fa-chevron-left"></i>
-						</button>
-						<div style="width: 10px;"></div>
-						<button type="button" class="btn btn-primary" ng-click="next()">
-							<i class="fas fa-chevron-right"></i>
-						</button>
-						<div style="width: 10px;"></div>
-						<button type="button" class="btn btn-primary" ng-click="margin('e')">
-							<i class="fas fa-forward-step"></i>
-						</button>
-					</div>
-					<div class="col buttons-save-cancel" ng-show="adding">
-						<button type="button" class="btn btn-danger" ng-click="adding = false; order = orders[index]">
-							<i class="fas fa-times"></i>
-							Cancelar
-						</button>
-						<div style="width: 10px;"></div>
-						<button type="submit" class="btn btn-success" ng-click="addOrder()">
-							<i class="fas fa-save"></i>
-							Agregar
-						</button>
-					</div>
-					<div class="col buttons-save-cancel" ng-show="editing">
-						<button type="button" class="btn btn-danger" ng-click="editing = false; order = orders_orig[index]">
-							<i class="fas fa-times"></i>
-							Cancelar
-						</button>
-						<div style="width: 10px;"></div>
-						<button type="button" class="btn btn-success" ng-click="editOrder()">
-							<i class="fas fa-save"></i>
-							Guardar
-						</button>
-					</div>
-					<div class="col buttons-actions justify-content-end" ng-show="!adding && !editing">
-						<button type="button" class="btn btn-primary" ng-click="initAddOrder()">
-							<i class="fas fa-plus"></i> Nuevo
-						</button>
-						<div style="width: 10px;"></div>
-						<button type="button" class="btn btn-warning" ng-disabled="order.saldo < order.total_neto" ng-click="editing = true">
-							<i class="fas fa-file-edit"></i> Modificar
-						</button>
-						<div style="width: 10px;"></div>
-						<button type="button" class="btn btn-danger" ng-disabled="order.saldo < order.total_neto" onclick="$('#modalDelete').modal('show')">
-							<i class="fas fa-times"></i> Eliminar
-						</button>
-					</div>
-				</div>
-			</div>
-			<div class="form-tabs">
-				<div class="row">
-					<button type="button" id="btn-general" class="col tablinks active" onclick="openTab(event, 'general')">General</button>
-					<button type="button" id="btn-adicionales" class="col tablinks" onclick="openTab(event, 'adicionales')">Adicionales</button>
-				</div>
-			</div>
-			<div id="general" class="form-body" style="display: flex;">
-				<div class="row">
-					<div class="col-sm-12 col-md-5">
-						<div class="controls">
-							<label>Número</label>
-							<input type="text" class="form-control" id="id" ng-model="order.doc_num" ng-disabled="true" ng-required="true" />
-						</div>
-					</div>
-					<div class="col-sm-12 col-md-4">
-						<div class="controls">
-							<label>Fecha</label>
-							<input type="date" class="form-control" id="fec_emis" ng-model="order.fec_emis" ng-disabled="!adding" ng-required="true" />
-						</div>
-					</div>
-					<div class="col-sm-12 col-md-3">
-						<div class="controls">
-							<label>Fec. Venc</label>
-							<input type="date" class="form-control" id="fec_venc" ng-model="order.fec_venc" ng-disabled="!adding" ng-required="true" />
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-12 col-md-5">
-						<div class="controls">
-							<label>Cliente</label>
-							<div class="input-search">
-								<input type="text" class="form-control" id="client" ng-model="order.co_cli" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setClient(order.co_cli, false)" ng-blur="setClient(order.co_cli, true)" />
-								<input type="text" class="form-control" id="des_client" ng-model="order.des_cli" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
-								<i class="fas fa-search" role="button" onclick="openModal(this, 'modalClients')" data-name="client"></i>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-12 col-md-4">
-						<div class="controls">
-							<label>Vendedor</label>
-							<div class="input-search">
-								<input type="text" class="form-control" id="seller" ng-model="order.co_ven" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setSeller(order.co_ven, false)" ng-blur="setSeller(order.co_ven, true)" />
-								<input type="text" class="form-control" id="des_seller" ng-model="order.des_ven" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
-								<i class="fas fa-search" role="button" onclick="openModal(this, 'modalSellers')" data-name="seller"></i>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-12 col-md-3">
-						<div class="controls">
-							<label>Moneda</label>
-							<div class="input-search">
-								<input type="text" class="form-control" id="currency" ng-model="order.co_mone" ng-disabled="!adding && !editing" ng-required="true" onkeydown="return false;" />
-								<i class="fas fa-search" role="button" onclick="openModal(this, 'modalCurrencies')" data-name="currency"></i>
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-12 col-md-5">
-						<div class="controls">
-							<label>Cond. Pago</label>
-							<div class="input-search">
-								<input type="text" class="form-control" id="cond" ng-model="order.co_cond" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setCond(order.co_cond, false)" ng-blur="setCond(order.co_cond, true)" />
-								<input type="text" class="form-control" id="des_cond" ng-model="order.des_cond" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
-								<i class="fas fa-search" role="button" onclick="openModal(this, 'modalConds')" data-name="cond"></i>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-12 col-md-4">
-						<div class="controls">
-							<label>Transporte</label>
-							<div class="input-search">
-								<input type="text" class="form-control" id="trans" ng-model="order.co_tran" ng-disabled="!adding && !editing" ng-required="true" onkeydown="return false;" />
-								<i class="fas fa-search" role="button" onclick="openModal(this, 'modalTrans')" data-name="trans"></i>
-							</div>
-						</div>
-					</div>
-					<div class="col-sm-12 col-md-3">
-						<div class="controls">
-							<label>Tasa</label>
-							<input type="text" class="form-control" id="tasa" ng-model="order.tasa" ng-disabled="!adding && !editing" ng-required="true" ng-change="update(order.tasa)" onkeydown="return onlyNumbers(event)" />
-						</div>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-sm-12 col-md-5">
-						<div class="controls">
-							<label>Descripción</label>
-							<input type="text" class="form-control" id="descrip" ng-model="order.descrip" ng-disabled="!adding && !editing" ng-required="false" />
-						</div>
-					</div>
-					<div class="col-sm-12 col-md-4">
-						<div class="controls">
-							<label>Estatus</label>
-							<input type="text" class="form-control" id="n_control" ng-model="order.estatus" ng-disabled="true" ng-required="false" />
-						</div>
-					</div>
-					<div class="col-sm-12 col-md-3 btn-convert">
-						<button type="button" class="btn btn-primary" ng-click="convert()">Conversión</button>
-					</div>
-				</div>
-				<div class="row mt-3" ng-if="adding || editing">
-					<div class="col">
-						<button type="button" class="btn btn-primary" ng-click="initItem(false, null)">
-							<i class="fas fa-plus"></i> Agregar Item
-						</button>
-					</div>
-				</div>
-				<div class="bottom" style="padding: 0 0 10px 0;">
-					<h4 class="text-center text-white form-header"><i class="fas fa-list"></i> Detalle</h4>
-					<div style="padding: 0 10px; overflow-x: auto;">
-						<table class="table">
-							<thead class="thead-dark">
-								<tr>
-									<th>N°</th>
-									<th>Artículo</th>
-									<th>Descripción</th>
-									<th>Almacén</th>
-									<th>Cantidad</th>
-									<th>IVA</th>
-									<th>Total</th>
-									<th ng-if="adding"></th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr ng-repeat="reng in order.saPedidoVentaReng" style="cursor: pointer;">
-									<td>{{ reng.reng_num }}</td>
-									<td>{{ reng.co_art }}</td>
-									<td>{{ searchArt(reng.co_art) }}</td>
-									<td>{{ reng.co_alma }}</td>
-									<td>{{ reng.total_art }}</td>
-									<td ng-show="!converted">{{ reng.monto_imp }}</td>
-									<td ng-show="converted" class="field-active">{{ reng.monto_imp_om }}</td>
-									<td ng-show="!converted">{{ reng.reng_neto }}</td>
-									<td ng-show="converted" class="field-active">{{ reng.reng_neto_om }}</td>
-									<td ng-if="adding || editing" class="d-flex justify-content-evenly">
-										<button type="button" class="btn btn-primary" ng-click="initItem(true, reng);">
-											<i class="fas fa-pencil"></i>
-										</button>
-										<button type="button" class="btn btn-danger" ng-click="updateAmounts(order, reng, order.saPedidoVentaReng, 3);">
-											<i class="fas fa-times"></i>
-										</button>
-									</td>
-								</tr>
-								<tr ng-if="!order.saPedidoVentaReng || order.saPedidoVentaReng.length == 0">
-									<td colspan="8"><p class="m-0 text-center">No hay items agregados</p></td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-					<hr />
-					<div class="row">
-						<div class="col-sm-12 col-md-6 offset-md-6">
-							<div class="controls">
-								<label>Sub-Total</label>
-								<input type="text" class="form-control" id="subtotal" ng-model="order.total_bruto" ng-show="!converted" ng-disabled="true" ng-required="true" />
-								<input type="text" class="form-control field-active" id="subtotal_om" ng-model="order.total_bruto_om" ng-show="converted" ng-disabled="true" ng-required="true" />
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12 col-md-6 offset-md-6">
-							<div class="controls">
-								<label>IVA</label>
-								<input type="text" class="form-control" id="iva" ng-model="order.monto_imp" ng-show="!converted" ng-disabled="true" ng-required="true" />
-								<input type="text" class="form-control field-active" id="iva_om" ng-model="order.monto_imp_om" ng-show="converted" ng-disabled="true" ng-required="true" />
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12 col-md-6">
-							<div class="controls">
-								<label>Saldo</label>
-								<input type="text" class="form-control" id="saldo" ng-model="order.saldo" ng-show="!converted" ng-disabled="true" ng-required="true" />
-								<input type="text" class="form-control field-active" id="saldo_om" ng-model="order.saldo_om" ng-show="converted" ng-disabled="true" ng-required="true" />
-							</div>
-						</div>
-						<div class="col-sm-12 col-md-6">
-							<div class="controls">
-								<label>Total</label>
-								<input type="text" class="form-control" id="total" ng-model="order.total_neto" ng-show="!converted" ng-disabled="true" ng-required="true" />
-								<input type="text" class="form-control field-active" id="total_om" ng-model="order.total_neto_om" ng-show="converted" ng-disabled="true" ng-required="true" />
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-			<div id="adicionales" class="form-body">
-				<div class="left">
-					<div class="controls">
-						<label>Campo 1</label>
-						<input type="text" class="form-control" ng-model="order.campo1" ng-disabled="true" />
-					</div>
-					<div class="controls">
-						<label>Campo 3</label>
-						<input type="text" class="form-control" ng-model="order.campo3" ng-disabled="true" />
-					</div>
-					<div class="controls">
-						<label>Campo 5</label>
-						<input type="text" class="form-control" ng-model="order.campo5" ng-disabled="true" />
-					</div>
-					<div class="controls">
-						<label>Campo 7</label>
-						<input type="text" class="form-control" ng-model="order.campo7" ng-disabled="true" />
-					</div>
-				</div>
-				<div class="right">
-					<div class="controls">
-						<label>Campo 2</label>
-						<input type="text" class="form-control" ng-model="order.campo2" ng-disabled="true" />
-					</div>
-					<div class="controls">
-						<label>Campo 4</label>
-						<input type="text" class="form-control" ng-model="order.campo4" ng-disabled="true" />
-					</div>
-					<div class="controls">
-						<label>Campo 6</label>
-						<input type="text" class="form-control" ng-model="order.campo6" ng-disabled="true" />
-					</div>
-					<div class="controls">
-						<label>Campo 8</label>
-						<input type="text" class="form-control" ng-model="order.campo8" ng-disabled="true" />
-					</div>
-				</div>
-			</div>
-		</form>
-	</div>
-	<!-- Modal Eliminar Pedido -->
-	<div class="modal fade modal-info" id="modalDelete" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-		<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
-			<div class="modal-content">
-				@*<div class="modal-header">
-					<h3 class="modal-title">Eliminar Pedido</h3>
-				</div>*@
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
-					<div style="display: flex; justify-content: center;">
-						<i class="fas fa-exclamation-triangle" style="color: var(--bs-yellow)"></i>
-					</div>
-					<h2 class="text-center">¿Desea eliminar el pedido {{ order.doc_num }}?</h2>
-				</div>
-				<div class="modal-footer" style="justify-content: center">
-					<button type="button" style="width: 70px;" class="btn btn-danger" data-dismiss="modal">No</button>
-					<button type="button" style="width: 70px;" class="btn btn-success" ng-click="deleteOrder(order.doc_num)">Sí</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal Confirm -->
-	<div class="modal fade modal-info" id="modalConfirm" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
-			<div class="modal-content">
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
-					<div style="display: flex; justify-content: center;">
-						<i class="fas fa-exclamation-triangle" style="color: var(--bs-yellow)"></i>
-					</div>
-					<h3 class="text-center">¿Desea eliminar la preliquidación N° {{ order.doc_num }}?</h3>
-				</div>
-				<div class="modal-footer" style="justify-content: center">
-					<button type="button" style="width: 70px;" class="btn btn-danger" data-dismiss="modal">No</button>
-					<button type="button" style="width: 70px;" class="btn btn-success" ng-click="deleteOrder(order.doc_num)">Sí</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal Waiting -->
-	<div class="modal fade modal-info" id="modalWaiting" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-		<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
-			<div class="modal-content">
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
-					<div style="display: flex; justify-content: center;">
-						<i class="fas fa-spinner fa-spin" style="color: #01579b;"></i>
-					</div>
-					<h2 class="text-center">Procesando...</h2>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal Success -->
-	<div class="modal fade modal-info" id="modalSuccess" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-		<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
-			<div class="modal-content">
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
-					<div style="display: flex; justify-content: center;">
-						<i class="fas fa-check-circle" style="color: var(--bs-green)"></i>
-					</div>
-					<h2 class="text-center">{{ successMessage }}</h2>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#modalWaiting').modal('hide');">Aceptar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal Error -->
-	<div class="modal fade modal-info" id="modalError" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-		<div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
-			<div class="modal-content">
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
-					<div style="display: flex; justify-content: center;">
-						<i class="fas fa-exclamation-triangle" style="color: var(--bs-red)"></i>
-					</div>
-					<h2 class="text-center">Ha ocurrido un error</h2>
-					<p class="text-center">{{ errorMessage }}</p>
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#modalWaiting').modal('hide');">Aceptar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal Agregar Item Pedido -->
-	<div class="modal fade" id="modalItem" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 1051;">
-		<form class="modal-dialog" role="document" style="max-width: 800px;" onsubmit="return false;">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 ng-if="!editItem" class="modal-title">Agregar Item</h5>
-					<h5 ng-if="editItem" class="modal-title">Editar Item</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto; text-align: left;">
-					<div class="row">
-						<div class="col-sm-12 col-md-6">
-							<div class="controls">
-								<label>Articulo</label>
-								<div class="input-search">
-									<input type="text" class="form-control" id="art" ng-model="reng.co_art" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setArt(reng.co_art, false)" ng-blur="setArt(reng.co_art, true)" />
-									<input type="text" class="form-control" id="des_art" ng-disabled="!adding && !editing" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
-									<i class="fas fa-search" role="button" onclick="openModal(this, 'modalArts')" data-name="art"></i>
-								</div>
-							</div>
-						</div>
-						<div class="col-sm-12 col-md-6">
-							<div class="controls">
-								<label>Almacen</label>
-								<div class="input-search">
-									<input type="text" class="form-control" id="alm" ng-model="reng.co_alma" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setAlm(reng.co_alma, false)" ng-blur="setAlm(reng.co_alma, true)" />
-									<input type="text" class="form-control" id="des_alm" ng-disabled="!adding && !editing" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
-									<i class="fas fa-search" role="button" onclick="openModal(this, 'modalAlms')" data-name="alm"></i>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12 col-md-4">
-							<div class="controls">
-								<label>Cantidad</label>
-								<input type="number" class="form-control" id="quantity" ng-model="reng.total_art" ng-disabled="!adding && !editing" ng-required="true" ng-change="updatePriceItem()" onkeydown="return onlyNumbers(event)" />
-							</div>
-						</div>
-						<div class="col-sm-12 col-md-4">
-							<div class="controls">
-								<label>Tipo de Precio</label>
-								<select class="form-select" id="tip_precio" ng-model="reng.co_precio" ng-change="receptPrice(reng.co_precio)" ng-disabled="!selectedArt">
-									<option ng-repeat="price in prices_filter" ng-click="setPrice(price)" value="{{ price.co_precio.trim() }}">{{ price.co_precio.trim() }}</option>
-								</select>
-							</div>
-						</div>
-						<div class="col-sm-12 col-md-4">
-							<div class="controls">
-								<label>Precio Unit. $USD</label>
-								<input type="text" class="form-control" id="price_usd" ng-model="reng.prec_vta_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" />
-							</div>
-						</div>
-					</div>
-					<div class="row">
-						<div class="col-sm-12 col-md-4">
-							<div class="controls">
-								<label>Total $USD (Sin IVA)</label>
-								<input type="text" class="form-control" id="total_usd" ng-model="reng.reng_neto_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" />
-							</div>
-						</div>
-						<div class="col-sm-12 col-md-4">
-							<div class="controls">
-								<label>Porc. Tasa</label>
-								<select class="form-select" id="tip_imp" ng-model="reng.tipo_imp" ng-change="receptImp(reng.tipo_imp)">
-									<option ng-repeat="imp in imps" ng-click="setImp(imp)" value="{{ imp.tipo_imp.trim() }}">{{ imp.porc_tasa.toFixed(2) }}% ({{ imp.tipo_imp.trim() }})</option>
-								</select>
-							</div>
-						</div>
-						<div class="col-sm-12 col-md-4">
-							<div class="controls">
-								<label>Monto IVA $USD</label>
-								<input type="text" class="form-control" id="iva_usd" ng-model="reng.monto_imp_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" />
-							</div>
-						</div>
-					</div>
-				</div>
-				<div class="modal-footer">
-					<span ng-if="searching" class="text-primary" style="flex: auto;">CONSULTANDO STOCK...</span>
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-					<button ng-if="!editItem" type="submit" class="btn btn-primary" ng-click="setItem(reng, 1)">Agregar</button>
-					<button ng-if="editItem" type="submit" class="btn btn-primary" ng-click="setItem(reng, 2)">Editar</button>
-				</div>
-			</div>
-		</form>
-	</div>
-	<!-- Modal 1 -->
-	<div class="modal fade" id="modalClients" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="modal-dialog" role="document" style="max-width: 800px;">
-			<div class="modal-content">
-				<div class="modal-header py-2">
-					<h5 class="modal-title">Buscar Cliente</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Buscar cliente..." onkeyup="search('modalClients')" />
-					</div>
-					<table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
-						<tr ng-repeat="client in clients" style="cursor: pointer" onclick="selectRow(this)">
-							<td>{{ client.co_cli }}</td>
-							<td>{{ client.cli_des }}</td>
-						</tr>
-						<tr ng-if="!clients">
-							<td colspan="2">Cargando clientes... <i class="fas fa-spinner-third fa-spin" style="font-size: 25px;"></i></td>
-						</tr>
-					</table>
-					<input type="hidden" id="name-input" />
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-					<button type="button" class="btn btn-primary" onclick="saveRow('modalClients')">Seleccionar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal 2 -->
-	<div class="modal fade" id="modalConds" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="modal-dialog" role="document" style="max-width: 800px;">
-			<div class="modal-content">
-				<div class="modal-header py-2">
-					<h5 class="modal-title">Buscar Cond. Pago</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Buscar cond. pago..." onkeyup="search('modalConds')" />
-					</div>
-					<table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
-						<tr ng-repeat="cond in conds" style="cursor: pointer" onclick="selectRow(this)">
-							<td>{{ cond.co_cond }}</td>
-							<td>{{ cond.cond_des }}</td>
-						</tr>
-					</table>
-					<input type="hidden" id="name-input" />
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-					<button type="button" class="btn btn-primary" onclick="saveRow('modalConds')">Seleccionar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal 3 -->
-	<div class="modal fade" id="modalSellers" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="modal-dialog" role="document" style="max-width: 800px;">
-			<div class="modal-content">
-				<div class="modal-header py-2">
-					<h5 class="modal-title">Buscar Moneda</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Buscar moneda..." onkeyup="search('modalSellers')" />
-					</div>
-					<table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
-						<tr ng-repeat="seller in sellers" style="cursor: pointer" onclick="selectRow(this)">
-							<td>{{ seller.co_ven }}</td>
-							<td>{{ seller.ven_des }}</td>
-						</tr>
-					</table>
-					<input type="hidden" id="name-input" />
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-					<button type="button" class="btn btn-primary" onclick="saveRow('modalSellers')">Seleccionar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal 4 -->
-	<div class="modal fade" id="modalArts" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="modal-dialog" role="document" style="max-width: 800px;">
-			<div class="modal-content">
-				<div class="modal-header py-2">
-					<h5 class="modal-title">Buscar Articulo</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Buscar articulo..." onkeyup="search('modalArts')" />
-					</div>
-					<table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
-						<tr ng-repeat="art in arts" ng-show="true" style="cursor: pointer" onclick="selectRow(this)">
-							<td>{{ art.co_art }}</td>
-							<td>{{ art.art_des }}</td>
-						</tr>
-					</table>
-					<input type="hidden" id="name-input" />
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-					<button type="button" class="btn btn-primary" onclick="saveRow('modalArts')">Seleccionar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal 5 -->
-	<div class="modal fade" id="modalCurrencies" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="modal-dialog" role="document" style="max-width: 800px;">
-			<div class="modal-content">
-				<div class="modal-header py-2">
-					<h5 class="modal-title">Buscar Articulo</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Buscar articulo..." onkeyup="search('modalCurrencies')" />
-					</div>
-					<table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
-						<tr ng-repeat="curr in currencies" ng-show="true" style="cursor: pointer" onclick="selectRow(this)">
-							<td>{{ curr.co_mone }}</td>
-							<td>{{ curr.mone_des }}</td>
-						</tr>
-					</table>
-					<input type="hidden" id="name-input" />
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-					<button type="button" class="btn btn-primary" onclick="saveRow('modalCurrencies')">Seleccionar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal 6 -->
-	<div class="modal fade" id="modalTrans" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="modal-dialog" role="document" style="max-width: 800px;">
-			<div class="modal-content">
-				<div class="modal-header py-2">
-					<h5 class="modal-title">Buscar Articulo</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Buscar articulo..." onkeyup="search('modalTrans')" />
-					</div>
-					<table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
-						<tr ng-repeat="tran in transports" ng-show="true" style="cursor: pointer" onclick="selectRow(this)">
-							<td>{{ tran.co_tran }}</td>
-							<td>{{ tran.des_tran }}</td>
-						</tr>
-					</table>
-					<input type="hidden" id="name-input" />
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-					<button type="button" class="btn btn-primary" onclick="saveRow('modalTrans')">Seleccionar</button>
-				</div>
-			</div>
-		</div>
-	</div>
-	<!-- Modal 7 -->
-	<div class="modal fade" id="modalAlms" tabindex="-1" role="dialog" aria-hidden="true">
-		<div class="modal-dialog" role="document" style="max-width: 800px;">
-			<div class="modal-content">
-				<div class="modal-header py-2">
-					<h5 class="modal-title">Buscar Almacen</h5>
-					<button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
-						<span aria-hidden="true">&times;</span>
-					</button>
-				</div>
-				<div class="modal-body" style="max-height: 450px; overflow-y: auto">
-					<div class="input-group">
-						<input type="text" class="form-control" placeholder="Buscar almacen..." onkeyup="search('modalAlms')" />
-					</div>
-					<table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
-						<tr ng-repeat="alm in alms" ng-show="true" style="cursor: pointer" onclick="selectRow(this)">
-							<td>{{ alm.co_alma }}</td>
-							<td>{{ alm.des_alma }}</td>
-						</tr>
-					</table>
-					<input type="hidden" id="name-input" />
-				</div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
-					<button type="button" class="btn btn-primary" onclick="saveRow('modalAlms')">Seleccionar</button>
-				</div>
-			</div>
-		</div>
-	</div>
+    <div class="row">
+        <div class="col-md-12 col-xl-3 container-list">
+            <input type="text" id="input-orders" class="form-control" placeholder="Buscar pedido..." style="border: solid 1px #ced4da;" onkeyup="searchOrder()" />
+            <div class="list-table-orders">
+                <table class="table table-hover table-striped" id="table-orders">
+                    <thead>
+                        <tr>
+                            <th class="text-white">Código</th>
+                            <th class="text-white">Cliente</th>
+                        </tr>
+                    </thead>
+                    <tr ng-repeat="order in orders" ng-class="{ active: orders[index].doc_num == order.doc_num }" ng-click="selectOrder(order.doc_num)" style="cursor: pointer;">
+                        <td><i class="fas fa-caret-right mx-1" ng-show="orders[index].doc_num == order.doc_num"></i>{{ order.doc_num }}</td>
+                        <td>{{ order.saCliente.cli_des }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <hr class="divider" />
+        <form action="" method="post" id="form" class="col-md-12 col-xl-9 container-form" onsubmit="return false;">
+            <div class="form-header">
+                <h3 class="text-center text-white"><i class="fas fa-file-invoice"></i> Pedido</h3>
+            </div>
+            <div class="form-buttons">
+                <div class="row">
+                    <div class="col buttons-next-prev" ng-show="!adding && !editing">
+                        <button type="button" class="btn btn-primary" ng-click="margin('s')">
+                            <i class="fas fa-backward-step"></i>
+                        </button>
+                        <div style="width: 10px;"></div>
+                        <button type="button" class="btn btn-primary" ng-click="prev()">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div style="width: 10px;"></div>
+                        <button type="button" class="btn btn-primary" ng-click="next()">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                        <div style="width: 10px;"></div>
+                        <button type="button" class="btn btn-primary" ng-click="margin('e')">
+                            <i class="fas fa-forward-step"></i>
+                        </button>
+                    </div>
+                    <div class="col buttons-save-cancel" ng-show="adding">
+                        <button type="button" class="btn btn-danger" ng-click="adding = false; order = orders[index]">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <div style="width: 10px;"></div>
+                        <button type="submit" class="btn btn-success" ng-click="addOrder()">
+                            <i class="fas fa-save"></i>
+                            Agregar
+                        </button>
+                    </div>
+                    <div class="col buttons-save-cancel" ng-show="editing">
+                        <button type="button" class="btn btn-danger" ng-click="editing = false; order = orders_orig[index]">
+                            <i class="fas fa-times"></i>
+                            Cancelar
+                        </button>
+                        <div style="width: 10px;"></div>
+                        <button type="button" class="btn btn-success" ng-click="editOrder()">
+                            <i class="fas fa-save"></i>
+                            Guardar
+                        </button>
+                    </div>
+                    <div class="col buttons-actions justify-content-end" ng-show="!adding && !editing">
+                        <button type="button" class="btn btn-primary" ng-click="initAddOrder()">
+                            <i class="fas fa-plus"></i> Nuevo
+                        </button>
+                        <div style="width: 10px;"></div>
+                        <button type="button" class="btn btn-warning" ng-disabled="order.saldo < order.total_neto || order.status != 0" ng-click="editing = true">
+                            <i class="fas fa-file-edit"></i> Modificar
+                        </button>
+                        <div style="width: 10px;"></div>
+                        <button type="button" class="btn btn-danger" ng-disabled="order.saldo < order.total_neto || order.status != 0" onclick="$('#modalDelete').modal('show')">
+                            <i class="fas fa-times"></i> Eliminar
+                        </button>
+                        <div style="width: 10px;"></div>
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#modalSearchBudget" onclick="focusField('#n_cotiz')">
+                            <i class="fa-solid fa-file-lines"></i> Importar Cotización
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="form-tabs">
+                <div class="row">
+                    <button type="button" id="btn-general" class="col tablinks active" onclick="openTab(event, 'general')">General</button>
+                    <button type="button" id="btn-adicionales" class="col tablinks" onclick="openTab(event, 'adicionales')">Adicionales</button>
+                </div>
+            </div>
+            <div id="general" class="form-body" style="display: flex;">
+                <div class="row">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="controls">
+                            <label>Número</label>
+                            <input type="text" class="form-control" id="id" ng-model="order.doc_num" ng-disabled="true" ng-required="true" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4">
+                        <div class="controls">
+                            <label>Fecha</label>
+                            <input type="date" class="form-control" id="fec_emis" ng-model="order.fec_emis" ng-disabled="!adding" ng-required="true" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-3">
+                        <div class="controls">
+                            <label>Fec. Venc</label>
+                            <input type="date" class="form-control" id="fec_venc" ng-model="order.fec_venc" ng-disabled="!adding" ng-required="true" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="controls">
+                            <label>Cliente</label>
+                            <div class="input-search">
+                                <input type="text" class="form-control" id="client" ng-model="order.co_cli" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setClient(order.co_cli, false)" ng-blur="setClient(order.co_cli, true)" />
+                                <input type="text" class="form-control" id="des_client" ng-model="order.des_cli" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
+                                <i class="fas fa-search" role="button" onclick="openModal(this, 'modalClients')" data-name="client"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4">
+                        <div class="controls">
+                            <label>Vendedor</label>
+                            <div class="input-search">
+                                <input type="text" class="form-control" id="seller" ng-model="order.co_ven" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setSeller(order.co_ven, false)" ng-blur="setSeller(order.co_ven, true)" />
+                                <input type="text" class="form-control" id="des_seller" ng-model="order.des_ven" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
+                                <i class="fas fa-search" role="button" onclick="openModal(this, 'modalSellers')" data-name="seller"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-3">
+                        <div class="controls">
+                            <label>Moneda</label>
+                            <div class="input-search">
+                                <input type="text" class="form-control" id="currency" ng-model="order.co_mone" ng-disabled="!adding && !editing" ng-required="true" onkeydown="return false;" />
+                                <i class="fas fa-search" role="button" onclick="openModal(this, 'modalCurrencies')" data-name="currency"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="controls">
+                            <label>Cond. Pago</label>
+                            <div class="input-search">
+                                <input type="text" class="form-control" id="cond" ng-model="order.co_cond" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setCond(order.co_cond, false)" ng-blur="setCond(order.co_cond, true)" />
+                                <input type="text" class="form-control" id="des_cond" ng-model="order.des_cond" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
+                                <i class="fas fa-search" role="button" onclick="openModal(this, 'modalConds')" data-name="cond"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4">
+                        <div class="controls">
+                            <label>Transporte</label>
+                            <div class="input-search">
+                                <input type="text" class="form-control" id="trans" ng-model="order.co_tran" ng-disabled="!adding && !editing" ng-required="true" onkeydown="return false;" />
+                                <i class="fas fa-search" role="button" onclick="openModal(this, 'modalTrans')" data-name="trans"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-3">
+                        <div class="controls">
+                            <label>Tasa</label>
+                            <input type="text" class="form-control" id="tasa" ng-model="order.tasa" ng-disabled="!adding && !editing" ng-required="true" ng-change="update(order.tasa)" onkeydown="return onlyNumbers(event)" />
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12 col-md-5">
+                        <div class="controls">
+                            <label>Descripción</label>
+                            <input type="text" class="form-control" id="descrip" ng-model="order.descrip" ng-disabled="!adding && !editing" ng-required="false" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-4">
+                        <div class="controls">
+                            <label>Estatus</label>
+                            <input type="text" class="form-control" id="n_control" ng-model="order.estatus" ng-disabled="true" ng-required="false" />
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-3 btn-convert">
+                        <button type="button" class="btn btn-primary" ng-click="convert()">Conversión</button>
+                    </div>
+                </div>
+                <div class="row mt-3" ng-if="adding || editing">
+                    <div class="col">
+                        <button type="button" class="btn btn-primary" ng-click="initItem(false, null)">
+                            <i class="fas fa-plus"></i> Agregar Item
+                        </button>
+                    </div>
+                </div>
+                <div class="bottom" style="padding: 0 0 10px 0;">
+                    <h4 class="text-center text-white form-header"><i class="fas fa-list"></i> Detalle</h4>
+                    <div style="padding: 0 10px; overflow-x: auto;">
+                        <table class="table">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th>N°</th>
+                                    <th>Artículo</th>
+                                    <th>Descripción</th>
+                                    <th>Almacén</th>
+                                    <th>Cantidad</th>
+                                    <th>Impuesto</th>
+                                    <th>IVA</th>
+                                    <th>Total</th>
+                                    <th ng-if="adding"></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="reng in order.saPedidoVentaReng" style="cursor: pointer;">
+                                    <td>{{ reng.reng_num }}</td>
+                                    <td>{{ reng.co_art }}</td>
+                                    <td>{{ searchArt(reng.co_art) }}</td>
+                                    <td>{{ reng.co_alma }}</td>
+                                    <td>{{ reng.total_art }}</td>
+                                    <td ng-show="reng.tipo_imp == '1'">IVA 16%</td>
+                                    <td ng-show="reng.tipo_imp == '7'">Exento</td>
+                                    <td ng-show="!converted">{{ reng.monto_imp }}</td>
+                                    <td ng-show="converted" class="field-active">{{ reng.monto_imp_om }}</td>
+                                    <td ng-show="!converted">{{ reng.reng_neto }}</td>
+                                    <td ng-show="converted" class="field-active">{{ reng.reng_neto_om }}</td>
+                                    <td ng-if="adding || editing" class="d-flex justify-content-evenly">
+                                        <button type="button" class="btn btn-primary" ng-click="initItem(true, reng);">
+                                            <i class="fas fa-pencil"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-danger" ng-click="updateAmounts(order, reng, order.saPedidoVentaReng, 3);">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                <tr ng-if="!order.saPedidoVentaReng || order.saPedidoVentaReng.length == 0">
+                                    <td colspan="8"><p class="m-0 text-center">No hay items agregados</p></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <hr />
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 offset-md-6">
+                            <div class="controls">
+                                <label>Sub-Total</label>
+                                <input type="text" class="form-control" id="subtotal" ng-model="order.total_bruto" ng-show="!converted" ng-disabled="true" ng-required="true" />
+                                <input type="text" class="form-control field-active" id="subtotal_om" ng-model="order.total_bruto_om" ng-show="converted" ng-disabled="true" ng-required="true" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6 offset-md-6">
+                            <div class="controls">
+                                <label>IVA</label>
+                                <input type="text" class="form-control" id="iva" ng-model="order.monto_imp" ng-show="!converted" ng-disabled="true" ng-required="true" />
+                                <input type="text" class="form-control field-active" id="iva_om" ng-model="order.monto_imp_om" ng-show="converted" ng-disabled="true" ng-required="true" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6">
+                            <div class="controls">
+                                <label>Saldo</label>
+                                <input type="text" class="form-control" id="saldo" ng-model="order.saldo" ng-show="!converted" ng-disabled="true" ng-required="true" />
+                                <input type="text" class="form-control field-active" id="saldo_om" ng-model="order.saldo_om" ng-show="converted" ng-disabled="true" ng-required="true" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <div class="controls">
+                                <label>Total</label>
+                                <input type="text" class="form-control" id="total" ng-model="order.total_neto" ng-show="!converted" ng-disabled="true" ng-required="true" />
+                                <input type="text" class="form-control field-active" id="total_om" ng-model="order.total_neto_om" ng-show="converted" ng-disabled="true" ng-required="true" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="adicionales" class="form-body">
+                <div class="left">
+                    <div class="controls">
+                        <label>Campo 1</label>
+                        <input type="text" class="form-control" ng-model="order.campo1" ng-disabled="true" />
+                    </div>
+                    <div class="controls">
+                        <label>Campo 3</label>
+                        <input type="text" class="form-control" ng-model="order.campo3" ng-disabled="true" />
+                    </div>
+                    <div class="controls">
+                        <label>Campo 5</label>
+                        <input type="text" class="form-control" ng-model="order.campo5" ng-disabled="true" />
+                    </div>
+                    <div class="controls">
+                        <label>Campo 7</label>
+                        <input type="text" class="form-control" ng-model="order.campo7" ng-disabled="true" />
+                    </div>
+                </div>
+                <div class="right">
+                    <div class="controls">
+                        <label>Campo 2</label>
+                        <input type="text" class="form-control" ng-model="order.campo2" ng-disabled="true" />
+                    </div>
+                    <div class="controls">
+                        <label>Campo 4</label>
+                        <input type="text" class="form-control" ng-model="order.campo4" ng-disabled="true" />
+                    </div>
+                    <div class="controls">
+                        <label>Campo 6</label>
+                        <input type="text" class="form-control" ng-model="order.campo6" ng-disabled="true" />
+                    </div>
+                    <div class="controls">
+                        <label>Campo 8</label>
+                        <input type="text" class="form-control" ng-model="order.campo8" ng-disabled="true" />
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- Modal Eliminar Pedido -->
+    <div class="modal fade modal-info" id="modalDelete" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+            <div class="modal-content">
+                @*<div class="modal-header">
+                        <h3 class="modal-title">Eliminar Pedido</h3>
+                    </div>*@
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+                    <div style="display: flex; justify-content: center;">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--bs-yellow)"></i>
+                    </div>
+                    <h2 class="text-center">¿Desea eliminar el pedido {{ order.doc_num }}?</h2>
+                </div>
+                <div class="modal-footer" style="justify-content: center">
+                    <button type="button" style="width: 70px;" class="btn btn-danger" data-dismiss="modal">No</button>
+                    <button type="button" style="width: 70px;" class="btn btn-success" ng-click="deleteOrder(order.doc_num)">Sí</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Confirm -->
+    <div class="modal fade modal-info" id="modalConfirm" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+                    <div style="display: flex; justify-content: center;">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--bs-yellow)"></i>
+                    </div>
+                    <h3 class="text-center">¿Desea eliminar la preliquidación N° {{ order.doc_num }}?</h3>
+                </div>
+                <div class="modal-footer" style="justify-content: center">
+                    <button type="button" style="width: 70px;" class="btn btn-danger" data-dismiss="modal">No</button>
+                    <button type="button" style="width: 70px;" class="btn btn-success" ng-click="deleteOrder(order.doc_num)">Sí</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Waiting -->
+    <div class="modal fade modal-info" id="modalWaiting" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+                    <div style="display: flex; justify-content: center;">
+                        <i class="fas fa-spinner fa-spin" style="color: #01579b;"></i>
+                    </div>
+                    <h2 class="text-center">Procesando...</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Success -->
+    <div class="modal fade modal-info" id="modalSuccess" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+                    <div style="display: flex; justify-content: center;">
+                        <i class="fas fa-check-circle" style="color: var(--bs-green)"></i>
+                    </div>
+                    <h2 class="text-center">{{ successMessage }}</h2>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#modalWaiting').modal('hide');">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Error -->
+    <div class="modal fade modal-info" id="modalError" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+                    <div style="display: flex; justify-content: center;">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--bs-red)"></i>
+                    </div>
+                    <h2 class="text-center">Ha ocurrido un error</h2>
+                    <p class="text-center">{{ errorMessage }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#modalWaiting').modal('hide');">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Agregar Item Pedido -->
+    <div class="modal fade" id="modalItem" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 1051;">
+        <form class="modal-dialog" role="document" style="max-width: 800px;" onsubmit="return false;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 ng-if="!editItem" class="modal-title">Agregar Item</h5>
+                    <h5 ng-if="editItem" class="modal-title">Editar Item</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto; text-align: left;">
+                    <div class="row">
+                        <div class="col-sm-12 col-md-6">
+                            <div class="controls">
+                                <label>Articulo</label>
+                                <div class="input-search">
+                                    <input type="text" class="form-control" id="art" ng-model="reng.co_art" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setArt(reng.co_art, false)" ng-blur="setArt(reng.co_art, true)" />
+                                    <input type="text" class="form-control" id="des_art" ng-disabled="!adding && !editing" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
+                                    <i class="fas fa-search" role="button" onclick="openModal(this, 'modalArts')" data-name="art"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-6">
+                            <div class="controls">
+                                <label>Almacen</label>
+                                <div class="input-search">
+                                    <input type="text" class="form-control" id="alm" ng-model="reng.co_alma" ng-disabled="!adding && !editing" ng-required="true" style="flex: 1;" ng-keyup="setAlm(reng.co_alma, false)" ng-blur="setAlm(reng.co_alma, true)" />
+                                    <input type="text" class="form-control" id="des_alm" ng-disabled="!adding && !editing" ng-readonly="true" style="flex: 3; margin-left: 5px;" />
+                                    <i class="fas fa-search" role="button" onclick="openModal(this, 'modalAlms')" data-name="alm"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-4">
+                            <div class="controls">
+                                <label>Cantidad</label>
+                                <input type="number" class="form-control" id="quantity" ng-model="reng.total_art" ng-disabled="!adding && !editing" ng-required="true" ng-change="updatePriceItem()" onkeydown="return onlyNumbers(event)" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div class="controls">
+                                <label>Tipo de Precio</label>
+                                <select class="form-select" id="tip_precio" ng-model="reng.co_precio" ng-change="receptPrice(reng.co_precio)" ng-disabled="!selectedArt">
+                                    <option ng-repeat="price in prices_filter" ng-click="setPrice(price)" value="{{ price.co_precio.trim() }}">{{ price.co_precio.trim() }}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div class="controls">
+                                <label>Precio Unit. $USD</label>
+                                <input type="text" class="form-control" id="price_usd" ng-model="reng.prec_vta_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" />
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12 col-md-4">
+                            <div class="controls">
+                                <label>Total $USD (Sin IVA)</label>
+                                <input type="text" class="form-control" id="total_usd" ng-model="reng.reng_neto_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" />
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div class="controls">
+                                <label>Porc. Tasa</label>
+                                <select class="form-select" id="tip_imp" ng-model="reng.tipo_imp" ng-change="receptImp(reng.tipo_imp)">
+                                    <option ng-repeat="imp in imps" ng-click="setImp(imp)" value="{{ imp.tipo_imp.trim() }}">{{ imp.porc_tasa.toFixed(2) }}% ({{ imp.tipo_imp.trim() }})</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-12 col-md-4">
+                            <div class="controls">
+                                <label>Monto IVA $USD</label>
+                                <input type="text" class="form-control" id="iva_usd" ng-model="reng.monto_imp_om" ng-disabled="!adding && !editing" ng-required="true" ng-readonly="true" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <span ng-if="searching" class="text-primary" style="flex: auto;">CONSULTANDO STOCK...</span>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button ng-if="!editItem" type="submit" class="btn btn-primary" ng-click="setItem(reng, 1)">Agregar</button>
+                    <button ng-if="editItem" type="submit" class="btn btn-primary" ng-click="setItem(reng, 2)">Editar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+    <!-- Modal Buscar Cotizacion -->
+    <div class="modal fade" id="modalSearchBudget" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false" style="z-index: 1051;">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Importar Cotización</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar" onclick="$('#text-error').text('');">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto">
+                    <div style="width: 80%; margin: 50px auto; display: flex; align-items: center;">
+                        <label style="flex: 1;">Ingrese Nro. de Cotización</label>
+                        <div class="input-search" style="flex: 1; position: relative;">
+                            <input type="text" class="form-control" id="n_cotiz" ng-model="idBudget" ng-keypress="detectEnter($event.originalEvent, 'C')" />
+                            <i class="fas fa-search" role="button" id="btn-cotiz" ng-click="getBudgets()" data-name="n_cotiz"></i>
+                            <label class="text-danger text-center w-100" id="text-error" style="font-weight: bold; font-size: 15px; color: #ff1919; position: absolute; top: 130%;"></label>
+                            <label class="text-primary text-center w-100" id="text-search" style="font-weight: bold; font-size: 15px; color: #ff1919; position: absolute; top: 130%;"></label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal" onclick="$('#text-error').text('');">Cerrar</button>
+                    <button type="button" class="btn btn-primary" ng-click="searchBudget(idBudget)">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 1 -->
+    <div class="modal fade" id="modalClients" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title">Buscar Cliente</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar cliente..." onkeyup="search('modalClients')" />
+                    </div>
+                    <table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
+                        <tr ng-repeat="client in clients" style="cursor: pointer" onclick="selectRow(this)">
+                            <td>{{ client.co_cli }}</td>
+                            <td>{{ client.cli_des }}</td>
+                        </tr>
+                        <tr ng-if="!clients">
+                            <td colspan="2">Cargando clientes... <i class="fas fa-spinner-third fa-spin" style="font-size: 25px;"></i></td>
+                        </tr>
+                    </table>
+                    <input type="hidden" id="name-input" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRow('modalClients')">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 2 -->
+    <div class="modal fade" id="modalConds" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title">Buscar Cond. Pago</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar cond. pago..." onkeyup="search('modalConds')" />
+                    </div>
+                    <table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
+                        <tr ng-repeat="cond in conds" style="cursor: pointer" onclick="selectRow(this)">
+                            <td>{{ cond.co_cond }}</td>
+                            <td>{{ cond.cond_des }}</td>
+                        </tr>
+                    </table>
+                    <input type="hidden" id="name-input" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRow('modalConds')">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 3 -->
+    <div class="modal fade" id="modalSellers" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title">Buscar Moneda</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar moneda..." onkeyup="search('modalSellers')" />
+                    </div>
+                    <table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
+                        <tr ng-repeat="seller in sellers" style="cursor: pointer" onclick="selectRow(this)">
+                            <td>{{ seller.co_ven }}</td>
+                            <td>{{ seller.ven_des }}</td>
+                        </tr>
+                    </table>
+                    <input type="hidden" id="name-input" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRow('modalSellers')">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 4 -->
+    <div class="modal fade" id="modalArts" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title">Buscar Articulo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar articulo..." onkeyup="search('modalArts')" />
+                    </div>
+                    <table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
+                        <tr ng-repeat="art in arts" ng-show="true" style="cursor: pointer" onclick="selectRow(this)">
+                            <td>{{ art.co_art }}</td>
+                            <td>{{ art.art_des }}</td>
+                        </tr>
+                    </table>
+                    <input type="hidden" id="name-input" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRow('modalArts')">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 5 -->
+    <div class="modal fade" id="modalCurrencies" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title">Buscar Articulo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar articulo..." onkeyup="search('modalCurrencies')" />
+                    </div>
+                    <table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
+                        <tr ng-repeat="curr in currencies" ng-show="true" style="cursor: pointer" onclick="selectRow(this)">
+                            <td>{{ curr.co_mone }}</td>
+                            <td>{{ curr.mone_des }}</td>
+                        </tr>
+                    </table>
+                    <input type="hidden" id="name-input" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRow('modalCurrencies')">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 6 -->
+    <div class="modal fade" id="modalTrans" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title">Buscar Articulo</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar articulo..." onkeyup="search('modalTrans')" />
+                    </div>
+                    <table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
+                        <tr ng-repeat="tran in transports" ng-show="true" style="cursor: pointer" onclick="selectRow(this)">
+                            <td>{{ tran.co_tran }}</td>
+                            <td>{{ tran.des_tran }}</td>
+                        </tr>
+                    </table>
+                    <input type="hidden" id="name-input" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRow('modalTrans')">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 7 -->
+    <div class="modal fade" id="modalAlms" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title">Buscar Almacen</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar almacen..." onkeyup="search('modalAlms')" />
+                    </div>
+                    <table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
+                        <tr ng-repeat="alm in alms" ng-show="true" style="cursor: pointer" onclick="selectRow(this)">
+                            <td>{{ alm.co_alma }}</td>
+                            <td>{{ alm.des_alma }}</td>
+                        </tr>
+                    </table>
+                    <input type="hidden" id="name-input" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="saveRow('modalAlms')">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal 8 -->
+    <div class="modal fade" id="modalBudgets" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Buscar Cotización</h5>
+                    <button type="button" class="close" onclick="$('#modalWaiting').modal('hide')" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar cotización..." onkeyup="search('modalBudgets')" />
+                    </div>
+                    <table class="table table-bordered table-hover table-striped mt-3" id="results">
+                        <tr ng-repeat="budget in budgets" style="cursor: pointer" onclick="selectRow(this)">
+                            <td class="text-start">{{ budget.doc_num }}</td>
+                            <td class="text-start">{{ budget.co_cli }} - {{ budget.saCliente.cli_des }}</td>
+                        </tr>
+                    </table>
+                    <input type="hidden" id="name-input" />
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="$('#modalWaiting').modal('hide');" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="$('#modalWaiting').modal('hide'); saveRow('modalBudgets');">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 <div class="panel-loading p-3">
 	<h4>Cargando módulo de pedidos...</h4>
@@ -797,7 +861,8 @@
 	var transports = @Html.Raw(Json.Encode(ViewBag.transports));
 	var alms = @Html.Raw(Json.Encode(ViewBag.alms));
 	var arts = @Html.Raw(ViewBag.arts);
-	var prices = @Html.Raw(ViewBag.prices);
+    var prices = @Html.Raw(ViewBag.prices);
+    var isNullOrEmpty = (str) => str == null || str == "";
 	@*var prices = @Html.Raw(Json.Encode(ViewBag.prices));*@
 	var imps = @Html.Raw(Json.Encode(ViewBag.imps));
 	var rate = parseFloat('@ViewBag.rate');
@@ -826,7 +891,7 @@
 		$scope.conds = conds;
 		$scope.sellers = sellers;
 		$scope.currencies = currencies;
-		$scope.transports = transports;
+        $scope.transports = transports;
 		$scope.alms = alms;
 		$scope.arts = arts;
 		$scope.prices = prices;
@@ -919,9 +984,15 @@
 			$scope.editItem = edit;
 
 			if (edit) {
-				$scope.reng = r;
+                $scope.reng = r;
+                $scope.oldTotal = r.total_art;
+                $scope.selectedArt = true;
 				$("#des_art").val(searchArt(r.co_art));
-				$("#des_alm").val(searchAlm(r.co_alma));
+                $("#des_alm").val(searchAlm(r.co_alma));
+
+                if ($scope.order.fromCotiz)
+                    $scope.prices_filter = $scope.getFilterPrices(r.co_art.trim());
+
 			} else {
 				$scope.reng = {
 					co_art: "",
@@ -1024,9 +1095,16 @@
 				if (req.data.Result <= 0 || req.data.Result < parseInt(r.total_art)) {
 					$("#modalError").modal("show");
 					$scope.searching = false;
-					$scope.errorMessage = `No hay stock disponible del articulo ${r.co_art.trim()} en el almacen ${r.co_alma.trim()} (DISPONIBLE ${req.data.Result}, SOLICITADA ${r.total_art})`;
-					if ($scope.editing)
-						r.total_art = $scope.orders_orig[$scope.index].saPedidoVentaReng[r.reng_num - 1].total_art;
+                    $scope.errorMessage = `No hay stock disponible del articulo ${r.co_art.trim()} en el almacen ${r.co_alma.trim()} (DISPONIBLE ${req.data.Result}, SOLICITADA ${r.total_art})`;
+
+                    // agregar en rama stats
+                    if ($scope.editing) {
+                        r.total_art = $scope.orders_orig[$scope.index].saPedidoVentaReng[r.reng_num - 1].total_art;
+                        $scope.updatePriceItem();
+                    } else if (action == 2) {
+                        r.total_art = $scope.oldTotal;
+                        $scope.updatePriceItem();
+                    }
 
 					$scope.$digest();
 					return -1;
@@ -1220,58 +1298,62 @@
 			$scope.updatePriceItem();
 		}
 
-		$scope.addOrder = function () {
+        $scope.addOrder = function () {
 
-			if ($("#form")[0].checkValidity()) {
-				if ($scope.order.saPedidoVentaReng.length > 0) {
+            if ($scope.order.fromCotiz) {
+                $scope.addFromBudget();
+            } else {
+                if ($("#form")[0].checkValidity()) {
+                    if ($scope.order.saPedidoVentaReng.length > 0) {
 
-					$("#form input, #form textarea").change();
+                        $("#form input, #form textarea").change();
 
-					$("#modalWaiting").modal("show");
-					$scope.order.fec_emis = origDate($scope.order.fec_emis);
-					$scope.order.fec_venc = origDate($scope.order.fec_venc);
-					$scope.order.fec_reg = origDate($scope.order.fec_reg);
-					$scope.order.co_cta_ingr_egr = null;
+                        $("#modalWaiting").modal("show");
+                        $scope.order.fec_emis = origDate($scope.order.fec_emis);
+                        $scope.order.fec_venc = origDate($scope.order.fec_venc);
+                        $scope.order.fec_reg = origDate($scope.order.fec_reg);
+                        $scope.order.co_cta_ingr_egr = null;
 
-					for (var ind in $scope.order) {
-						if ($scope.order[ind] === "")
-							$scope.order[ind] = null;
-					}
+                        for (var ind in $scope.order) {
+                            if ($scope.order[ind] === "")
+                                $scope.order[ind] = null;
+                        }
 
-					var req = {
-						method: 'POST',
-						url: '/api/DataMasterApi/AddOrder/',
-						data: $scope.order,
-						headers: {
-							'Content-Type': 'application/json'
-						},
-					}
+                        var req = {
+                            method: 'POST',
+                            url: '/api/DataMasterApi/AddOrder/',
+                            data: $scope.order,
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                        }
 
-					$http(req).then(function (response) {
+                        $http(req).then(function (response) {
 
-						var res = response.data;
-						if (res.Status == "OK") {
-							$("#modalSuccess").modal("show");
-							$scope.successMessage = `El Pedido ${res.Result.doc_num} se ha agregado con éxito`;
-							$scope.orders.unshift(res.Result);
-							$scope.order = $scope.orders[0];
-							$scope.order = convert($scope.order); // AGREGAR PRECIOS OM
-							$scope.index = 0;
-							$scope.adding = false;
-						} else {
-							$("#modalError").modal("show");
-							$scope.errorMessage = res.Message;
-						}
+                            var res = response.data;
+                            if (res.Status == "OK") {
+                                $("#modalSuccess").modal("show");
+                                $scope.successMessage = `El Pedido ${res.Result.doc_num} se ha agregado con éxito`;
+                                $scope.orders.unshift(res.Result);
+                                $scope.order = $scope.orders[0];
+                                $scope.order = convert($scope.order); // AGREGAR PRECIOS OM
+                                $scope.index = 0;
+                                $scope.adding = false;
+                            } else {
+                                $("#modalError").modal("show");
+                                $scope.errorMessage = res.Message;
+                            }
 
-					}, function (response) {
-						$("#modalError").modal("show");
-						$scope.errorMessage = "ERROR INTERNO -> " + response.data.ExceptionMessage;
-					});
+                        }, function (response) {
+                            $("#modalError").modal("show");
+                            $scope.errorMessage = "ERROR INTERNO -> " + response.data.ExceptionMessage;
+                        });
 
-				} else {
-					alert("Debes agregar items al pedido");
-				}
-			}
+                    } else {
+                        alert("Debes agregar items al pedido");
+                    }
+                }
+            }
 		}
 
 		$scope.editOrder = function () {
@@ -1345,7 +1427,178 @@
 						$scope.errorMessage = res.Message;
 					}
 				});
-		}
+        }
+
+        // FUNCIONES CON COTIZACIONES
+        $scope.getBudgets = function () {
+
+            $("#modalWaiting").modal("show");
+            $http.get("/api/DataMasterApi/GetBudgets/" + 20)
+                .then(function (response) {
+
+                    var res = response.data;
+                    if (res.Status == "OK") {
+                        $scope.budgets = res.Result;
+                        openModal($("#btn-cotiz")[0], "modalBudgets");
+                    } else {
+                        $scope.errorMessage = res.Message;
+                        $("#modalError").modal("show");
+                    }
+                });
+        }
+
+        $scope.detectEnter = function (e, i) {
+            if (i == 'C') {
+                if (e.which == 13) {
+                    $scope.searchBudget($scope.idBudget);
+                } else {
+                    $("#text-error").text("");
+                }
+            } // else if (i == 'F') {
+            //    if (e.which == 13) {
+            //        $scope.searchSingleInvoice($scope.idInvoice);
+            //    } else {
+            //        $("#text-error-f").text("");
+            //    }
+            //}
+        }
+
+        $scope.searchBudget = function (id) {
+
+            if (isNullOrEmpty(id))
+                id = $("#n_cotiz").val();
+
+            $("#text-error").text("");
+            if (!isNullOrEmpty(id)) {
+
+                $("#text-search").text("BUSCANDO COTIZACIÓN...");
+                $http.get("/api/DataMasterApi/GetBudget/" + id)
+                    .then(function (response) {
+
+                        var res = response.data;
+                        if (res.Status == "OK") {
+
+                            if (res.Result.saCotizacionClienteReng && res.Result.saCotizacionClienteReng.length > 0) { // VALIDANDO RENGLONES DE LA COTIZACION
+
+                                $("#modalSearchBudget").modal("hide");
+
+                                $scope.order = res.Result;
+                                $scope.order.saPedidoVentaReng = res.Result.saCotizacionClienteReng;
+
+                                $scope.order.doc_num = "";
+                                $scope.order.descrip = id;
+                                $scope.order = convert($scope.order); // AGREGAR PRECIOS OM, DESCRIPCIONES Y FECHAS
+
+                                for (var reng of $scope.order.saPedidoVentaReng) {
+                                    reng.tipo_doc = "CCLI";
+                                    reng.num_doc = id;
+                                    reng.rowguid_doc = reng.rowguid;
+                                    reng.co_precio = reng.co_precio.trim();
+                                }
+
+                                $scope.order.fec_emis = new Date(Date.now());
+                                $scope.order.fec_venc = new Date(Date.now());
+                                $scope.order.fec_reg = new Date(Date.now());
+                                $scope.order.fromCotiz = true;
+
+                                $("#n_cotiz").val("");
+                                $("#text-error").text("");
+                                $("#text-search").text("");
+                                $scope.adding = true;
+                                $scope.converted = true;
+
+                            } else {
+                                $("#n_cotiz").focus();
+                                $("#text-search").text("");
+                                $("#text-error").text("**ERROR RECUPERANDO RENGLONES. INTENTE DE NUEVO**");
+                            }
+
+                        } else {
+                            $scope.idOrder = "";
+                            $("#n_cotiz").focus();
+                            $("#text-search").text("");
+
+                            if (res.Message == "0")
+                                $("#text-error").text("**COTIZACIÓN NO ENCONTRADA**");
+                            else if (res.Message == "1")
+                                $("#text-error").text("**COTIZACIÓN BLOQUEADA**");
+                            else {
+                                $("#text-error").text("**HA OCURRIDO UN ERROR**");
+                                $scope.errorMessage = res.Message;
+                                $("#modalError").modal("show");
+                            }
+                        }
+
+                    }, function () {
+                        $scope.idOrder = "";
+                        $("#n_cotiz").val("");
+                        $("#n_cotiz").focus();
+                        $("#text-search").text("");
+                        $("#text-error").text("**HA OCURRIDO UN ERROR**");
+                    });
+
+            } else {
+                $("#text-error").text("**DEBES INGRESAR UN NÚMERO DE COTIZACIÓN**");
+                $("#text-search").text("");
+            }
+        }
+
+        $scope.addFromBudget = async function () {
+
+            if ($("#form")[0].checkValidity()) {
+
+                $("#form input, #form textarea").change();
+                $("#modalWaiting").modal("show");
+                $scope.order.co_cta_ingr_egr = null;
+
+                for (var ind in $scope.order) {
+                    if ($scope.order[ind] === "")
+                        $scope.order[ind] = null;
+                }
+
+                for (var r of $scope.order.saPedidoVentaReng) {
+                    var req = await $http.get("/api/DataMasterApi/GetStock/" + r.co_art.trim() + "/" + r.co_alma.trim());
+                    if (req.data.Result <= 0 || req.data.Result < parseInt(r.total_art)) {
+                        $scope.errorMessage = `No hay stock disponible del articulo ${r.co_art.trim()} en el almacen ${r.co_alma.trim()} (DISPONIBLE ${req.data.Result}, SOLICITADA ${r.total_art})`;
+                        $scope.$digest();
+                        $("#modalError").modal("show");
+                        return;
+                    }
+                }
+
+                var req = {
+                    method: 'POST',
+                    url: '/api/DataMasterApi/AddNewOrder/',
+                    data: $scope.order,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                }
+
+                $http(req).then(function (response) {
+
+                    var res = response.data;
+                    if (res.Status == "OK") {
+                        console.log(res);
+                        $("#modalSuccess").modal("show");
+                        $scope.successMessage = `El Pedido ${res.Result.doc_num} se ha agregado con éxito`;
+                        $scope.orders.unshift(res.Result);
+                        $scope.order = $scope.orders[0];
+                        $scope.order = convert($scope.order); // AGREGAR PRECIOS OM
+                        $scope.order.fromCotiz = false;
+                        $scope.index = 0;
+                        $scope.adding = false;
+                    } else {
+                        $("#modalError").modal("show");
+                        $scope.errorMessage = res.Message;
+                    }
+
+                }, function (response) {
+                    $("#modalError").modal("show");
+                    $scope.errorMessage = "ERROR INTERNO -> " + response.data.ExceptionMessage;
+                });
+            }
+        }
 	});
 
 	function setStatus(status) {
@@ -1516,12 +1769,9 @@
 	function openModal(elem, modal) {
 
 		var previous = elem.previousElementSibling;
-
 		if (!previous.disabled) {
-
 			$("#" + modal).find("#name-input").val($(elem).data("name"));
 			$("#" + modal).modal("show");
-
 		}
 	}
 
@@ -1629,6 +1879,14 @@
 
 		document.getElementById(tabName).style.display = "flex";
 		e.target.className += " active";
-	}
+    }
+
+    // FUNCIONES NUEVAS
+    function focusField(field) {
+        $(field).val("");
+        setTimeout(function () {
+            $(field).focus();
+        }, 1000);
+    }
 
 </script>
