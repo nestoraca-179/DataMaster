@@ -183,14 +183,13 @@ h5.no-data {
 			</div>
 		</div>
 		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
-			<div class="direct shadow-tm" style="border-bottom: solid 5px #2E7D32;">
-				<h5>Total Ventas del Mes</h5>
-				@*<span ng-show="stats" class="stat-number">{{ stats.totalAmountSale.toLocaleString('es-ES') }}</span>*@
-				<span ng-show="stats" class="stat-number">{{ formatNumber(stats.totalAmountSale / rate) }}$</span>
-				<i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
-				<i class="fa-solid fa-coins" style="color: #2E7D32;"></i>
-				@*<i style="color: #2E7D32; font-size: 28px; font-weight: bold; font-style: normal;"></i>*@
-			</div>
+            <div class="direct shadow-tm" style="border-bottom: solid 5px #2E7D32;">
+                <h5>Total Ventas del Mes</h5>
+                @*<span ng-show="stats" class="stat-number">{{ formatNumber(stats.totalAmountSale / rate) }}$</span>*@
+                <span ng-show="stats" class="stat-number">{{ formatNumber(stats.totalAmountSaleUSD) }}$</span>
+                <i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
+                <i class="fa-solid fa-coins" style="color: #2E7D32;"></i>
+            </div>
 		</div>
 		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
 			<div class="direct shadow-tm" style="border-bottom: solid 5px #EF6C00;">
@@ -203,11 +202,10 @@ h5.no-data {
 		<div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
 			<div class="direct shadow-tm" style="border-bottom: solid 5px #D84315;">
 				<h5>Total Compras del Mes</h5>
-				@*<span ng-show="stats" class="stat-number">{{ stats.totalAmountBuy.toLocaleString('es-ES') }}$</span>*@
-				<span ng-show="stats" class="stat-number">{{ formatNumber(stats.totalAmountBuy / rate) }}$</span>
+				@*<span ng-show="stats" class="stat-number">{{ formatNumber(stats.totalAmountBuy / rate) }}$</span>*@
+				<span ng-show="stats" class="stat-number">{{ formatNumber(stats.totalAmountBuyUSD) }}$</span>
 				<i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
 				<i class="fa-solid fa-coins" style="color: #D84315;"></i>
-				@*<i style="color: #D84315; font-size: 28px; font-weight: bold; font-style: normal;"></i>*@
 			</div>
 		</div>
 	</div>
@@ -474,7 +472,7 @@ h5.no-data {
 
 	function parseDate(date) {
 		var d = date.getDate();
-		var m = date.getDate() + 1;
+		var m = date.getMonth() + 1;
 		var y = date.getFullYear();
 
 		return `${d}-${m}-${y}`;

@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace DataMaster.Models
 {
@@ -14,6 +11,10 @@ namespace DataMaster.Models
 			decimal totalAmountSaleSuc = 0, totalAmountBuySuc = 0, totalStateSuc;
 			decimal totalReimbExpSale = 0, totalReimbExpSaleSuc = 0, totalReimbExpBuy = 0, totalReimbExpBuySuc = 0;
 
+			// MONTOS USD
+			decimal totalAmountSaleUSD = 0, totalAmountSaleSucUSD = 0;
+			decimal totalAmountBuyUSD = 0, totalAmountBuySucUSD = 0;
+
 			// VENTAS
 			var sp1 = db.RepFacturaVentaxFecha(null, null, fec_d, fec_h, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 			var enumerator1 = sp1.GetEnumerator();
@@ -21,14 +22,17 @@ namespace DataMaster.Models
 			while (enumerator1.MoveNext())
 			{
 				decimal total_neto_v = enumerator1.Current.anulado ? 0 : enumerator1.Current.total_neto.Value;
+				decimal tasa = enumerator1.Current.tasa;
 
 				totalCountSale++;
 				totalAmountSale += Math.Round(decimal.Parse(total_neto_v.ToString()), 2);
+				totalAmountSaleUSD += Math.Round(total_neto_v / tasa, 2);
 
 				if (enumerator1.Current.co_sucu_in?.Trim() == sucur)
 				{
 					totalCountSaleSuc++;
 					totalAmountSaleSuc += Math.Round(decimal.Parse(total_neto_v.ToString()), 2);
+					totalAmountSaleSucUSD += Math.Round(total_neto_v / tasa, 2);
 				}
 			}
 
@@ -39,14 +43,17 @@ namespace DataMaster.Models
 			while (enumerator2.MoveNext())
 			{
 				decimal total_neto_c = enumerator2.Current.anulado ? 0 : enumerator2.Current.total_neto.Value;
+				decimal tasa = enumerator2.Current.tasa;
 
 				totalCountBuy++;
 				totalAmountBuy += Math.Round(decimal.Parse(total_neto_c.ToString()), 2);
+				totalAmountBuyUSD += Math.Round(total_neto_c / tasa, 2);
 
 				if (enumerator2.Current.co_sucu_in?.Trim() == sucur)
 				{
 					totalCountBuySuc++;
 					totalAmountBuySuc += Math.Round(decimal.Parse(total_neto_c.ToString()), 2);
+					totalAmountBuySucUSD += Math.Round(total_neto_c / tasa, 2);
 				}
 			}
 
@@ -130,7 +137,9 @@ namespace DataMaster.Models
 					totalCountSale,
 					totalCountBuy,
 					totalAmountSale,
+					totalAmountSaleUSD,
 					totalAmountBuy,
+					totalAmountBuyUSD,
 					totalState,
 					totalReimbExpSale,
 					totalReimbExpBuy
@@ -140,7 +149,9 @@ namespace DataMaster.Models
 					totalCountSale = totalCountSaleSuc,
 					totalCountBuy = totalCountBuySuc,
 					totalAmountSale = totalAmountSaleSuc,
+					totalAmountSaleUSD = totalAmountSaleSucUSD,
 					totalAmountBuy = totalAmountBuySuc,
+					totalAmountBuyUSD = totalAmountBuySucUSD,
 					totalState = totalStateSuc,
 					totalReimbExpSale = totalReimbExpSaleSuc,
 					totalReimbExpBuy = totalReimbExpBuySuc
@@ -149,6 +160,5 @@ namespace DataMaster.Models
 
 			return obj;
 		}
-
 	}
 }

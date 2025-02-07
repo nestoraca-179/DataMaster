@@ -1,15 +1,11 @@
 ﻿using DataMaster.Models;
 using DevExpress.DataAccess.Sql;
 using DevExpress.Web.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 using System.Web.Mvc;
 
 namespace DataMaster.Controllers
 {
-    public class RepController : Controller
+	public class RepController : Controller
     {
         RepStockArticulos report = new RepStockArticulos();
         public ActionResult RepStockArticulosPartial()

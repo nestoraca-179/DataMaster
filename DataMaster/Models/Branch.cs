@@ -1,10 +1,9 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 
 namespace DataMaster.Models
 {
-    public class Branch : ProfitAdmManager
+	public class Branch : ProfitAdmManager
     {
         public saSucursal GetBranchByID(string id)
         {
