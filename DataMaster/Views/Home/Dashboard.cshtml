@@ -292,8 +292,8 @@ h5.no-data {
 	fec_d.setMinutes(0);
 	fec_d.setSeconds(0);
 
-	var fecha_d = fec_d.toLocaleDateString().replaceAll("/", "-");
-	var fecha_h = fec_h.toLocaleDateString().replaceAll("/", "-");
+	var fecha_d = parseDate(fec_d); // fec_d.toLocaleDateString().replaceAll("/", "-");
+	var fecha_h = parseDate(fec_h); // fec_h.toLocaleDateString().replaceAll("/", "-");
 
 	app.controller("controller", function ($scope, $http) {
 
@@ -471,6 +471,14 @@ h5.no-data {
 			return formatter.format(number);
 		}
 	});
+
+	function parseDate(date) {
+		var d = date.getDate();
+		var m = date.getDate() + 1;
+		var y = date.getFullYear();
+
+		return `${d}-${m}-${y}`;
+    }
 
 </script>
 @* GRAFICA ARTICULOS VENDIDOS *@
