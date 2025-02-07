@@ -18,7 +18,10 @@ namespace DataMaster.Models
 
                 budget.saCliente.saCotizacionCliente = null;
                 budget.saVendedor.saCotizacionCliente = null;
-                budget.saCondicionPago.saCotizacionCliente = null;
+                
+                if (budget.saCondicionPago != null)
+                    budget.saCondicionPago.saCotizacionCliente = null;
+                
                 foreach (saCotizacionClienteReng reng in budget.saCotizacionClienteReng)
                 {
                     reng.saCotizacionCliente = null;

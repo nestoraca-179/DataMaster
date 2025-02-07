@@ -1300,13 +1300,13 @@
 
         $scope.addOrder = function () {
 
+            $("#form input, #form textarea").change();
+
             if ($scope.order.fromCotiz) {
                 $scope.addFromBudget();
             } else {
                 if ($("#form")[0].checkValidity()) {
                     if ($scope.order.saPedidoVentaReng.length > 0) {
-
-                        $("#form input, #form textarea").change();
 
                         $("#modalWaiting").modal("show");
                         $scope.order.fec_emis = origDate($scope.order.fec_emis);
@@ -1620,7 +1620,7 @@
 	}
 
 	function searchCond(id) {
-		return conds.find(c => c.co_cond == id).cond_des;
+		return conds.find(c => c.co_cond == id)?.cond_des;
 	}
 
 	function searchVen(id) {
