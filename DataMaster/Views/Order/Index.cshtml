@@ -1195,7 +1195,7 @@
 		}
 
 		$scope.receptPrice = function (value) {
-            var price = $scope.prices_filter.find(p => p.co_art == $scope.reng.co_art?.trim() && p.co_precio.trim() == value);
+            var price = $scope.prices_filter.find(p => p.co_art.trim() == $scope.reng.co_art?.trim() && p.co_precio.trim() == value.trim());
 			$scope.setPrice(price);
 		}
 
