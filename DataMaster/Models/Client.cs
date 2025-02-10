@@ -79,9 +79,6 @@ namespace DataMaster.Models
 				cliente.cli_des = enumerator.Current.cli_des.Trim();
 				cliente.desc_glob = enumerator.Current.anulado ? 0 : enumerator.Current.total_neto; // USADO PARA EL TOTAL
 
-				// cliente.campo1 = Convert.ToDouble(enumerator.Current.Venta).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
-				// cliente.campo2 = Math.Round(Convert.ToDouble((enumerator.Current.Venta * 100) / enumerator.Current.Venta_total), 2).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
-
 				clientes_temp.Add(cliente);
 			}
 
@@ -97,12 +94,13 @@ namespace DataMaster.Models
 					new_cliente.cli_des = cl.cli_des;
 					new_cliente.campo1 = total_c.ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
 					new_cliente.campo2 = Math.Round((total_c * 100) / total, 2).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
+					new_cliente.desc_glob = total_c;
 
 					clientes.Add(new_cliente);
 				}
 			}
 
-			return clientes;
+			return clientes.OrderByDescending(c => c.desc_glob).ToList();
 		}
 
 		public List<saCliente> GetMostMorousClients(int number)
