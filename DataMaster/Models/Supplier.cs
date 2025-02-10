@@ -65,6 +65,5 @@ namespace DataMaster.Models
 
 			return suppliers;
 		}
-
 	}
 }

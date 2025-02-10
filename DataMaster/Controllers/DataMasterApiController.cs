@@ -200,7 +200,7 @@ namespace DataMaster.Controllers
 				DateTime fecha_h = utils.FormatDate(fec_h);
 				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
 
-				object stats = new Invoice().GetStatsInvoices(fecha_d, fecha_h, sucur);
+				object stats = new Invoice().GetStatsInvoicesWithNotes(fecha_d, fecha_h, sucur);
 
 				response.Status = "OK";
 				response.Result = stats;
@@ -254,7 +254,7 @@ namespace DataMaster.Controllers
 				DateTime fecha_h = utils.FormatDate(fec_h);
 				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
 
-				List<saArticulo> arts = new Product().GetMostProducts(fecha_d, fecha_h, number, false, suc == 1 ? sucur : null);
+				List<saArticulo> arts = new Product().GetMostProductsWithNotes(fecha_d, fecha_h, number, false, suc == 1 ? sucur : null);
 
 				response.Status = "OK";
 				response.Result = arts;
@@ -308,10 +308,11 @@ namespace DataMaster.Controllers
 				DateTime fecha_h = utils.FormatDate(fec_h);
 				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
 
-				List<saProveedor> suppliers = new Supplier().GetMostActiveSuppliers(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
+				// List<saProveedor> suppliers = new Supplier().GetMostActiveSuppliers(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
+				List<saCliente> clientes = new Client().GetMostActiveClientsWithNotes(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
 
 				response.Status = "OK";
-				response.Result = suppliers;
+				response.Result = clientes;
 			}
 			catch (Exception ex)
 			{

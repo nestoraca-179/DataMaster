@@ -17,13 +17,13 @@ namespace DataMaster.Models
     
     public partial class ProfitAdmEntities : DbContext
     {
-		public ProfitAdmEntities(string conn) : base(conn)
-		{
-			Configuration.ProxyCreationEnabled = false;
-			((IObjectContextAdapter)this).ObjectContext.CommandTimeout = 180;
-		}
+        public ProfitAdmEntities(string conn) : base(conn)
+        {
+            Configuration.ProxyCreationEnabled = false;
+            ((IObjectContextAdapter)this).ObjectContext.CommandTimeout = 180;
+        }
 
-		protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             throw new UnintentionalCodeFirstException();
         }
@@ -1759,6 +1759,221 @@ namespace DataMaster.Models
                 new ObjectParameter("bHeaderRep", typeof(bool));
     
             return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<RepTotalVentaxArticulo_Result>("RepTotalVentaxArticulo", dCo_fecha_dParameter, dCo_fecha_hParameter, sCo_Art_dParameter, sCo_Art_hParameter, sCo_Linea_dParameter, sCo_Linea_hParameter, sCo_Sub_Linea_dParameter, sCo_Sub_Linea_hParameter, sCo_Categoria_dParameter, sCo_Categoria_hParameter, sCo_MonedaParameter, sCo_SucursalParameter, sCampOrderByParameter, sDirParameter, bHeaderRepParameter);
+        }
+    
+        public virtual ObjectResult<RepNotaEntregaVentaxFecha_Result> RepNotaEntregaVentaxFecha(string cCo_Numero_d, string cCo_Numero_h, Nullable<System.DateTime> dCo_fecha_d, Nullable<System.DateTime> dCo_fecha_h, string cCo_cliente_d, string cCo_cliente_h, string cCo_Vendedor_d, string cCo_Vendedor_h, string cCo_Transporte_d, string cCo_Transporte_h, string cCo_Zona_d, string cCo_Zona_h, string cImprSubTotal, string cCo_Moneda, string cStatus, string cAnulado, string cCo_Sucursal, string sCampOrderBy, string sDir, Nullable<bool> bHeaderRep)
+        {
+            var cCo_Numero_dParameter = cCo_Numero_d != null ?
+                new ObjectParameter("cCo_Numero_d", cCo_Numero_d) :
+                new ObjectParameter("cCo_Numero_d", typeof(string));
+    
+            var cCo_Numero_hParameter = cCo_Numero_h != null ?
+                new ObjectParameter("cCo_Numero_h", cCo_Numero_h) :
+                new ObjectParameter("cCo_Numero_h", typeof(string));
+    
+            var dCo_fecha_dParameter = dCo_fecha_d.HasValue ?
+                new ObjectParameter("dCo_fecha_d", dCo_fecha_d) :
+                new ObjectParameter("dCo_fecha_d", typeof(System.DateTime));
+    
+            var dCo_fecha_hParameter = dCo_fecha_h.HasValue ?
+                new ObjectParameter("dCo_fecha_h", dCo_fecha_h) :
+                new ObjectParameter("dCo_fecha_h", typeof(System.DateTime));
+    
+            var cCo_cliente_dParameter = cCo_cliente_d != null ?
+                new ObjectParameter("cCo_cliente_d", cCo_cliente_d) :
+                new ObjectParameter("cCo_cliente_d", typeof(string));
+    
+            var cCo_cliente_hParameter = cCo_cliente_h != null ?
+                new ObjectParameter("cCo_cliente_h", cCo_cliente_h) :
+                new ObjectParameter("cCo_cliente_h", typeof(string));
+    
+            var cCo_Vendedor_dParameter = cCo_Vendedor_d != null ?
+                new ObjectParameter("cCo_Vendedor_d", cCo_Vendedor_d) :
+                new ObjectParameter("cCo_Vendedor_d", typeof(string));
+    
+            var cCo_Vendedor_hParameter = cCo_Vendedor_h != null ?
+                new ObjectParameter("cCo_Vendedor_h", cCo_Vendedor_h) :
+                new ObjectParameter("cCo_Vendedor_h", typeof(string));
+    
+            var cCo_Transporte_dParameter = cCo_Transporte_d != null ?
+                new ObjectParameter("cCo_Transporte_d", cCo_Transporte_d) :
+                new ObjectParameter("cCo_Transporte_d", typeof(string));
+    
+            var cCo_Transporte_hParameter = cCo_Transporte_h != null ?
+                new ObjectParameter("cCo_Transporte_h", cCo_Transporte_h) :
+                new ObjectParameter("cCo_Transporte_h", typeof(string));
+    
+            var cCo_Zona_dParameter = cCo_Zona_d != null ?
+                new ObjectParameter("cCo_Zona_d", cCo_Zona_d) :
+                new ObjectParameter("cCo_Zona_d", typeof(string));
+    
+            var cCo_Zona_hParameter = cCo_Zona_h != null ?
+                new ObjectParameter("cCo_Zona_h", cCo_Zona_h) :
+                new ObjectParameter("cCo_Zona_h", typeof(string));
+    
+            var cImprSubTotalParameter = cImprSubTotal != null ?
+                new ObjectParameter("cImprSubTotal", cImprSubTotal) :
+                new ObjectParameter("cImprSubTotal", typeof(string));
+    
+            var cCo_MonedaParameter = cCo_Moneda != null ?
+                new ObjectParameter("cCo_Moneda", cCo_Moneda) :
+                new ObjectParameter("cCo_Moneda", typeof(string));
+    
+            var cStatusParameter = cStatus != null ?
+                new ObjectParameter("cStatus", cStatus) :
+                new ObjectParameter("cStatus", typeof(string));
+    
+            var cAnuladoParameter = cAnulado != null ?
+                new ObjectParameter("cAnulado", cAnulado) :
+                new ObjectParameter("cAnulado", typeof(string));
+    
+            var cCo_SucursalParameter = cCo_Sucursal != null ?
+                new ObjectParameter("cCo_Sucursal", cCo_Sucursal) :
+                new ObjectParameter("cCo_Sucursal", typeof(string));
+    
+            var sCampOrderByParameter = sCampOrderBy != null ?
+                new ObjectParameter("sCampOrderBy", sCampOrderBy) :
+                new ObjectParameter("sCampOrderBy", typeof(string));
+    
+            var sDirParameter = sDir != null ?
+                new ObjectParameter("sDir", sDir) :
+                new ObjectParameter("sDir", typeof(string));
+    
+            var bHeaderRepParameter = bHeaderRep.HasValue ?
+                new ObjectParameter("bHeaderRep", bHeaderRep) :
+                new ObjectParameter("bHeaderRep", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<RepNotaEntregaVentaxFecha_Result>("RepNotaEntregaVentaxFecha", cCo_Numero_dParameter, cCo_Numero_hParameter, dCo_fecha_dParameter, dCo_fecha_hParameter, cCo_cliente_dParameter, cCo_cliente_hParameter, cCo_Vendedor_dParameter, cCo_Vendedor_hParameter, cCo_Transporte_dParameter, cCo_Transporte_hParameter, cCo_Zona_dParameter, cCo_Zona_hParameter, cImprSubTotalParameter, cCo_MonedaParameter, cStatusParameter, cAnuladoParameter, cCo_SucursalParameter, sCampOrderByParameter, sDirParameter, bHeaderRepParameter);
+        }
+    
+        public virtual ObjectResult<RepTotalNotaEntregaxArticulo_Result> RepTotalNotaEntregaxArticulo(Nullable<System.DateTime> sCo_fecha_d, Nullable<System.DateTime> sCo_fecha_h, string sCo_Art_d, string sCo_Art_h, string sCo_Linea_d, string sCo_Linea_h, string sCo_Sub_Linea_d, string sCo_Sub_Linea_h, string sCo_Categoria_d, string sCo_Categoria_h, string cCo_Moneda, string cCo_Sucursal, string sOperacion, string sCampOrderBy, string sDir, Nullable<bool> bHeaderRep)
+        {
+            var sCo_fecha_dParameter = sCo_fecha_d.HasValue ?
+                new ObjectParameter("sCo_fecha_d", sCo_fecha_d) :
+                new ObjectParameter("sCo_fecha_d", typeof(System.DateTime));
+    
+            var sCo_fecha_hParameter = sCo_fecha_h.HasValue ?
+                new ObjectParameter("sCo_fecha_h", sCo_fecha_h) :
+                new ObjectParameter("sCo_fecha_h", typeof(System.DateTime));
+    
+            var sCo_Art_dParameter = sCo_Art_d != null ?
+                new ObjectParameter("sCo_Art_d", sCo_Art_d) :
+                new ObjectParameter("sCo_Art_d", typeof(string));
+    
+            var sCo_Art_hParameter = sCo_Art_h != null ?
+                new ObjectParameter("sCo_Art_h", sCo_Art_h) :
+                new ObjectParameter("sCo_Art_h", typeof(string));
+    
+            var sCo_Linea_dParameter = sCo_Linea_d != null ?
+                new ObjectParameter("sCo_Linea_d", sCo_Linea_d) :
+                new ObjectParameter("sCo_Linea_d", typeof(string));
+    
+            var sCo_Linea_hParameter = sCo_Linea_h != null ?
+                new ObjectParameter("sCo_Linea_h", sCo_Linea_h) :
+                new ObjectParameter("sCo_Linea_h", typeof(string));
+    
+            var sCo_Sub_Linea_dParameter = sCo_Sub_Linea_d != null ?
+                new ObjectParameter("sCo_Sub_Linea_d", sCo_Sub_Linea_d) :
+                new ObjectParameter("sCo_Sub_Linea_d", typeof(string));
+    
+            var sCo_Sub_Linea_hParameter = sCo_Sub_Linea_h != null ?
+                new ObjectParameter("sCo_Sub_Linea_h", sCo_Sub_Linea_h) :
+                new ObjectParameter("sCo_Sub_Linea_h", typeof(string));
+    
+            var sCo_Categoria_dParameter = sCo_Categoria_d != null ?
+                new ObjectParameter("sCo_Categoria_d", sCo_Categoria_d) :
+                new ObjectParameter("sCo_Categoria_d", typeof(string));
+    
+            var sCo_Categoria_hParameter = sCo_Categoria_h != null ?
+                new ObjectParameter("sCo_Categoria_h", sCo_Categoria_h) :
+                new ObjectParameter("sCo_Categoria_h", typeof(string));
+    
+            var cCo_MonedaParameter = cCo_Moneda != null ?
+                new ObjectParameter("cCo_Moneda", cCo_Moneda) :
+                new ObjectParameter("cCo_Moneda", typeof(string));
+    
+            var cCo_SucursalParameter = cCo_Sucursal != null ?
+                new ObjectParameter("cCo_Sucursal", cCo_Sucursal) :
+                new ObjectParameter("cCo_Sucursal", typeof(string));
+    
+            var sOperacionParameter = sOperacion != null ?
+                new ObjectParameter("sOperacion", sOperacion) :
+                new ObjectParameter("sOperacion", typeof(string));
+    
+            var sCampOrderByParameter = sCampOrderBy != null ?
+                new ObjectParameter("sCampOrderBy", sCampOrderBy) :
+                new ObjectParameter("sCampOrderBy", typeof(string));
+    
+            var sDirParameter = sDir != null ?
+                new ObjectParameter("sDir", sDir) :
+                new ObjectParameter("sDir", typeof(string));
+    
+            var bHeaderRepParameter = bHeaderRep.HasValue ?
+                new ObjectParameter("bHeaderRep", bHeaderRep) :
+                new ObjectParameter("bHeaderRep", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<RepTotalNotaEntregaxArticulo_Result>("RepTotalNotaEntregaxArticulo", sCo_fecha_dParameter, sCo_fecha_hParameter, sCo_Art_dParameter, sCo_Art_hParameter, sCo_Linea_dParameter, sCo_Linea_hParameter, sCo_Sub_Linea_dParameter, sCo_Sub_Linea_hParameter, sCo_Categoria_dParameter, sCo_Categoria_hParameter, cCo_MonedaParameter, cCo_SucursalParameter, sOperacionParameter, sCampOrderByParameter, sDirParameter, bHeaderRepParameter);
+        }
+    
+        public virtual ObjectResult<RepTotalNotaEntregaxCliente_Result> RepTotalNotaEntregaxCliente(Nullable<System.DateTime> sCo_fecha_d, Nullable<System.DateTime> sCo_fecha_h, string sCo_Cli_d, string sCo_Cli_h, string sCo_Zona_d, string sCo_Zona_h, string sCo_Segmento_d, string sCo_Segmento_h, string cCo_Moneda, string cCo_Sucursal, string sOperacion, string sCampOrderBy, string sDir, Nullable<bool> bHeaderRep)
+        {
+            var sCo_fecha_dParameter = sCo_fecha_d.HasValue ?
+                new ObjectParameter("sCo_fecha_d", sCo_fecha_d) :
+                new ObjectParameter("sCo_fecha_d", typeof(System.DateTime));
+    
+            var sCo_fecha_hParameter = sCo_fecha_h.HasValue ?
+                new ObjectParameter("sCo_fecha_h", sCo_fecha_h) :
+                new ObjectParameter("sCo_fecha_h", typeof(System.DateTime));
+    
+            var sCo_Cli_dParameter = sCo_Cli_d != null ?
+                new ObjectParameter("sCo_Cli_d", sCo_Cli_d) :
+                new ObjectParameter("sCo_Cli_d", typeof(string));
+    
+            var sCo_Cli_hParameter = sCo_Cli_h != null ?
+                new ObjectParameter("sCo_Cli_h", sCo_Cli_h) :
+                new ObjectParameter("sCo_Cli_h", typeof(string));
+    
+            var sCo_Zona_dParameter = sCo_Zona_d != null ?
+                new ObjectParameter("sCo_Zona_d", sCo_Zona_d) :
+                new ObjectParameter("sCo_Zona_d", typeof(string));
+    
+            var sCo_Zona_hParameter = sCo_Zona_h != null ?
+                new ObjectParameter("sCo_Zona_h", sCo_Zona_h) :
+                new ObjectParameter("sCo_Zona_h", typeof(string));
+    
+            var sCo_Segmento_dParameter = sCo_Segmento_d != null ?
+                new ObjectParameter("sCo_Segmento_d", sCo_Segmento_d) :
+                new ObjectParameter("sCo_Segmento_d", typeof(string));
+    
+            var sCo_Segmento_hParameter = sCo_Segmento_h != null ?
+                new ObjectParameter("sCo_Segmento_h", sCo_Segmento_h) :
+                new ObjectParameter("sCo_Segmento_h", typeof(string));
+    
+            var cCo_MonedaParameter = cCo_Moneda != null ?
+                new ObjectParameter("cCo_Moneda", cCo_Moneda) :
+                new ObjectParameter("cCo_Moneda", typeof(string));
+    
+            var cCo_SucursalParameter = cCo_Sucursal != null ?
+                new ObjectParameter("cCo_Sucursal", cCo_Sucursal) :
+                new ObjectParameter("cCo_Sucursal", typeof(string));
+    
+            var sOperacionParameter = sOperacion != null ?
+                new ObjectParameter("sOperacion", sOperacion) :
+                new ObjectParameter("sOperacion", typeof(string));
+    
+            var sCampOrderByParameter = sCampOrderBy != null ?
+                new ObjectParameter("sCampOrderBy", sCampOrderBy) :
+                new ObjectParameter("sCampOrderBy", typeof(string));
+    
+            var sDirParameter = sDir != null ?
+                new ObjectParameter("sDir", sDir) :
+                new ObjectParameter("sDir", typeof(string));
+    
+            var bHeaderRepParameter = bHeaderRep.HasValue ?
+                new ObjectParameter("bHeaderRep", bHeaderRep) :
+                new ObjectParameter("bHeaderRep", typeof(bool));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<RepTotalNotaEntregaxCliente_Result>("RepTotalNotaEntregaxCliente", sCo_fecha_dParameter, sCo_fecha_hParameter, sCo_Cli_dParameter, sCo_Cli_hParameter, sCo_Zona_dParameter, sCo_Zona_hParameter, sCo_Segmento_dParameter, sCo_Segmento_hParameter, cCo_MonedaParameter, cCo_SucursalParameter, sOperacionParameter, sCampOrderByParameter, sDirParameter, bHeaderRepParameter);
         }
     }
 }

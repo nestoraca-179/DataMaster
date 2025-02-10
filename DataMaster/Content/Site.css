@@ -127,6 +127,7 @@ body header .menu-login {
 }
 body footer {
     width: 100%;
+    min-height: 45px;
     flex: 1;
     background: #e3e2e2;
     margin: 0 !important;

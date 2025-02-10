@@ -193,7 +193,7 @@ h5.no-data {
             </div>
             <div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
                 <div class="direct shadow-tm" style="border-bottom: solid 5px #EF6C00;">
-                    <h5>Facturas de Compra del Mes</h5>
+                    <h5>Notas de Entrega del Mes</h5>
                     <span ng-show="stats" class="stat-number">{{ stats.totalCountBuy }}</span>
                     <i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
                     <i class="fas fa-file-invoice" style="color: #EF6C00;"></i>
@@ -201,7 +201,7 @@ h5.no-data {
             </div>
             <div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
                 <div class="direct shadow-tm" style="border-bottom: solid 5px #D84315;">
-                    <h5>Total Compras del Mes</h5>
+                    <h5>Total Notas de Entrega del Mes</h5>
                     <span ng-show="stats" class="stat-number">{{ formatNumber(stats.totalAmountBuyUSD) }}$</span>
                     <i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
                     <i class="fa-solid fa-coins" style="color: #D84315;"></i>
@@ -216,7 +216,7 @@ h5.no-data {
                         <figure ng-if="msp.length > 0" class="highcharts-figure">
                             <div id="container-msp"></div>
                         </figure>
-                        <h5 ng-if="msp.length == 0" class="text-center no-data">Servicios más vendidos (Sin datos)</h5>
+                        <h5 ng-if="msp.length == 0" class="text-center no-data">Articulos más vendidos (Sin datos)</h5>
                     </div>
                 </div>
             </div>
@@ -227,7 +227,7 @@ h5.no-data {
                         <figure ng-if="mpp.length > 0" class="highcharts-figure">
                             <div id="container-mpp"></div>
                         </figure>
-                        <h5 ng-if="mpp.length == 0" class="text-center no-data">Servicios más comprados (Sin datos)</h5>
+                        <h5 ng-if="mpp.length == 0" class="text-center no-data">Articulos más despachados en N/E (Sin datos)</h5>
                     </div>
                 </div>
             </div>
@@ -237,7 +237,7 @@ h5.no-data {
                 <div class="container-chart shadow-tm pl-3 pr-3 d-flex" style="height: 100%;">
                     <i ng-if="!mac || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
                     <div id="cont-mac" style="display: none;">
-                        <h5 ng-if="mac.length > 0" class="text-center mt-3 mb-3">Clientes más activos</h5>
+                        <h5 ng-if="mac.length > 0" class="text-center mt-3 mb-3" style="font-family: 'Raleway', sans-serif !important;">Clientes más activos</h5>
                         <table ng-if="mac.length > 0" class="table table-hover borderless">
                             <thead>
                                 <tr>
@@ -267,7 +267,7 @@ h5.no-data {
                         <figure ng-if="mas.length > 0" class="highcharts-figure">
                             <div id="container-mas"></div>
                         </figure>
-                        <h5 ng-if="mas.length == 0" class="text-center no-data">Proveedores más activos (Sin datos)</h5>
+                        <h5 ng-if="mas.length == 0" class="text-center no-data">Clientes con más N/E (Sin datos)</h5>
                     </div>
                 </div>
             </div>
@@ -290,7 +290,9 @@ h5.no-data {
 	fec_d.setDate(1);
 	fec_d.setHours(0);
 	fec_d.setMinutes(0);
-	fec_d.setSeconds(0);
+    fec_d.setSeconds(0);
+
+    fec_d.setFullYear(2010);
 
 	var fecha_d = parseDate(fec_d); // fec_d.toLocaleDateString().replaceAll("/", "-");
 	var fecha_h = parseDate(fec_h); // fec_h.toLocaleDateString().replaceAll("/", "-");
@@ -511,7 +513,7 @@ h5.no-data {
 				},
 				colors: ['#C0392B', '#971b0f'],
 				title: {
-					text: 'Servicios más vendidos'
+                    text: 'Articulos más vendidos'
 				},
 				accessibility: {
 					announceNewData: {
@@ -589,7 +591,7 @@ h5.no-data {
 				},
 				colors: ['#B81E0D', '#E32510', '#96190B', '#741308', '#520D06'],
 				title: {
-					text: 'Servicios más comprados'
+                    text: 'Articulos más despachados en N/E'
 				},
 				tooltip: {
 					pointFormat: '{series.name}: <b>{point.y:,.2f} Unds</b>'
@@ -633,11 +635,11 @@ h5.no-data {
 		var proveedores = mas;
 		var objects = proveedores.map(function (x) {
 			return [
-				capitalize(x.prov_des),
-				parseFloat(x.campo1)
+                capitalize(x.prov_des ?? x.cli_des),
+                x.prov_des != null ? parseFloat(x.campo1) : parseFloat2(x.campo1)
 			];
-		});
-
+        });
+        console.log(objects);
 		Highcharts.setOptions({
 			lang: {
 				decimalPoint: ",",
@@ -656,8 +658,8 @@ h5.no-data {
 				},
 				colors: ['#1565C0', '#2E7D32', '#EF6C00', '#D84315', '#6610F2'],
 				title: {
-					text: 'Proveedores más activos'
-				},
+                    text: 'Clientes con más N/E'
+                },
 				exporting: {
 					enabled: false,
 				},
@@ -678,6 +680,13 @@ h5.no-data {
 				}]
 			});
 		}
-	}
+    }
+
+    function parseFloat2(value) {
+        let formatted = value.replace(/\./g, '').replace(',', '.');
+        let number = parseFloat(formatted);
+
+        return number;
+    }
 
 </script>

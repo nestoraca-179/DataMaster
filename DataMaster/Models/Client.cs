@@ -63,6 +63,48 @@ namespace DataMaster.Models
 			return clientes;
 		}
 
+		public List<saCliente> GetMostActiveClientsWithNotes(DateTime fec_d, DateTime fec_h, int number, string sucur)
+		{
+			List<saCliente> clientes = new List<saCliente>();
+			List<saCliente> clientes_temp = new List<saCliente>();
+
+			var sp = db.RepTotalNotaEntregaxCliente(fec_d, fec_h, null, null, null, null, null, null, null, sucur, null, null, null, null);
+			var enumerator = sp.GetEnumerator();
+
+			while (enumerator.MoveNext())
+			{
+				saCliente cliente = new saCliente();
+
+				cliente.co_cli = enumerator.Current.co_cli.Trim();
+				cliente.cli_des = enumerator.Current.cli_des.Trim();
+				cliente.desc_glob = enumerator.Current.anulado ? 0 : enumerator.Current.total_neto; // USADO PARA EL TOTAL
+
+				// cliente.campo1 = Convert.ToDouble(enumerator.Current.Venta).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
+				// cliente.campo2 = Math.Round(Convert.ToDouble((enumerator.Current.Venta * 100) / enumerator.Current.Venta_total), 2).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
+
+				clientes_temp.Add(cliente);
+			}
+
+			decimal total = clientes_temp.Select(c => c.desc_glob).Sum();
+			foreach (saCliente cl in clientes_temp.OrderBy(c => c.co_cli))
+			{
+				if (!clientes.Any(c => c.co_cli == cl.co_cli))
+				{
+					saCliente new_cliente = new saCliente();
+					decimal total_c = clientes_temp.Where(c => c.co_cli == cl.co_cli).Select(c => c.desc_glob).Sum();
+
+					new_cliente.co_cli = cl.co_cli;
+					new_cliente.cli_des = cl.cli_des;
+					new_cliente.campo1 = total_c.ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
+					new_cliente.campo2 = Math.Round((total_c * 100) / total, 2).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
+
+					clientes.Add(new_cliente);
+				}
+			}
+
+			return clientes;
+		}
+
 		public List<saCliente> GetMostMorousClients(int number)
 		{
 			List<saCliente> clients = new List<saCliente>();
@@ -99,6 +141,5 @@ namespace DataMaster.Models
 
 			return clients;
 		}
-
 	}
 }
