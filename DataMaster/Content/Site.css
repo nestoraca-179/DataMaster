@@ -19,6 +19,7 @@ body {
 
 body header {
     width: 100%;
+    min-height: 65px;
     flex: 1.5;
     margin: 0 !important;
     padding: 0;
