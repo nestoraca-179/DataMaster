@@ -61,9 +61,12 @@ namespace DataMaster.Models
 		{
 			Usuario del_user = GetUserByID(id);
 
-			db.Usuario.Attach(del_user);
-			db.Usuario.Remove(del_user);
-			db.SaveChanges();
+			using (DataMasterEntities context = new DataMasterEntities())
+			{
+				context.Usuario.Attach(del_user);
+				context.Usuario.Remove(del_user);
+				context.SaveChanges();
+			}
 
 			return del_user;
 		}
