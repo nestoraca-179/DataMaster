@@ -1,0 +1,91 @@
+﻿@{
+    ViewBag.Title = "Verificar Pedido";
+}
+
+<style>
+    .search-bar > * {
+        flex: 1;
+    }
+</style>
+<div class="container-fluid" ng-app="Verify" ng-controller="controller">
+    <div class="row mt-3">
+        <h2 class="col-md-6">Verificar Pedido</h2>
+        <div class="col-md-6 d-flex align-items-center gap-2">
+            <input type="text" class="form-control" placeholder="Nro. Pedido" autofocus ng-model="nroOrder" ng-keypress="detectEnter($event, nroOrder)" />
+            <button class="btn btn-primary" style="min-width: 120px;" ng-click="searchOrder(nroOrder)">
+                <i class="fas fa-search me-2"></i>Buscar
+            </button>
+        </div>
+    </div>
+    <hr />
+    <!-- Modal -->
+    <div class="modal fade" id="documentsModal" tabindex="-1" role="dialog" aria-labelledby="documentsModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="documentsModalLabel">Últimos 20 Documentos</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+                    <ul id="documentsList" class="list-group">
+                        <!-- Aquí se llenarán los documentos -->
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="~/Scripts/angular-min.js"></script>
+<script>
+    var app = angular.module("Verify", []);
+    var isNullOrEmpty = (str) => str == null || str == "";
+
+    // only for testing
+    var documents = [
+        "Documento 1",
+        "Documento 2",
+        "Documento 3",
+        "Documento 4",
+        "Documento 5",
+        "Documento 6",
+        "Documento 7",
+        "Documento 8",
+        "Documento 9",
+        "Documento 10",
+        "Documento 11",
+        "Documento 12",
+        "Documento 13",
+        "Documento 14",
+        "Documento 15",
+        "Documento 16",
+        "Documento 17",
+        "Documento 18",
+        "Documento 19",
+        "Documento 20"
+    ];
+
+    app.controller("controller", function ($scope) {
+
+        $scope.searchOrder = function (id) {
+            if (isNullOrEmpty(id)) {
+                $('#documentsList').empty();
+                documents.forEach(function (doc) { $('#documentsList').append('<li class="list-group-item">' + doc + '</li>'); });
+                $('#documentsModal').modal('show');
+            } else {
+                alert('Buscando documento con código: ' + id);
+            }
+        }
+
+        $scope.detectEnter = function (event, id) {
+            if (event.originalEvent.key === "Enter")
+                $scope.searchOrder(id);
+        }
+
+    });
+
+</script>
