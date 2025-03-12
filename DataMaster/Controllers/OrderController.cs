@@ -72,10 +72,19 @@ namespace DataMaster.Controllers
 			else if (Session["USER"] == null)
 				return RedirectToAction("Logout", "Account", new { msg = "Debes iniciar sesión" });
 
+			JavaScriptSerializer serializer = new JavaScriptSerializer();
+			serializer.MaxJsonLength = 50000000;
+
 			saSucursal s = (Session["BRANCH"] as saSucursal);
 			ViewBag.usuario = (Session["USER"] as Usuario);
 			ViewBag.empresa = Session["NAME_CONN"];
 			ViewBag.sucur = s?.sucur_des;
+			ViewBag.orders = serializer.Serialize(new Order().GetAllOrders(30, s?.co_sucur));
+
+			if (Session["ARTS"] == null)
+				Session["ARTS"] = serializer.Serialize(new Product().GetAllArts());
+
+			ViewBag.arts = Session["ARTS"];
 
 			return View();
 		}

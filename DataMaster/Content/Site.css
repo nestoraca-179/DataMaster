@@ -186,6 +186,10 @@ label, span {
     margin: 30px auto;
     color: #e89c12;
 }
+.modal-info .fas {
+    font-size: 6em;
+    padding: 5%;
+}
 .form-group-h {
     display: flex;
     align-items: center;
@@ -380,7 +384,7 @@ input:checked + .slider:before {
     display: flex;
     flex-direction: column;
 }
-.container-list .table td, .table th {
+.container-list .table td, .container-list .table th {
     padding: 5px;
     font-size: 11px;
     user-select: none;

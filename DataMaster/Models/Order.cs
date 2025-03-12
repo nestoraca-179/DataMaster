@@ -9,6 +9,33 @@ namespace DataMaster.Models
 {
 	public class Order : ProfitAdmManager
 	{
+		public saPedidoVenta GetOrderByID(string id)
+		{
+			saPedidoVenta order;
+
+			try
+			{
+				order = db.saPedidoVenta.AsNoTracking().Include("saPedidoVentaReng").Include("saCliente").Include("saCondicionPago")
+					.Include("saVendedor").Single(i => i.doc_num == id);
+
+				order.saCliente.saPedidoVenta = null;
+				order.saVendedor.saPedidoVenta = null;
+				order.saCondicionPago.saPedidoVenta = null;
+
+				foreach (saPedidoVentaReng reng in order.saPedidoVentaReng)
+				{
+					reng.saPedidoVenta = null;
+				}
+			}
+			catch (Exception ex)
+			{
+				order = null;
+				IncidentController.CreateIncident("ERROR BUSCANDO PEDIDO VENTA " + id, ex);
+			}
+
+			return order;
+		}
+
 		public List<saPedidoVenta> GetAllOrders(int number, string sucur)
 		{
 			List<saPedidoVenta> orders = new List<saPedidoVenta>();
@@ -16,7 +43,7 @@ namespace DataMaster.Models
 			try
 			{
 				orders = db.saPedidoVenta.AsNoTracking().Where(o => o.co_sucu_in == sucur).Include("saPedidoVentaReng").Include("saCliente")
-					.Include("saVendedor").Include("saCondicionPago").OrderByDescending(i => i.fec_emis).ThenBy(i => i.doc_num).Take(number).ToList();
+					.Include("saVendedor").Include("saCondicionPago").OrderByDescending(i => i.fec_emis).ThenByDescending(i => i.doc_num).Take(number).ToList();
 
 				foreach (saPedidoVenta order in orders)
 				{

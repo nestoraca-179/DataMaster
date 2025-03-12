@@ -33,6 +33,40 @@ namespace DataMaster.Controllers
 			return response;
 		}
 
+		// PEDIDO VENTA
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetOrder/{id}")]
+		public DataMasterResponse GetOrder(string id)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				saPedidoVenta order = new Order().GetOrderByID(id);
+
+				if (order == null)
+				{
+					response.Status = "ERROR";
+					response.Message = $"No se ha encontrado el pedido Nro. {id}"; // COTIZACION NO EXISTE
+				}
+				else
+				{
+					response.Status = "OK";
+					response.Result = order;
+					response.Message = null;
+				}
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR BUSCANDO PEDIDO " + id, ex);
+			}
+
+			return response;
+		}
+
 		[HttpPost]
 		[Route("api/DataMasterApi/AddOrder/")]
 		public DataMasterResponse Addorder(saPedidoVenta order)
@@ -110,6 +144,8 @@ namespace DataMaster.Controllers
 
 			return response;
 		}
+
+		// USUARIO
 
 		[HttpPost]
 		[Route("api/DataMasterApi/AddUser/")]

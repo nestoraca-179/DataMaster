@@ -6,35 +6,216 @@
     .search-bar > * {
         flex: 1;
     }
+    .modal td {
+        font-size: 14px;
+    }
+    .card {
+        border: 0;
+        border-radius: 5px;
+        padding: 15px 20px;
+        -webkit-box-shadow: 0px 5px 7px -5px rgba(0,0,0,0.75);
+        -moz-box-shadow: 0px 5px 7px -5px rgba(0,0,0,0.75);
+        box-shadow: 0px 5px 7px -5px rgba(0,0,0,0.75);
+    }
+    .data-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 5px 0;
+    }
+    .label {
+        flex: 1;
+        text-align: left;
+        font-weight: bold;
+    }
+    .value {
+        flex: 2;
+        text-align: right;
+        font-size: 14px;
+    }
+    .table-items th {
+        padding: 10px;
+        font-size: 14px;
+        font-weight: 400;
+    }
+    .table-items td {
+        padding: 5px 10px;
+        font-size: 12px;
+    }
+    .table-items thead {
+        background: #c0392b;
+        color: #FFF;
+    }
 </style>
 <div class="container-fluid" ng-app="Verify" ng-controller="controller">
     <div class="row mt-3">
-        <h2 class="col-md-6">Verificar Pedido</h2>
+        <h2 class="col-md-6 m-0">Verificar Pedido</h2>
         <div class="col-md-6 d-flex align-items-center gap-2">
-            <input type="text" class="form-control" placeholder="Nro. Pedido" autofocus ng-model="nroOrder" ng-keypress="detectEnter($event, nroOrder)" />
-            <button class="btn btn-primary" style="min-width: 120px;" ng-click="searchOrder(nroOrder)">
+            <input type="text" id="nroOrder" class="form-control" placeholder="Nro. Pedido" autofocus ng-model="nroOrder" ng-keypress="detectEnter($event, true, nroOrder)" />
+            <button class="btn btn-primary" style="min-width: 120px;" ng-click="askOrder(nroOrder)">
                 <i class="fas fa-search me-2"></i>Buscar
             </button>
         </div>
     </div>
     <hr />
-    <!-- Modal -->
-    <div class="modal fade" id="documentsModal" tabindex="-1" role="dialog" aria-labelledby="documentsModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
+    <h6 ng-if="!order">No se ha seleccionado pedido.</h6>
+    <div ng-if="order" class="row">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="data-row">
+                    <div class="label">Documento:</div>
+                    <div class="value">{{ order.doc_num }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="label">Cliente:</div>
+                    <div class="value">{{ order.saCliente.cli_des }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="label">Fecha:</div>
+                    <div class="value">{{ formatDate(order.fec_emis).split(' ')[0] }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="label">Total:</div>
+                    <div class="value">{{ formatNumber(order.total_neto / order.tasa) }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="label">Tasa:</div>
+                    <div class="value">{{ formatNumber(order.tasa) }}</div>
+                </div>
+                <div class="data-row">
+                    <div class="label">Items:</div>
+                    <div class="value">{{ order.saPedidoVentaReng.length }}</div>
+                </div>
+            </div>
+            <hr />
+            <div>
+                <label>Verificar Item</label>
+                <input type="text" id="nroItem" name="name" class="form-control mt-2" placeholder="Nro. Item" ng-model="nroItem" ng-keypress="detectEnter($event, false, nroItem)" ng-change="validateItem(nroItem, false)" ng-disabled="allItemsVerified" />
+                <small ng-if="!isBarcode" class="text-secondary">Presiona Enter para verificar<br /></small>
+                <small ng-if="success" class="text-success mx-2">** {{ successMsg }} **<br /></small>
+                <small ng-if="error" class="text-danger mx-2">** {{ errorMsg }} **</small>
+            </div>
+            <div class="form-check mt-3">
+                <input class="form-check-input" type="checkbox" ng-model="isBarcode" ng-change="setIsBarcode(isBarcode)" ng-disabled="allItemsVerified">
+                <label class="form-check-label">Usando pistola lectora de codigo de barras</label>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <h4>Items</h4>
+            <hr />
+            <table class="table table-striped table-items m-0">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Reng.</th>
+                        <th>Cod. Artículo</th>
+                        <th>Nom. Artículo</th>
+                        <th>Almacen</th>
+                        <th>Precio</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Por Verificar</th>
+                        <th>Verificados</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-repeat="item in order.saPedidoVentaReng">
+                        <td>{{ item.reng_num }}</td>
+                        <td>{{ item.co_art }}</td>
+                        <td>{{ searchArt(item.co_art) }}</td>
+                        <td>{{ item.co_alma }}</td>
+                        <td>{{ formatNumber(item.prec_vta / order.tasa) }}</td>
+                        <td>{{ item.total_art }}</td>
+                        <td>{{ formatNumber(item.reng_neto / order.tasa) }}</td>
+                        <td class="table-warning">{{ item.total_art - item.total_art_verified }}</td>
+                        <td class="table-success">{{ item.total_art_verified }}</td>
+                    </tr>
+                    <!-- Puedes agregar más filas aquí -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <!-- Modal Pedidos -->
+    <div class="modal fade" id="modalOrders" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document" style="max-width: 800px;">
             <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="documentsModalLabel">Últimos 20 Documentos</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <div class="modal-header py-2">
+                    <h5 class="modal-title">Buscar Pedido</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
-                    <ul id="documentsList" class="list-group">
-                        <!-- Aquí se llenarán los documentos -->
-                    </ul>
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Buscar pedido..." ng-keyup="search('modalOrders')" />
+                    </div>
+                    <table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
+                        <thead>
+                            <tr>
+                                <th>Nro. Pedido</th>
+                                <th>Cliente</th>
+                                <th>Fecha</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="order in orders" style="cursor: pointer" ng-click="selectRow($event.currentTarget)">
+                                <td>{{ order.doc_num }}</td>
+                                <td>{{ order.saCliente.cli_des }}</td>
+                                <td>{{ formatDate(order.fec_emis) }}</td>
+                            </tr>
+                            <tr ng-if="!orders">
+                                <td colspan="2">No hay pedidos</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" ng-click="saveRow()">Seleccionar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Waiting -->
+    <div class="modal fade modal-info" id="modalWaiting" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+                    <div style="display: flex; justify-content: center;">
+                        <i class="fas fa-spinner fa-spin" style="color: #01579b;"></i>
+                    </div>
+                    <h2 class="text-center">Buscando...</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Success -->
+    <div class="modal fade modal-info" id="modalSuccess" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+                    <div style="display: flex; justify-content: center;">
+                        <i class="fas fa-check-circle" style="color: var(--bs-green)"></i>
+                    </div>
+                    <h2 class="text-center">{{ successMessage }}</h2>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#modalWaiting').modal('hide');">Aceptar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Error -->
+    <div class="modal fade modal-info" id="modalError" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width: 800px; margin: 0 auto;">
+            <div class="modal-content">
+                <div class="modal-body" style="max-height: 450px; overflow-y: auto; padding: 45px;">
+                    <div style="display: flex; justify-content: center;">
+                        <i class="fas fa-exclamation-triangle" style="color: var(--bs-red)"></i>
+                    </div>
+                    <h2 class="text-center">Ha ocurrido un error</h2>
+                    <p class="text-center">{{ errorMessage }}</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="$('#modalWaiting').modal('hide');">Aceptar</button>
                 </div>
             </div>
         </div>
@@ -44,48 +225,195 @@
 <script>
     var app = angular.module("Verify", []);
     var isNullOrEmpty = (str) => str == null || str == "";
+    var orders = @Html.Raw(ViewBag.orders);
+	var arts = @Html.Raw(ViewBag.arts);
 
-    // only for testing
-    var documents = [
-        "Documento 1",
-        "Documento 2",
-        "Documento 3",
-        "Documento 4",
-        "Documento 5",
-        "Documento 6",
-        "Documento 7",
-        "Documento 8",
-        "Documento 9",
-        "Documento 10",
-        "Documento 11",
-        "Documento 12",
-        "Documento 13",
-        "Documento 14",
-        "Documento 15",
-        "Documento 16",
-        "Documento 17",
-        "Documento 18",
-        "Documento 19",
-        "Documento 20"
-    ];
+    app.controller("controller", function ($scope, $http) {
 
-    app.controller("controller", function ($scope) {
+        $scope.order = null;
+        $scope.orders = orders;
+        $scope.arts = arts;
+        $scope.isBarcode = true;
+        $scope.success = false;
+        $scope.error = false;
+        $scope.allItemsVerified = false;
 
-        $scope.searchOrder = function (id) {
+        $scope.askOrder = function (id) {
+            $scope.allItemsVerified = false;
+            $scope.success = false;
+            $scope.error = false;
+
             if (isNullOrEmpty(id)) {
-                $('#documentsList').empty();
-                documents.forEach(function (doc) { $('#documentsList').append('<li class="list-group-item">' + doc + '</li>'); });
-                $('#documentsModal').modal('show');
+                blankClass();
+                $("#modalOrders").modal("show");
             } else {
-                alert('Buscando documento con código: ' + id);
+                $scope.order = $scope.orders.find(o => o.doc_num.trim() == id.trim());
+                if (!$scope.order)
+                    $scope.searchOrder(id);
+                else
+                    $scope.order = addVerifiedColumn($scope.order);
             }
         }
 
-        $scope.detectEnter = function (event, id) {
-            if (event.originalEvent.key === "Enter")
-                $scope.searchOrder(id);
+        $scope.searchOrder = function (id) {
+            $("#modalWaiting").modal("show");
+            $http.get(`/api/DataMasterApi/GetOrder/${id}`).then(function (response) {
+                let res = response.data;
+                if (res.Status == "OK") {
+                    $scope.order = res.Result;
+                    $scope.order = addVerifiedColumn($scope.order);
+                    setTimeout(function () { $("#modalWaiting").modal("hide"); }, 500);
+                } else {
+                    $scope.errorMessage = res.Message;
+                    $("#modalError").modal("show");
+                }
+            });
+        }
+
+        $scope.detectEnter = function (event, isOrder, id) {
+            if (event.originalEvent.key === "Enter") {
+                if (isOrder) {
+                    $scope.askOrder(id);
+                } else {
+                    $scope.validateItem(id, true);
+                }
+            }
+        }
+
+        $scope.setIsBarcode = function (value) {
+            $scope.isBarcode = value;
+        }
+
+        $scope.search = function (modal) {
+            let value = $("#" + modal).find("input[type=text]").val().toLowerCase();
+            let table = $("#" + modal).find("#results")[0];
+            blankClass();
+
+            for (let i = 1; i < table.rows.length; i++) {
+                let row = table.rows[i];
+                let elems = row.getElementsByTagName("td");
+
+                let val1 = elems[0].innerHTML.toLocaleLowerCase();
+                let val2 = elems[1].innerHTML.toLocaleLowerCase();
+
+                if (!val1.includes(value) && !val2.includes(value))
+                    row.style.display = "none";
+                else
+                    row.style.display = "";
+            }
+        }
+
+        $scope.searchArt = function (id) {
+            return arts.find(s => s.co_art.trim() == id.trim()).art_des;
+        }
+
+        $scope.selectRow = function (elem) {
+            blankClass();
+            elem.classList.add("table-danger");
+        }
+
+        $scope.saveRow = function () {
+            let item = document.getElementsByClassName("table-danger")[0];
+
+            if (item != null) {
+                var elem = item.children[0];
+                var value = elem.innerHTML;
+
+                blankClass();
+                $scope.nroOrder = value.trim();
+                $scope.order = $scope.orders.find(o => o.doc_num.trim() == value.trim());
+                $scope.order = addVerifiedColumn($scope.order);
+                $("#modalOrders").find("input[type=text]").val("");
+                $("#modalOrders").modal("hide");
+            } else {
+                alert("Debes seleccionar un item");
+            }
+        }
+
+        $scope.validateItem = async function (id, fromEnter) {
+            $scope.success = false;
+            $scope.error = false;
+
+            if (!isNullOrEmpty(id)) {
+                if ($scope.isBarcode || fromEnter) {
+                    let item = $scope.order.saPedidoVentaReng.find(i => i.co_art.trim() == id);
+                    if (item) {
+                        if (item.total_art_verified < item.total_art) {
+                            item.total_art_verified++;
+                            $("#nroItem").val("");
+                            $("#nroItem").change();
+
+                            if (item.total_art_verified < item.total_art)
+                                $scope.setSuccess(`Item ${id} - ${item.total_art_verified} de ${item.total_art} unidades verificadas`);
+                            else
+                                $scope.setSuccess(`Item ${id} - verificado con exito`);
+                            $scope.allItemsVerified = $scope.verifyAllItems();
+                            if ($scope.allItemsVerified) {
+                                $scope.successMessage = `Pedido ${$scope.order.doc_num.trim()} verificado con exito`;
+                                $("#modalSuccess").modal("show");
+                            }
+                        } else
+                            $scope.setError(`El item ${id} ya ha sido verificado`);
+                    } else {
+                        $scope.setError(`No se encontro un item con codigo ${id}`);
+                    }
+                }
+            }
+        }
+
+        $scope.verifyAllItems = function () {
+            for (let r of $scope.order.saPedidoVentaReng) {
+                if (r.total_art - r.total_art_verified > 0)
+                    return false;
+            }
+
+            return true;
+        }
+
+        $scope.setSuccess = function (msg) {
+            $scope.success = true;
+            $scope.successMsg = msg;
+        }
+
+        $scope.setError = function (msg) {
+            $scope.error = true;
+            $scope.errorMsg = msg;
+        }
+
+        $scope.formatNumber = function (value) {
+            return new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
+        }
+
+        $scope.formatDate = function (dateString) {
+            let timestamp = parseInt(dateString.match(/\/Date\((\d+)\)\//)[1], 10);
+            let date = new Date(timestamp);
+
+            let day = String(date.getDate()).padStart(2, '0');
+            let month = String(date.getMonth() + 1).padStart(2, '0');
+            let year = date.getFullYear();
+            let hours = String(date.getHours()).padStart(2, '0');
+            let minutes = String(date.getMinutes()).padStart(2, '0');
+
+            return `${day}/${month}/${year} ${hours}:${minutes}`;
         }
 
     });
+
+    function blankClass() {
+        var previous = document.getElementsByClassName("table-danger")[0];
+
+        if (previous != null)
+            previous.classList.remove("table-danger");
+    }
+
+    function addVerifiedColumn(o) {
+
+        setTimeout(function () { $("#nroItem").focus() }, 1000);
+        for (let r of o.saPedidoVentaReng) {
+            r.total_art_verified = 0;
+        }
+
+        return o;
+    }
 
 </script>
