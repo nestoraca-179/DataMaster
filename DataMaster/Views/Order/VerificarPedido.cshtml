@@ -75,7 +75,7 @@
                 </div>
                 <div class="data-row">
                     <div class="label">Total:</div>
-                    <div class="value">{{ formatNumber(order.total_neto / order.tasa) }}</div>
+                    <div class="value">${{ formatNumber(order.total_neto / order.tasa) }}</div>
                 </div>
                 <div class="data-row">
                     <div class="label">Tasa:</div>
@@ -117,7 +117,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="item in order.saPedidoVentaReng">
+                    <tr ng-repeat="item in order.saPedidoVentaReng" ng-class="{'table-primary': (item.total_art - item.total_art_verified) == 0}">
                         <td>{{ item.reng_num }}</td>
                         <td>{{ item.co_art }}</td>
                         <td>{{ searchArt(item.co_art) }}</td>
