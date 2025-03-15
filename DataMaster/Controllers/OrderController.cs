@@ -65,7 +65,7 @@ namespace DataMaster.Controllers
 			return View();
         }
     
-		public ActionResult VerificarPedido()
+		public ActionResult VerificarNotaEntrega()
 		{
 			if (!Request.IsAuthenticated)
 				return RedirectToAction("Index", "Home", new { message = "Debes iniciar sesión" });
@@ -79,7 +79,7 @@ namespace DataMaster.Controllers
 			ViewBag.usuario = (Session["USER"] as Usuario);
 			ViewBag.empresa = Session["NAME_CONN"];
 			ViewBag.sucur = s?.sucur_des;
-			ViewBag.orders = serializer.Serialize(new Order().GetAllOrders(30, s?.co_sucur));
+			ViewBag.orders = serializer.Serialize(new Note().GetAllSellNotes(30, s?.co_sucur));
 
 			if (Session["ARTS"] == null)
 				Session["ARTS"] = serializer.Serialize(new Product().GetAllArts());

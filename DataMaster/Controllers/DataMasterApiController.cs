@@ -35,38 +35,6 @@ namespace DataMaster.Controllers
 
 		// PEDIDO VENTA
 
-		[HttpGet]
-		[Route("api/DataMasterApi/GetOrder/{id}")]
-		public DataMasterResponse GetOrder(string id)
-		{
-			DataMasterResponse response = new DataMasterResponse();
-
-			try
-			{
-				saPedidoVenta order = new Order().GetOrderByID(id);
-
-				if (order == null)
-				{
-					response.Status = "ERROR";
-					response.Message = $"No se ha encontrado el pedido Nro. {id}"; // COTIZACION NO EXISTE
-				}
-				else
-				{
-					response.Status = "OK";
-					response.Result = order;
-					response.Message = null;
-				}
-			}
-			catch (Exception ex)
-			{
-				response.Status = "ERROR";
-				response.Message = ex.Message;
-				IncidentController.CreateIncident("ERROR BUSCANDO PEDIDO " + id, ex);
-			}
-
-			return response;
-		}
-
 		[HttpPost]
 		[Route("api/DataMasterApi/AddOrder/")]
 		public DataMasterResponse Addorder(saPedidoVenta order)
@@ -140,6 +108,40 @@ namespace DataMaster.Controllers
 				response.Status = "ERROR";
 				response.Message = ex.Message;
 				IncidentController.CreateIncident("ERROR ELIMINANDO PEDIDO " + id.ToString(), ex);
+			}
+
+			return response;
+		}
+
+		// NOTA ENTREGA
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetSellNote/{id}")]
+		public DataMasterResponse GetSellNote(string id)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				saNotaEntregaVenta order = new Note().GetSellNoteByID(id);
+
+				if (order == null)
+				{
+					response.Status = "ERROR";
+					response.Message = $"No se ha encontrado la Nota de Entrega Nro. {id}";
+				}
+				else
+				{
+					response.Status = "OK";
+					response.Result = order;
+					response.Message = null;
+				}
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR BUSCANDO NOTA ENTREGA " + id, ex);
 			}
 
 			return response;

@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "Verificar Pedido";
+    ViewBag.Title = "Verificar Nota Entrega";
 }
 
 <style>
@@ -48,16 +48,16 @@
 </style>
 <div class="container-fluid" ng-app="Verify" ng-controller="controller">
     <div class="row mt-3">
-        <h2 class="col-md-6 m-0">Verificar Pedido</h2>
+        <h2 class="col-md-6 m-0">Verificar Nota de Entrega</h2>
         <div class="col-md-6 d-flex align-items-center gap-2">
-            <input type="text" id="nroOrder" class="form-control" placeholder="Nro. Pedido" autofocus ng-model="nroOrder" ng-keypress="detectEnter($event, true, nroOrder)" />
+            <input type="text" id="nroOrder" class="form-control" placeholder="Nro. Nota Entrega" autofocus ng-model="nroOrder" ng-keypress="detectEnter($event, true, nroOrder)" />
             <button class="btn btn-primary" style="min-width: 120px;" ng-click="askOrder(nroOrder)">
                 <i class="fas fa-search me-2"></i>Buscar
             </button>
         </div>
     </div>
     <hr />
-    <h6 ng-if="!order">No se ha seleccionado pedido.</h6>
+    <h6 ng-if="!order">No se ha seleccionado Nota de Entrega.</h6>
     <div ng-if="order" class="row">
         <div class="col-md-4">
             <div class="card">
@@ -83,7 +83,7 @@
                 </div>
                 <div class="data-row">
                     <div class="label">Items:</div>
-                    <div class="value">{{ order.saPedidoVentaReng.length }}</div>
+                    <div class="value">{{ order.saNotaEntregaVentaReng.length }}</div>
                 </div>
             </div>
             <hr />
@@ -109,7 +109,7 @@
                         <th>Cod. Artículo</th>
                         <th>Nom. Artículo</th>
                         <th>Almacen</th>
-                        <th>Precio</th>
+                        <th>Precio OM</th>
                         <th>Cantidad</th>
                         <th>Total</th>
                         <th>Por Verificar</th>
@@ -117,7 +117,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="item in order.saPedidoVentaReng" ng-class="{'table-primary': (item.total_art - item.total_art_verified) == 0}">
+                    <tr ng-repeat="item in order.saNotaEntregaVentaReng" ng-class="{'table-primary': (item.total_art - item.total_art_verified) == 0}">
                         <td>{{ item.reng_num }}</td>
                         <td>{{ item.co_art }}</td>
                         <td>{{ searchArt(item.co_art) }}</td>
@@ -133,24 +133,24 @@
             </table>
         </div>
     </div>
-    <!-- Modal Pedidos -->
+    <!-- Modal Nota Entrega -->
     <div class="modal fade" id="modalOrders" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document" style="max-width: 800px;">
             <div class="modal-content">
                 <div class="modal-header py-2">
-                    <h5 class="modal-title">Buscar Pedido</h5>
+                    <h5 class="modal-title">Buscar Nota de Entrega</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body" style="max-height: 450px; overflow-y: auto">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Buscar pedido..." ng-keyup="search('modalOrders')" />
+                        <input type="text" class="form-control" placeholder="Buscar nota de entrega..." ng-keyup="search('modalOrders')" />
                     </div>
                     <table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
                         <thead>
                             <tr>
-                                <th>Nro. Pedido</th>
+                                <th>Nro. Nota de Entrega</th>
                                 <th>Cliente</th>
                                 <th>Fecha</th>
                             </tr>
@@ -257,7 +257,7 @@
 
         $scope.searchOrder = function (id) {
             $("#modalWaiting").modal("show");
-            $http.get(`/api/DataMasterApi/GetOrder/${id}`).then(function (response) {
+            $http.get(`/api/DataMasterApi/GetSellNote/${id}`).then(function (response) {
                 let res = response.data;
                 if (res.Status == "OK") {
                     $scope.order = res.Result;
@@ -295,8 +295,9 @@
 
                 let val1 = elems[0].innerHTML.toLocaleLowerCase();
                 let val2 = elems[1].innerHTML.toLocaleLowerCase();
+                let val3 = elems[2].innerHTML.toLocaleLowerCase();
 
-                if (!val1.includes(value) && !val2.includes(value))
+                if (!val1.includes(value) && !val2.includes(value) && !val3.includes(value))
                     row.style.display = "none";
                 else
                     row.style.display = "";
@@ -336,7 +337,7 @@
 
             if (!isNullOrEmpty(id)) {
                 if ($scope.isBarcode || fromEnter) {
-                    let item = $scope.order.saPedidoVentaReng.find(i => i.co_art.trim() == id);
+                    let item = $scope.order.saNotaEntregaVentaReng.find(i => i.co_art.trim() == id);
                     if (item) {
                         if (item.total_art_verified < item.total_art) {
                             item.total_art_verified++;
@@ -349,7 +350,7 @@
                                 $scope.setSuccess(`Item ${id} - verificado con exito`);
                             $scope.allItemsVerified = $scope.verifyAllItems();
                             if ($scope.allItemsVerified) {
-                                $scope.successMessage = `Pedido ${$scope.order.doc_num.trim()} verificado con exito`;
+                                $scope.successMessage = `Nota de Entrega ${$scope.order.doc_num.trim()} verificada con exito`;
                                 $("#modalSuccess").modal("show");
                             }
                         } else
@@ -362,7 +363,7 @@
         }
 
         $scope.verifyAllItems = function () {
-            for (let r of $scope.order.saPedidoVentaReng) {
+            for (let r of $scope.order.saNotaEntregaVentaReng) {
                 if (r.total_art - r.total_art_verified > 0)
                     return false;
             }
@@ -415,7 +416,7 @@
     function addVerifiedColumn(o) {
 
         setTimeout(function () { $("#nroItem").focus() }, 1000);
-        for (let r of o.saPedidoVentaReng) {
+        for (let r of o.saNotaEntregaVentaReng) {
             r.total_art_verified = 0;
         }
 
