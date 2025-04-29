@@ -992,6 +992,8 @@
 
 		$scope.updatePriceItem = function () {
 
+			$scope.reng.tipo_imp = "7"; // NUEVO 29-04-2025
+			$scope.reng.porc_imp = 0; // NUEVO 29-04-2025
 			var cant = parseFloat($scope.reng.total_art ?? 0);
 			var price = parseFloat($scope.reng.prec_vta_om ?? 0);
 			var imp = parseFloat($scope.reng.porc_imp ?? 0) / 100;
