@@ -224,6 +224,29 @@ namespace DataMaster.Controllers
 			return response;
 		}
 
+		[HttpGet]
+		[Route("api/DataMasterApi/ResetPass/{id}")]
+		public DataMasterResponse ResetPass(int id)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				MyUser.ResetPass(id);
+
+				response.Status = "OK";
+				response.Result = id;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR RESETANDO CLAVE DE USUARIO " + id.ToString(), ex);
+			}
+
+			return response;
+		}
+
 		// ESTADISTICAS DASHBOARD ADMIN
 
 		[HttpGet]

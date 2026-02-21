@@ -71,6 +71,17 @@ namespace DataMaster.Models
 			return del_user;
 		}
 
+		public static void ResetPass(int id)
+		{
+			Usuario user = GetUserByID(id);
+
+			user.password = SecurityController.Encrypt("datamaster.123");
+			user.fec_camb = DateTime.Now.AddDays(-1);
+
+			db.Entry(user).State = EntityState.Modified;
+			db.SaveChanges();
+		}
+
 		private static string GetChanges(Usuario user_v, Usuario user_n)
 		{
 			string campos = "";
