@@ -1,14 +1,16 @@
 ﻿@{
-    ViewBag.Title = "Verificar Nota Entrega";
+    ViewBag.Title = "Verificar Factura Venta";
 }
 
 <style>
     .search-bar > * {
         flex: 1;
     }
+
     .modal td {
         font-size: 14px;
     }
+
     .card {
         border: 0;
         border-radius: 5px;
@@ -17,30 +19,36 @@
         -moz-box-shadow: 0px 5px 7px -5px rgba(0,0,0,0.75);
         box-shadow: 0px 5px 7px -5px rgba(0,0,0,0.75);
     }
+
     .data-row {
         display: flex;
         justify-content: space-between;
         padding: 5px 0;
     }
+
     .label {
         flex: 1;
         text-align: left;
         font-weight: bold;
     }
+
     .value {
         flex: 2;
         text-align: right;
         font-size: 14px;
     }
+
     .table-items th {
         padding: 10px;
         font-size: 14px;
         font-weight: 400;
     }
+
     .table-items td {
         padding: 5px 10px;
         font-size: 12px;
     }
+
     .table-items thead {
         background: #c0392b;
         color: #FFF;
@@ -48,42 +56,42 @@
 </style>
 <div class="container-fluid" ng-app="Verify" ng-controller="controller">
     <div class="row mt-3">
-        <h2 class="col-md-6 m-0">Verificar Nota de Entrega</h2>
+        <h2 class="col-md-6 m-0">Verificar Factura de Venta</h2>
         <div class="col-md-6 d-flex align-items-center gap-2">
-            <input type="text" id="nroOrder" class="form-control" placeholder="Nro. Nota Entrega" autofocus ng-model="nroOrder" ng-keypress="detectEnter($event, true, nroOrder)" />
-            <button class="btn btn-primary" style="min-width: 120px;" ng-click="askOrder(nroOrder)">
+            <input type="text" id="nroInvoice" class="form-control" placeholder="Nro. Factura Venta" autofocus ng-model="nroInvoice" ng-keypress="detectEnter($event, true, nroInvoice)" />
+            <button class="btn btn-primary" style="min-width: 120px;" ng-click="askInvoice(nroInvoice)">
                 <i class="fas fa-search me-2"></i>Buscar
             </button>
         </div>
     </div>
     <hr />
-    <h6 ng-if="!order">No se ha seleccionado Nota de Entrega.</h6>
-    <div ng-if="order" class="row">
+    <h6 ng-if="!invoice">No se ha seleccionado Factura de Venta.</h6>
+    <div ng-if="invoice" class="row">
         <div class="col-md-4">
             <div class="card">
                 <div class="data-row">
                     <div class="label">Documento:</div>
-                    <div class="value">{{ order.doc_num }}</div>
+                    <div class="value">{{ invoice.doc_num }}</div>
                 </div>
                 <div class="data-row">
                     <div class="label">Cliente:</div>
-                    <div class="value">{{ order.saCliente.cli_des }}</div>
+                    <div class="value">{{ invoice.saCliente.cli_des }}</div>
                 </div>
                 <div class="data-row">
                     <div class="label">Fecha:</div>
-                    <div class="value">{{ formatDate(order.fec_emis).split(' ')[0] }}</div>
+                    <div class="value">{{ formatDate(invoice.fec_emis).split(' ')[0] }}</div>
                 </div>
                 <div class="data-row">
                     <div class="label">Total:</div>
-                    <div class="value">${{ formatNumber(order.total_neto / order.tasa) }}</div>
+                    <div class="value">${{ formatNumber(invoice.total_neto / invoice.tasa) }}</div>
                 </div>
                 <div class="data-row">
                     <div class="label">Tasa:</div>
-                    <div class="value">{{ formatNumber(order.tasa) }}</div>
+                    <div class="value">{{ formatNumber(invoice.tasa) }}</div>
                 </div>
                 <div class="data-row">
                     <div class="label">Items:</div>
-                    <div class="value">{{ order.saNotaEntregaVentaReng.length }}</div>
+                    <div class="value">{{ invoice.saFacturaVentaReng.length }}</div>
                 </div>
             </div>
             <hr />
@@ -117,14 +125,14 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="item in order.saNotaEntregaVentaReng" ng-class="{'table-primary': (item.total_art - item.total_art_verified) == 0}">
+                    <tr ng-repeat="item in invoice.saFacturaVentaReng" ng-class="{'table-primary': (item.total_art - item.total_art_verified) == 0}">
                         <td>{{ item.reng_num }}</td>
                         <td>{{ item.co_art }}</td>
                         <td>{{ searchArt(item.co_art) }}</td>
                         <td>{{ item.co_alma }}</td>
-                        <td>{{ formatNumber(item.prec_vta / order.tasa) }}</td>
+                        <td>{{ formatNumber(item.prec_vta / invoice.tasa) }}</td>
                         <td>{{ item.total_art }}</td>
-                        <td>{{ formatNumber(item.reng_neto / order.tasa) }}</td>
+                        <td>{{ formatNumber(item.reng_neto / invoice.tasa) }}</td>
                         <td class="table-warning">{{ item.total_art - item.total_art_verified }}</td>
                         <td class="table-success">{{ item.total_art_verified }}</td>
                     </tr>
@@ -133,35 +141,35 @@
             </table>
         </div>
     </div>
-    <!-- Modal Nota Entrega -->
-    <div class="modal fade" id="modalOrders" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Modal Factura Venta -->
+    <div class="modal fade" id="modalInvoices" tabindex="-1" role="dialog" aria-hidden="true">
         <div class="modal-dialog" role="document" style="max-width: 800px;">
             <div class="modal-content">
                 <div class="modal-header py-2">
-                    <h5 class="modal-title">Buscar Nota de Entrega</h5>
+                    <h5 class="modal-title">Buscar Factura de Venta</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body" style="max-height: 450px; overflow-y: auto">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Buscar nota de entrega..." ng-keyup="search('modalOrders')" />
+                        <input type="text" class="form-control" placeholder="Buscar Factura de Venta..." ng-keyup="search('modalInvoices')" />
                     </div>
                     <table class="table table-bordered table-hover table-striped mt-3" id="results" style="text-align: left;">
                         <thead>
                             <tr>
-                                <th>Nro. Nota de Entrega</th>
+                                <th>Nro. Factura de Venta</th>
                                 <th>Cliente</th>
                                 <th>Fecha</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr ng-repeat="order in orders" style="cursor: pointer" ng-click="selectRow($event.currentTarget)">
-                                <td>{{ order.doc_num }}</td>
-                                <td>{{ order.saCliente.cli_des }}</td>
-                                <td>{{ formatDate(order.fec_emis) }}</td>
+                            <tr ng-repeat="invoice in invoices" style="cursor: pointer" ng-click="selectRow($event.currentTarget)">
+                                <td>{{ invoice.doc_num }}</td>
+                                <td>{{ invoice.saCliente.cli_des }}</td>
+                                <td>{{ formatDate(invoice.fec_emis) }}</td>
                             </tr>
-                            <tr ng-if="!orders">
+                            <tr ng-if="!invoices">
                                 <td colspan="2">No hay pedidos</td>
                             </tr>
                         </tbody>
@@ -225,51 +233,51 @@
 <script>
     var app = angular.module("Verify", []);
     var isNullOrEmpty = (str) => str == null || str == "";
-    var orders = @Html.Raw(ViewBag.orders);
+    var invoices = @Html.Raw(ViewBag.invoices);
 	var arts = @Html.Raw(ViewBag.arts);
 
     app.controller("controller", function ($scope, $http) {
 
-        $scope.order = null;
-        $scope.orders = orders;
+        $scope.invoice = null;
+        $scope.invoices = invoices;
         $scope.arts = arts;
         $scope.isBarcode = true;
         $scope.success = false;
         $scope.error = false;
         $scope.allItemsVerified = false;
 
-        $scope.askOrder = function (id) {
+        $scope.askInvoice = function (id) {
             $scope.allItemsVerified = false;
             $scope.success = false;
             $scope.error = false;
 
             if (isNullOrEmpty(id)) {
                 blankClass();
-                $("#modalOrders").modal("show");
+                $("#modalInvoices").modal("show");
             } else {
-                $scope.order = $scope.orders.find(o => o.doc_num.trim() == id.trim());
-                if (!$scope.order) {
-                    $scope.searchOrder(id);
+                $scope.invoice = $scope.invoices.find(o => o.doc_num.trim() == id.trim());
+                if (!$scope.invoice) {
+                    $scope.searchInvoice(id);
                 } else {
-                    if ($scope.order.campo8 == "OK") {
-                        $scope.errorMessage = "Nota de Entrega " + $scope.order.doc_num.trim() + " ya verificada";
+                    if ($scope.invoice.campo8 == "OK") {
+                        $scope.errorMessage = "Factura de Venta " + $scope.invoice.doc_num.trim() + " ya verificada";
                         $("#modalError").modal("show");
-                        $scope.order = null;
+                        $scope.invoice = null;
                         return;
                     }
 
-                    $scope.order = addVerifiedColumn($scope.order);
+                    $scope.invoice = addVerifiedColumn($scope.invoice);
                 }
             }
         }
 
-        $scope.searchOrder = function (id) {
+        $scope.searchInvoice = function (id) {
             $("#modalWaiting").modal("show");
-            $http.get(`/api/DataMasterApi/GetSellNote/${id}`).then(function (response) {
+            $http.get(`/api/DataMasterApi/GetSellInvoice/${id}`).then(function (response) {
                 let res = response.data;
                 if (res.Status == "OK") {
-                    $scope.order = res.Result;
-                    $scope.order = addVerifiedColumn($scope.order);
+                    $scope.invoice = res.Result;
+                    $scope.invoice = addVerifiedColumn($scope.invoice);
                     setTimeout(function () { $("#modalWaiting").modal("hide"); }, 500);
                 } else {
                     $scope.errorMessage = res.Message;
@@ -278,10 +286,10 @@
             });
         }
 
-        $scope.detectEnter = function (event, isOrder, id) {
+        $scope.detectEnter = function (event, isInvoice, id) {
             if (event.originalEvent.key === "Enter") {
-                if (isOrder) {
-                    $scope.askOrder(id);
+                if (isInvoice) {
+                    $scope.askInvoice(id);
                 } else {
                     $scope.validateItem(id, true);
                 }
@@ -329,18 +337,18 @@
                 var value = elem.innerHTML;
 
                 blankClass();
-                $scope.nroOrder = value.trim();
-                $scope.order = $scope.orders.find(o => o.doc_num.trim() == value.trim());
-                if ($scope.order.campo8 == "OK") {
-                    $scope.errorMessage = "Nota de Entrega " + $scope.order.doc_num.trim() + " ya verificada";
+                $scope.nroInvoice = value.trim();
+                $scope.invoice = $scope.invoices.find(o => o.doc_num.trim() == value.trim());
+                if ($scope.invoice.campo8 == "OK") {
+                    $scope.errorMessage = "Factura de Venta " + $scope.invoice.doc_num.trim() + " ya verificada";
                     $("#modalError").modal("show");
-                    $scope.order = null;
+                    $scope.invoice = null;
                     return;
                 }
 
-                $scope.order = addVerifiedColumn($scope.order);
-                $("#modalOrders").find("input[type=text]").val("");
-                $("#modalOrders").modal("hide");
+                $scope.invoice = addVerifiedColumn($scope.invoice);
+                $("#modalInvoices").find("input[type=text]").val("");
+                $("#modalInvoices").modal("hide");
             } else {
                 alert("Debes seleccionar un item");
             }
@@ -352,7 +360,7 @@
 
             if (!isNullOrEmpty(id)) {
                 if ($scope.isBarcode || fromEnter) {
-                    let item = $scope.order.saNotaEntregaVentaReng.find(i => i.co_art.trim() == id);
+                    let item = $scope.invoice.saFacturaVentaReng.find(i => i.co_art.trim() == id);
                     if (item) {
                         if (item.total_art_verified < item.total_art) {
                             item.total_art_verified++;
@@ -366,8 +374,8 @@
 
                             $scope.allItemsVerified = $scope.verifyAllItems();
                             if ($scope.allItemsVerified) {
-                                $scope.markNoteAsVerified($scope.order.doc_num.trim());
-                                $scope.successMessage = `Nota de Entrega ${$scope.order.doc_num.trim()} verificada con exito`;
+                                $scope.markInvoiceAsVerified($scope.invoice.doc_num.trim());
+                                $scope.successMessage = `Factura de Venta ${$scope.invoice.doc_num.trim()} verificada con exito`;
                                 $("#modalSuccess").modal("show");
                             }
                         } else
@@ -380,7 +388,7 @@
         }
 
         $scope.verifyAllItems = function () {
-            for (let r of $scope.order.saNotaEntregaVentaReng) {
+            for (let r of $scope.invoice.saFacturaVentaReng) {
                 if (r.total_art - r.total_art_verified > 0)
                     return false;
             }
@@ -421,11 +429,11 @@
             return `${day}/${month}/${year} ${hours}:${minutes}`;
         }
 
-        $scope.markNoteAsVerified = function (id) {
-            $http.get(`/api/DataMasterApi/MarkNoteAsVerified/${id}`).then(function (response) {
+        $scope.markInvoiceAsVerified = function (id) {
+            $http.get(`/api/DataMasterApi/MarkInvoiceAsVerified/${id}`).then(function (response) {
                 let res = response.data;
                 if (res.Status == "OK") {
-                    $scope.order.campo8 = "OK";
+                    $scope.invoice.campo8 = "OK";
                 } else {
                     $scope.errorMessage = res.Message;
                     $("#modalError").modal("show");
@@ -445,7 +453,7 @@
     function addVerifiedColumn(o) {
 
         setTimeout(function () { $("#nroItem").focus() }, 1000);
-        for (let r of o.saNotaEntregaVentaReng) {
+        for (let r of o.saFacturaVentaReng) {
             r.total_art_verified = 0;
         }
 

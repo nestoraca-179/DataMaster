@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Web;
 
 namespace DataMaster.Models
 {
@@ -30,7 +29,7 @@ namespace DataMaster.Models
 			catch (Exception ex)
 			{
 				order = null;
-				IncidentController.CreateIncident("ERROR BUSCANDO PEDIDO VENTA " + id, ex);
+				IncidentController.CreateIncident("ERROR BUSCANDO NOTA ENTREGA " + id, ex);
 			}
 
 			return order;
@@ -59,10 +58,18 @@ namespace DataMaster.Models
 			catch (Exception ex)
 			{
 				orders = null;
-				IncidentController.CreateIncident("ERROR BUSCANDO PEDIDOS", ex);
+				IncidentController.CreateIncident("ERROR BUSCANDO NOTAS ENTREGA", ex);
 			}
 
 			return orders;
+		}
+
+		public void MarkAsVerified(string id)
+		{
+			saNotaEntregaVenta order = GetSellNoteByID(id);
+			order.campo8 = "OK";
+			db.Entry(order).State = EntityState.Modified;
+			db.SaveChanges();
 		}
 	}
 }

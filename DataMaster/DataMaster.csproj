@@ -737,6 +737,7 @@
     <Content Include="Views\Report\RepStockArticulos.cshtml" />
     <Content Include="Views\Report\_RepStockArticulosPartial.cshtml" />
     <Content Include="Views\Order\VerificarNotaEntrega.cshtml" />
+    <Content Include="Views\Order\VerificarFacturaVenta.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

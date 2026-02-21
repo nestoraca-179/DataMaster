@@ -1,9 +1,77 @@
-﻿using System;
+﻿using DataMaster.Controllers;
+using System;
+using System.Collections.Generic;
+using System.Data.Entity;
+using System.Linq;
 
 namespace DataMaster.Models
 {
 	public class Invoice : ProfitAdmManager
 	{
+		public saFacturaVenta GetSellInvoiceByID(string id)
+		{
+			saFacturaVenta invoice;
+
+			try
+			{
+				invoice = db.saFacturaVenta.AsNoTracking().Include("saFacturaVentaReng").Include("saCliente").Include("saCondicionPago")
+					.Include("saVendedor").Single(i => i.doc_num == id);
+
+				invoice.saCliente.saFacturaVenta = null;
+				invoice.saVendedor.saFacturaVenta = null;
+				invoice.saCondicionPago.saFacturaVenta = null;
+
+				foreach (saFacturaVentaReng reng in invoice.saFacturaVentaReng)
+				{
+					reng.saFacturaVenta = null;
+				}
+			}
+			catch (Exception ex)
+			{
+				invoice = null;
+				IncidentController.CreateIncident("ERROR BUSCANDO FACTURA VENTA " + id, ex);
+			}
+
+			return invoice;
+		}
+
+		public List<saFacturaVenta> GetAllSellInvoices(int number, string sucur)
+		{
+			List<saFacturaVenta> invoices = new List<saFacturaVenta>();
+
+			try
+			{
+				invoices = db.saFacturaVenta.AsNoTracking().Where(o => o.co_sucu_in == sucur).Include("saFacturaVentaReng").Include("saCliente")
+					.Include("saVendedor").Include("saCondicionPago").OrderByDescending(i => i.fec_emis).ThenByDescending(i => i.doc_num).Take(number).ToList();
+
+				foreach (saFacturaVenta invoice in invoices)
+				{
+					invoice.saVendedor.saFacturaVenta = null;
+					invoice.saCondicionPago.saFacturaVenta = null;
+					invoice.saCliente.saFacturaVenta = null;
+					foreach (saFacturaVentaReng reng in invoice.saFacturaVentaReng)
+					{
+						reng.saFacturaVenta = null;
+					}
+				}
+			}
+			catch (Exception ex)
+			{
+				invoices = null;
+				IncidentController.CreateIncident("ERROR BUSCANDO FACTURAS VENTA", ex);
+			}
+
+			return invoices;
+		}
+
+		public void MarkAsVerified(string id)
+		{
+			saFacturaVenta invoice = GetSellInvoiceByID(id);
+			invoice.campo8 = "OK";
+			db.Entry(invoice).State = EntityState.Modified;
+			db.SaveChanges();
+		}
+
 		public object GetStatsInvoices(DateTime fec_d, DateTime fec_h, string sucur)
 		{
 			int totalCountSale = 0, totalCountBuy = 0, totalCountSaleSuc = 0, totalCountBuySuc = 0;
@@ -194,7 +262,7 @@ namespace DataMaster.Models
 			}
 
 			// COMPRAS
-			var sp2 = db.RepNotaEntregaVentaxFecha(null, null, fec_d, fec_h, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+			var sp2 = db.RepFacturaVentaxFecha(null, null, fec_d, fec_h, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
 			var enumerator2 = sp2.GetEnumerator();
 
 			while (enumerator2.MoveNext())

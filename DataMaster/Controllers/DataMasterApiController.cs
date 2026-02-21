@@ -130,6 +130,11 @@ namespace DataMaster.Controllers
 					response.Status = "ERROR";
 					response.Message = $"No se ha encontrado la Nota de Entrega Nro. {id}";
 				}
+				else if (order.campo8 == "OK") // USED FOR VERIFICATION
+				{
+					response.Status = "ERROR";
+					response.Message = $"La Nota de Entrega Nro. {id} ya ha sido verificada";
+				}
 				else
 				{
 					response.Status = "OK";
@@ -142,6 +147,91 @@ namespace DataMaster.Controllers
 				response.Status = "ERROR";
 				response.Message = ex.Message;
 				IncidentController.CreateIncident("ERROR BUSCANDO NOTA ENTREGA " + id, ex);
+			}
+
+			return response;
+		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/MarkNoteAsVerified/{id}")]
+		public DataMasterResponse MarkNoteAsVerified(string id)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				new Note().MarkAsVerified(id);
+
+				response.Status = "OK";
+				response.Result = id;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR MARCANDO NOTA DE ENTREGA " + id + " COMO VERIFICADA", ex);
+			}
+
+			return response;
+		}
+
+		// FACTURA VENTA
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetSellInvoice/{id}")]
+		public DataMasterResponse GetSellInvoice(string id)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				saFacturaVenta invoice = new Invoice().GetSellInvoiceByID(id);
+
+				if (invoice == null)
+				{
+					response.Status = "ERROR";
+					response.Message = $"No se ha encontrado la Factura de Venta Nro. {id}";
+				}
+				else if (invoice.campo8 == "OK") // USED FOR VERIFICATION 
+				{
+					response.Status = "ERROR";
+					response.Message = $"La Factura de Venta Nro. {id} ya ha sido verificada";
+				}
+				else
+				{
+					response.Status = "OK";
+					response.Result = invoice;
+					response.Message = null;
+				}
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR BUSCANDO FACTURA VENTA " + id, ex);
+			}
+
+			return response;
+		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/MarkInvoiceAsVerified/{id}")]
+		public DataMasterResponse MarkInvoiceAsVerified(string id)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				new Invoice().MarkAsVerified(id);
+
+				response.Status = "OK";
+				response.Result = id;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR MARCANDO FACTURA DE VENTA " + id + " COMO VERIFICADA", ex);
 			}
 
 			return response;
