@@ -799,7 +799,9 @@
 	var arts = @Html.Raw(ViewBag.arts);
 	var prices = @Html.Raw(ViewBag.prices);
 	var imps = @Html.Raw(Json.Encode(ViewBag.imps));
-	var rate = parseFloat('@ViewBag.rate');
+    var rate = parseFloat('@ViewBag.rate');
+    const DEFAULT_WAREHOUSE = "01";
+    const DEFAULT_PRICE_TYPE = "02";
 
 	orders = parseItems(orders);
 	orders_orig = parseItems(orders_orig);
@@ -924,6 +926,7 @@
 			} else {
 				$scope.reng = {
 					co_art: "",
+                    co_alma: DEFAULT_WAREHOUSE,
 					total_art: 1,
 					tipo_imp: "1",
 					porc_imp: 16.00,
@@ -934,9 +937,10 @@
 
 				$scope.selectedArt = false;
 				$("#art").val("");
-				$("#des_art").val("");
-				$("#alm").val("");
-				$("#des_alm").val("");
+                $("#des_art").val("");
+                $("#des_alm").val(searchAlm(DEFAULT_WAREHOUSE));
+				// $("#alm").val("");
+				// $("#des_alm").val("");
 			}
 
 			$('#modalItem').modal('show');
@@ -1141,9 +1145,12 @@
 
 			let art = arts.find(a => a.co_art.trim() == value);
 			if (art != null) {
-				$scope.selectedArt = true;
-				$scope.prices_filter = $scope.getFilterPrices(art.co_art.trim());
-				$scope.setPrice($scope.prices_filter[0]);
+                $scope.selectedArt = true;
+                $scope.prices_filter = $scope.getFilterPrices(art.co_art.trim());
+
+                let defaultPrice = $scope.prices_filter.find(t => t.co_precio.trim() == DEFAULT_PRICE_TYPE);
+                $scope.setPrice(defaultPrice != null ? defaultPrice : $scope.prices_filter[0]);
+				// $scope.setPrice($scope.prices_filter[0]);
 				$("#des_art").val(art.art_des);
 			} else {
 				$scope.selectedArt = false;
