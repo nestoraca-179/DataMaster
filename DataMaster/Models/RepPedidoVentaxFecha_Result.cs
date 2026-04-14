@@ -11,9 +11,15 @@ namespace DataMaster.Models
 {
     using System;
     
-    public partial class RepTotalNotaEntregaxCliente_Result
+    public partial class RepPedidoVentaxFecha_Result
     {
-        public string Operacion { get; set; }
+        public string Filtro_anulado { get; set; }
+        public string SubTotales { get; set; }
+        public string tipo_rep { get; set; }
+        public string tip_cli { get; set; }
+        public string cli_des { get; set; }
+        public string co_zon { get; set; }
+        public string co_seg { get; set; }
         public string doc_num { get; set; }
         public string descrip { get; set; }
         public string co_cli { get; set; }
@@ -33,14 +39,15 @@ namespace DataMaster.Models
         public decimal monto_desc_glob { get; set; }
         public string porc_reca { get; set; }
         public decimal monto_reca { get; set; }
-        public Nullable<decimal> monto_imp { get; set; }
+        public decimal total_bruto { get; set; }
+        public decimal monto_imp { get; set; }
         public decimal monto_imp2 { get; set; }
         public decimal monto_imp3 { get; set; }
-        public Nullable<decimal> otros1 { get; set; }
-        public Nullable<decimal> otros2 { get; set; }
-        public Nullable<decimal> otros3 { get; set; }
-        public decimal total_neto { get; set; }
-        public decimal saldo { get; set; }
+        public decimal otros1 { get; set; }
+        public decimal otros2 { get; set; }
+        public decimal otros3 { get; set; }
+        public Nullable<decimal> total_neto { get; set; }
+        public Nullable<decimal> saldo { get; set; }
         public string dir_ent { get; set; }
         public string comentario { get; set; }
         public string dis_cen { get; set; }
@@ -70,11 +77,5 @@ namespace DataMaster.Models
         public string trasnfe { get; set; }
         public byte[] validador { get; set; }
         public System.Guid rowguid { get; set; }
-        public string cli_des { get; set; }
-        public Nullable<decimal> total_art { get; set; }
-        public Nullable<decimal> coti { get; set; }
-        public Nullable<decimal> monto_desc { get; set; }
-        public Nullable<decimal> pendiente { get; set; }
-        public Nullable<decimal> total_bruto { get; set; }
     }
 }

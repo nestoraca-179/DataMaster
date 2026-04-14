@@ -229,7 +229,7 @@ namespace DataMaster.Models
 			return obj;
 		}
 
-		public object GetStatsInvoicesWithNotes(DateTime fec_d, DateTime fec_h, string sucur)
+		public object GetStatsInvoicesWithOrders(DateTime fec_d, DateTime fec_h, string sucur)
 		{
 			int totalCountSale = 0, totalCountBuy = 0, totalCountSaleSuc = 0, totalCountBuySuc = 0;
 			decimal totalAmountSale = 0, totalAmountBuy = 0, totalState;
@@ -262,7 +262,7 @@ namespace DataMaster.Models
 			}
 
 			// COMPRAS
-			var sp2 = db.RepFacturaVentaxFecha(null, null, fec_d, fec_h, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null);
+			var sp2 = db.RepPedidoVentaxFecha(null, null, fec_d, fec_h, null, null, null, null, null, null, null, null, null, null, "SPRO", null, null, null, null, null);
 			var enumerator2 = sp2.GetEnumerator();
 
 			while (enumerator2.MoveNext())

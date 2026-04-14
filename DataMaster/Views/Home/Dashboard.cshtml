@@ -193,7 +193,7 @@ h5.no-data {
             </div>
             <div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
                 <div class="direct shadow-tm" style="border-bottom: solid 5px #EF6C00;">
-                    <h5>Notas de Entrega del Mes</h5>
+                    <h5>Pedidos de Venta del Mes (Pendientes)</h5>
                     <span ng-show="stats" class="stat-number">{{ stats.totalCountBuy }}</span>
                     <i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
                     <i class="fas fa-file-invoice" style="color: #EF6C00;"></i>
@@ -201,7 +201,7 @@ h5.no-data {
             </div>
             <div class="col-sm-6 col-md-6 col-xl-6 col-xxl-3 col-stat">
                 <div class="direct shadow-tm" style="border-bottom: solid 5px #D84315;">
-                    <h5>Total Notas de Entrega del Mes</h5>
+                    <h5>Total Pedidos de Venta del Mes (Pendientes)</h5>
                     <span ng-show="stats" class="stat-number">{{ formatNumber(stats.totalAmountBuyUSD) }}$</span>
                     <i ng-if="!stats" class="fa-solid fa-circle-notch fa-spin"></i>
                     <i class="fa-solid fa-coins" style="color: #D84315;"></i>
@@ -322,7 +322,11 @@ h5.no-data {
                     $scope.msp = $scope.all_msp;
                     $scope.validate('msp');
 
-                }, function (error) { console.log("Ha ocurrido un error (MSP) ->"); console.log(error); });
+                    $scope.all_mpp = response.data.Result;
+                    $scope.mpp = $scope.all_mpp;
+                    $scope.validate('mpp')
+
+                }, function (error) { console.log("Ha ocurrido un error (MSP/MPP) ->"); console.log(error); });
 
             // SUCURSAL
             if (sucur != null) {
@@ -330,29 +334,34 @@ h5.no-data {
                     .then(function (response) {
 
                         $scope.suc_msp = response.data.Result;
-
-                    }, function (error) { console.log("Ha ocurrido un error (MSP-S) ->"); console.log(error); });
-            }
-
-            // SERVICIOS MAS COMPRADOS
-            $http.get(`../../api/DataMasterApi/GetMostPurchaseProducts/${fecha_d}/${fecha_h}/5/0`)
-                .then(function (response) {
-
-                    $scope.all_mpp = response.data.Result;
-                    $scope.mpp = $scope.all_mpp;
-                    $scope.validate('mpp');
-
-                }, function (error) { console.log("Ha ocurrido un error (MPP) ->"); console.log(error); });
-
-            // SUCURSAL
-            if (sucur != null) {
-                $http.get(`../../api/DataMasterApi/GetMostPurchaseProducts/${fecha_d}/${fecha_h}/5/1`)
-                    .then(function (response) {
-
                         $scope.suc_mpp = response.data.Result;
 
-                    }, function (error) { console.log("Ha ocurrido un error (MPP) ->"); console.log(error); });
+                    }, function (error) { console.log("Ha ocurrido un error (MSP-S/MPP-S) ->"); console.log(error); });
             }
+
+            /*
+
+            // SERVICIOS MAS COMPRADOS
+            //$http.get(`../../api/DataMasterApi/GetMostPurchaseProducts/${fecha_d}/${fecha_h}/5/0`)
+            //    .then(function (response) {
+
+            //        $scope.all_mpp = response.data.Result;
+            //        $scope.mpp = $scope.all_mpp;
+            //        $scope.validate('mpp');
+
+            //    }, function (error) { console.log("Ha ocurrido un error (MPP) ->"); console.log(error); });
+
+            // SUCURSAL
+            //if (sucur != null) {
+            //    $http.get(`../../api/DataMasterApi/GetMostPurchaseProducts/${fecha_d}/${fecha_h}/5/1`)
+            //        .then(function (response) {
+
+            //            $scope.suc_mpp = response.data.Result;
+
+            //        }, function (error) { console.log("Ha ocurrido un error (MPP) ->"); console.log(error); });
+            //}
+
+            */
 
             // CLIENTES CON MAS VENTAS
             $http.get(`../../api/DataMasterApi/GetMostActiveClients/${fecha_d}/${fecha_h}/7/0`)
@@ -484,7 +493,7 @@ h5.no-data {
     }
 
 </script>
-@* GRAFICA ARTICULOS VENDIDOS *@
+@* GRAFICA ARTICULOS VENDIDOS (CANTIDAD) *@
 <script>
 
 	function initMSP(msp) {
@@ -559,7 +568,7 @@ h5.no-data {
 	}
 
 </script>
-@* GRAFICA ARTICULOS COMPRADOS *@
+@* GRAFICA ARTICULOS VENDIDOS (PORCENTAJE) *@
 <script>
 
 	function initMPP(mpp) {
@@ -592,7 +601,7 @@ h5.no-data {
                     text: 'Articulos más despachados en N/E'
 				},
 				tooltip: {
-					pointFormat: '{series.name}: <b>{point.y:,.2f} Unds</b>'
+					pointFormat: '{series.name}: <b>{point.y} Unds</b>'
 				},
 				accessibility: {
 					point: {

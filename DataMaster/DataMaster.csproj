@@ -927,6 +927,9 @@
     <Compile Include="Models\RepNotaEntregaVentaxFecha_Result.cs">
       <DependentUpon>ProfitAdm.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\RepPedidoVentaxFecha_Result.cs">
+      <DependentUpon>ProfitAdm.tt</DependentUpon>
+    </Compile>
     <Compile Include="Models\RepProveedorMasCompra_Result.cs">
       <DependentUpon>ProfitAdm.tt</DependentUpon>
     </Compile>

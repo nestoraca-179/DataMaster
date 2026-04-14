@@ -351,7 +351,7 @@ namespace DataMaster.Controllers
 				DateTime fecha_h = utils.FormatDate(fec_h);
 				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
 
-				object stats = new Invoice().GetStatsInvoicesWithNotes(fecha_d, fecha_h, sucur);
+				object stats = new Invoice().GetStatsInvoicesWithOrders(fecha_d, fecha_h, sucur);
 
 				response.Status = "OK";
 				response.Result = stats;
