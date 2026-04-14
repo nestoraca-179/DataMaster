@@ -43,52 +43,53 @@ namespace DataMaster.Models
 
 		public List<saCliente> GetMostActiveClients(DateTime fec_d, DateTime fec_h, int number, string sucur)
 		{
-			List<saCliente> clientes = new List<saCliente>();
+			List<saCliente> clients = new List<saCliente>();
 
-			var sp = db.RepClienteMasVenta(fec_d, fec_h, null, null, null, null, null, null, null, number, sucur, null, null, null);
+			// var sp = db.RepClienteMasVenta(fec_d, fec_h, null, null, null, null, null, null, null, number, sucur, null, null, null);
+			var sp = db.RepClienteMasVenta_USD(fec_d, fec_h, null, null, null, null, null, null, null, number, sucur, null, null, null);
 			var enumerator = sp.GetEnumerator();
 
 			while (enumerator.MoveNext())
 			{
-				saCliente cliente = new saCliente();
+				saCliente client = new saCliente();
 
-				cliente.co_cli = enumerator.Current.co_cli.Trim();
-				cliente.cli_des = enumerator.Current.cli_des.Trim();
-				cliente.campo1 = Convert.ToDouble(enumerator.Current.Venta).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
-				cliente.campo2 = Math.Round(Convert.ToDouble((enumerator.Current.Venta * 100) / enumerator.Current.Venta_total), 2).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
+				client.co_cli = enumerator.Current.co_cli.Trim();
+				client.cli_des = enumerator.Current.cli_des.Trim();
+				client.campo1 = Convert.ToDouble(enumerator.Current.Venta).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
+				client.campo2 = Math.Round(Convert.ToDouble((enumerator.Current.Venta * 100) / enumerator.Current.Venta_total), 2).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
 
-				clientes.Add(cliente);
+				clients.Add(client);
 			}
 
-			return clientes;
+			return clients;
 		}
 
 		public List<saCliente> GetMostActiveClientsWithNotes(DateTime fec_d, DateTime fec_h, int number, string sucur)
 		{
-			List<saCliente> clientes = new List<saCliente>();
-			List<saCliente> clientes_temp = new List<saCliente>();
+			List<saCliente> clients = new List<saCliente>();
+			List<saCliente> clients_temp = new List<saCliente>();
 
 			var sp = db.RepTotalNotaEntregaxCliente(fec_d, fec_h, null, null, null, null, null, null, null, sucur, null, null, null, null);
 			var enumerator = sp.GetEnumerator();
 
 			while (enumerator.MoveNext())
 			{
-				saCliente cliente = new saCliente();
+				saCliente client = new saCliente();
 
-				cliente.co_cli = enumerator.Current.co_cli.Trim();
-				cliente.cli_des = enumerator.Current.cli_des.Trim();
-				cliente.desc_glob = enumerator.Current.anulado ? 0 : enumerator.Current.total_neto; // USADO PARA EL TOTAL
+				client.co_cli = enumerator.Current.co_cli.Trim();
+				client.cli_des = enumerator.Current.cli_des.Trim();
+				client.desc_glob = enumerator.Current.anulado ? 0 : enumerator.Current.total_neto; // USADO PARA EL TOTAL
 
-				clientes_temp.Add(cliente);
+				clients_temp.Add(client);
 			}
 
-			decimal total = clientes_temp.Select(c => c.desc_glob).Sum();
-			foreach (saCliente cl in clientes_temp.OrderBy(c => c.co_cli))
+			decimal total = clients_temp.Select(c => c.desc_glob).Sum();
+			foreach (saCliente cl in clients_temp.OrderBy(c => c.co_cli))
 			{
-				if (!clientes.Any(c => c.co_cli == cl.co_cli))
+				if (!clients.Any(c => c.co_cli == cl.co_cli))
 				{
 					saCliente new_cliente = new saCliente();
-					decimal total_c = clientes_temp.Where(c => c.co_cli == cl.co_cli).Select(c => c.desc_glob).Sum();
+					decimal total_c = clients_temp.Where(c => c.co_cli == cl.co_cli).Select(c => c.desc_glob).Sum();
 
 					new_cliente.co_cli = cl.co_cli;
 					new_cliente.cli_des = cl.cli_des;
@@ -96,11 +97,15 @@ namespace DataMaster.Models
 					new_cliente.campo2 = Math.Round((total_c * 100) / total, 2).ToString("N2", CultureInfo.GetCultureInfo("es-ES"));
 					new_cliente.desc_glob = total_c;
 
-					clientes.Add(new_cliente);
+					clients.Add(new_cliente);
 				}
 			}
 
-			return clientes.OrderByDescending(c => c.desc_glob).ToList();
+			clients = clients.OrderByDescending(c => c.desc_glob).ToList();
+			if (clients.Count > number)
+				clients.RemoveRange(number, clients.Count - number);
+
+			return clients;
 		}
 
 		public List<saCliente> GetMostMorousClients(int number)
@@ -126,12 +131,10 @@ namespace DataMaster.Models
 
 			clients = (from c in clients
 					   group c.campo1 by (c.co_cli, c.cli_des) into g
-					   select new saCliente
-					   {
+					   select new saCliente {
 						   co_cli = g.Key.co_cli,
 						   cli_des = g.Key.co_cli + " - " + g.Key.cli_des,
 						   campo1 = Math.Round(g.Select(x => double.Parse(x)).Sum(), 2).ToString()
-
 					   }).OrderByDescending(x => double.Parse(x.campo1)).ToList();
 
 			if (clients.Count > number)

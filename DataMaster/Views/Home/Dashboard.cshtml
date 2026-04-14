@@ -329,7 +329,7 @@ h5.no-data {
                 }, function (error) { console.log("Ha ocurrido un error (MSP/MPP) ->"); console.log(error); });
 
             // SUCURSAL
-            if (sucur != null) {
+            if (sucur != null && sucur.trim() != "") {
                 $http.get(`../../api/DataMasterApi/GetMostSaleProducts/${fecha_d}/${fecha_h}/5/1`)
                     .then(function (response) {
 
@@ -338,30 +338,6 @@ h5.no-data {
 
                     }, function (error) { console.log("Ha ocurrido un error (MSP-S/MPP-S) ->"); console.log(error); });
             }
-
-            /*
-
-            // SERVICIOS MAS COMPRADOS
-            //$http.get(`../../api/DataMasterApi/GetMostPurchaseProducts/${fecha_d}/${fecha_h}/5/0`)
-            //    .then(function (response) {
-
-            //        $scope.all_mpp = response.data.Result;
-            //        $scope.mpp = $scope.all_mpp;
-            //        $scope.validate('mpp');
-
-            //    }, function (error) { console.log("Ha ocurrido un error (MPP) ->"); console.log(error); });
-
-            // SUCURSAL
-            //if (sucur != null) {
-            //    $http.get(`../../api/DataMasterApi/GetMostPurchaseProducts/${fecha_d}/${fecha_h}/5/1`)
-            //        .then(function (response) {
-
-            //            $scope.suc_mpp = response.data.Result;
-
-            //        }, function (error) { console.log("Ha ocurrido un error (MPP) ->"); console.log(error); });
-            //}
-
-            */
 
             // CLIENTES CON MAS VENTAS
             $http.get(`../../api/DataMasterApi/GetMostActiveClients/${fecha_d}/${fecha_h}/7/0`)
@@ -374,17 +350,17 @@ h5.no-data {
                 }, function (error) { console.log("Ha ocurrido un error (MAC) ->"); console.log(error); });
 
             // SUCURSAL
-            if (sucur != null) {
+            if (sucur != null && sucur.trim() != "") {
                 $http.get(`../../api/DataMasterApi/GetMostActiveClients/${fecha_d}/${fecha_h}/7/1`)
                     .then(function (response) {
 
                         $scope.suc_mac = response.data.Result;
 
-                    }, function (error) { console.log("Ha ocurrido un error (MAC) ->"); console.log(error); });
+                    }, function (error) { console.log("Ha ocurrido un error (MAC-S) ->"); console.log(error); });
             }
 
-            // PROVEEDORES CON MAS COMPRAS
-            $http.get(`../../api/DataMasterApi/GetMostActiveSuppliers/${fecha_d}/${fecha_h}/5/0`)
+            // VENDEDORES MAS ACTIVOS
+            $http.get(`../../api/DataMasterApi/GetMostActiveSellers/${fecha_d}/${fecha_h}/5/0`)
                 .then(function (response) {
 
                     $scope.all_mas = response.data.Result;
@@ -394,13 +370,13 @@ h5.no-data {
                 }, function (error) { console.log("Ha ocurrido un error (MAS) ->"); console.log(error); });
 
             // SUCURSAL
-            if (sucur != null) {
-                $http.get(`../../api/DataMasterApi/GetMostActiveSuppliers/${fecha_d}/${fecha_h}/5/1`)
+            if (sucur != null && sucur.trim() != "") {
+                $http.get(`../../api/DataMasterApi/GetMostActiveSellers/${fecha_d}/${fecha_h}/5/1`)
                     .then(function (response) {
 
                         $scope.suc_mas = response.data.Result;
 
-                    }, function (error) { console.log("Ha ocurrido un error (MAS) ->"); console.log(error); });
+                    }, function (error) { console.log("Ha ocurrido un error (MAS-S) ->"); console.log(error); });
             }
         }
 
@@ -520,7 +496,7 @@ h5.no-data {
 				},
 				colors: ['#C0392B', '#971b0f'],
 				title: {
-                    text: 'Articulos más vendidos'
+                    text: 'Articulos más vendidos (Unds)'
 				},
 				accessibility: {
 					announceNewData: {
@@ -598,7 +574,7 @@ h5.no-data {
 				},
 				colors: ['#B81E0D', '#E32510', '#96190B', '#741308', '#520D06'],
 				title: {
-                    text: 'Articulos más despachados en N/E'
+                    text: 'Articulos más vendidos (%)'
 				},
 				tooltip: {
 					pointFormat: '{series.name}: <b>{point.y} Unds</b>'
@@ -634,17 +610,17 @@ h5.no-data {
 	}
 
 </script>
-@* GRAFICA PROVEEDORES COMPRAS *@
+@* GRAFICA VENDEDORES VENTAS *@
 <script>
 
 	function initMAS(mas) {
 
-		var proveedores = mas;
-		var objects = proveedores.map(function (x) {
-			return [
-                capitalize(x.prov_des ?? x.cli_des),
-                x.prov_des != null ? parseFloat(x.campo1) : parseFloat2(x.campo1)
-			];
+		var sellers = mas;
+        var objects = sellers.map(function (x) {
+            return [
+                capitalize(x.ven_des) + ` (${x.campo1 ?? 0})`,
+                parseFloat2(x.campo2 ?? "0")
+            ];
         });
         
 		Highcharts.setOptions({
@@ -665,7 +641,7 @@ h5.no-data {
 				},
 				colors: ['#1565C0', '#2E7D32', '#EF6C00', '#D84315', '#6610F2'],
 				title: {
-                    text: 'Clientes con más N/E'
+                    text: 'Vendedores con mas Ventas'
                 },
 				exporting: {
 					enabled: false,
@@ -680,7 +656,10 @@ h5.no-data {
 						},
 						showInLegend: true
 					}
-				},
+                },
+                tooltip: {
+                    pointFormat: '<span style="color:{point.color}">Cantidad</span>: <b>{point.y:.2f}</b> $USD<br/>'
+                },
 				series: [{
 					name: 'Monto Total',
 					data: objects

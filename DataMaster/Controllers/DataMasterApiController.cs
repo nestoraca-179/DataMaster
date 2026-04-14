@@ -474,5 +474,32 @@ namespace DataMaster.Controllers
 
 			return response;
 		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetMostActiveSellers/{fec_d}/{fec_h}/{number}/{suc}")]
+		public DataMasterResponse GetMostActiveSellers(string fec_d, string fec_h, int number, int suc)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				DateTime fecha_d = utils.FormatDate(fec_d);
+				DateTime fecha_h = utils.FormatDate(fec_h);
+				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+
+				List<saVendedor> sellers = new Seller().GetMostActiveSellers(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
+
+				response.Status = "OK";
+				response.Result = sellers;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR OBTENIENDO VENDEDORES MAS ACTIVOS", ex);
+			}
+
+			return response;
+		}
 	}
 }
