@@ -77,17 +77,21 @@ text, tspan {
     border-top: none;
     padding: 10px;
 }
-#cont-msp, #cont-mpp, #cont-mac, #cont-mas {
+#cont-msp, #cont-mpp, #cont-mac, #cont-mas, #cont-mss {
     height: 100%;
     position: relative;
     min-height: 40px;
 }
-#cont-mac {
+#cont-mac, #cont-bba {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     padding: 0 10px;
+}
+#cont-bba {
+    max-height: 400px;
+    overflow-y: auto;
 }
 h5.no-data {
     width: 100%;
@@ -285,7 +289,39 @@ h5.no-data {
                 </div>
             </div>
             <div class="col-md-12 col-xl-6 col-graph">
-                
+                <div class="container-chart shadow-tm pl-3 pr-3 d-flex">
+                    <i ng-if="!bba || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+                    <div id="cont-bba" style="display: none;">
+                        <h5 ng-if="bba.length > 0" class="text-center mt-3 mb-3" style="font-family: 'Raleway', sans-serif !important;">Saldos Cajas/Bancos a la fecha</h5>
+                        <table ng-if="bba.length > 0" class="table table-hover borderless">
+                            <thead>
+                                <tr>
+                                    <th class="first-item"></th>
+                                    <th>Caja / Banco</th>
+                                    <th style="text-align: right;">Ingresos (+)</th>
+                                    <th style="text-align: right;">Egresos (-)</th>
+                                    <th style="text-align: right;">Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat="detail in bba">
+                                    <td class="first-item" style="vertical-align: middle;">
+                                        <i class="fas" ng-class="{ 'fa-cash-register text-warning': detail.isBox, 'fa-building-columns text-primary': !detail.isBox }"></i>
+                                    </td>
+                                    <td>{{ detail.name }}</td>
+                                    <td style="text-align: right;">{{ formatNumber(detail.totalIncomes) }}</td>
+                                    <td style="text-align: right;">{{ formatNumber(detail.totalOutcomes) }}</td>
+                                    <td style="text-align: right;">
+                                        <span class="fw-bold" ng-class="{ 'text-success': detail.balance > 0, 'text-danger': detail.balance < 0 }">
+                                            {{ formatNumber(detail.balance) }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <h5 ng-if="bba.length == 0" class="text-center no-data">Saldos Cajas/Bancos a la fecha (Sin datos)</h5>
+                    </div>
+                </div>
             </div>
         </div>
         <hr class="mx-3" />
@@ -296,7 +332,7 @@ h5.no-data {
 <script>
 	var app = angular.module("DashboardAdmin", []);
 	var user = @Html.Raw(Json.Encode(ViewBag.usuario));
-	var graphs = ['msp', 'mpp', 'mac', 'mas', 'mss'];
+	var graphs = ['msp', 'mpp', 'mac', 'mas', 'mss', 'bba'];
 	var responsive = screen.availWidth <= 767 ? true : false;
 	var sucur = '@ViewBag.sucur';
 	var rate = parseFloat('@ViewBag.rate');
@@ -413,6 +449,16 @@ h5.no-data {
 
                     }, function (error) { console.log("Ha ocurrido un error (MSS-S) ->"); console.log(error); });
             }
+
+            // SALDOS CAJAS / BANCOS
+            $http.get(`../../api/DataMasterApi/GetBalances/${fecha_h}`)
+                .then(function (response) {
+
+                    $scope.all_bba = response.data.Result;
+                    $scope.bba = $scope.all_bba;
+                    $scope.validate('bba');
+
+                }, function (error) { console.log("Ha ocurrido un error (BBA) ->"); console.log(error); });
         }
 
 		$scope.validate = function (item) {
@@ -430,6 +476,7 @@ h5.no-data {
 					$("#cont-mac").removeAttr("style");
                     initMAS($scope.mas);
                     initMSS($scope.mss);
+                    $("#cont-bba").removeAttr("style");
 					if (responsive)
 						$("table.borderless").addClass("table-sm");
 				}, 0.05);

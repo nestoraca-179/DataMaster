@@ -1608,6 +1608,7 @@
     </Compile>
     <Compile Include="Models\Storage.cs" />
     <Compile Include="Models\Supplier.cs" />
+    <Compile Include="Models\BalanceDetail.cs" />
     <Compile Include="Models\Transport.cs" />
     <Compile Include="Models\Usuario.cs">
       <DependentUpon>DataMaster.tt</DependentUpon>

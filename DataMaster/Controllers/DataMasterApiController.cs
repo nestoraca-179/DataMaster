@@ -528,5 +528,29 @@ namespace DataMaster.Controllers
 
 			return response;
 		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetBalances/{date}")]
+		public DataMasterResponse GetBalances(string date)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				DateTime finalDate = utils.FormatDate(date);
+				List<BalanceDetail> details = new BalanceDetail().GetDetailsBankAccountsAndBoxes(finalDate);
+
+				response.Status = "OK";
+				response.Result = details;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR SALDOS DE CUENTAS Y BANCOS", ex);
+			}
+
+			return response;
+		}
 	}
 }
