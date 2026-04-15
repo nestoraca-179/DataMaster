@@ -216,7 +216,7 @@ h5.no-data {
                         <figure ng-if="msp.length > 0" class="highcharts-figure">
                             <div id="container-msp"></div>
                         </figure>
-                        <h5 ng-if="msp.length == 0" class="text-center no-data">Articulos más vendidos (Sin datos)</h5>
+                        <h5 ng-if="msp.length == 0" class="text-center no-data">Articulos más vendidos (Unds)</h5>
                     </div>
                 </div>
             </div>
@@ -227,7 +227,7 @@ h5.no-data {
                         <figure ng-if="mpp.length > 0" class="highcharts-figure">
                             <div id="container-mpp"></div>
                         </figure>
-                        <h5 ng-if="mpp.length == 0" class="text-center no-data">Articulos más despachados en N/E (Sin datos)</h5>
+                        <h5 ng-if="mpp.length == 0" class="text-center no-data">Articulos más vendidos (%)</h5>
                     </div>
                 </div>
             </div>
@@ -243,7 +243,7 @@ h5.no-data {
                                 <tr>
                                     <th class="first-item"></th>
                                     <th>Cliente</th>
-                                    <th>Total</th>
+                                    <th>Total (USD)</th>
                                     <th style="text-align: right;">Porcentaje</th>
                                 </tr>
                             </thead>
@@ -272,15 +272,31 @@ h5.no-data {
                 </div>
             </div>
         </div>
+        <div class="row mt-1 mx-2" style="margin: 0; align-items: stretch;">
+            <div class="col-md-12 col-xl-6 col-graph">
+                <div class="container-chart shadow-tm">
+                    <i ng-if="!mss || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+                    <div id="cont-mss" style="display: none;">
+                        <figure ng-if="mss.length > 0" class="highcharts-figure">
+                            <div id="container-mss"></div>
+                        </figure>
+                        <h5 ng-if="mss.length == 0" class="text-center no-data">Articulos más vendidos (Sin datos)</h5>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 col-xl-6 col-graph">
+                
+            </div>
+        </div>
         <hr class="mx-3" />
+        </div>
+        <h2 ng-if="!user.admin" class="m-0 mt-2">Bienvenido {{ user.des_usuario }}!</h2>
     </div>
-    <h2 ng-if="!user.admin" class="m-0 mt-2">Bienvenido {{ user.des_usuario }}!</h2>
-</div>
 <script src="~/Scripts/angular-min.js"></script>
 <script>
 	var app = angular.module("DashboardAdmin", []);
 	var user = @Html.Raw(Json.Encode(ViewBag.usuario));
-	var graphs = ['msp', 'mpp', 'mac', 'mas'];
+	var graphs = ['msp', 'mpp', 'mac', 'mas', 'mss'];
 	var responsive = screen.availWidth <= 767 ? true : false;
 	var sucur = '@ViewBag.sucur';
 	var rate = parseFloat('@ViewBag.rate');
@@ -296,7 +312,6 @@ h5.no-data {
 	var fecha_h = parseDate(fec_h); // fec_h.toLocaleDateString().replaceAll("/", "-");
 
 	app.controller("controller", function ($scope, $http) {
-
 		$scope.user = user;
 		$scope.bySucur = false;
 		$scope.show_all = false;
@@ -314,7 +329,7 @@ h5.no-data {
 
                 }, function (error) { console.log("Ha ocurrido un error (STATS) ->"); console.log(error); });
 
-            // SERVICIOS MAS VENDIDOS
+            // ARTICULOS MAS VENDIDOS
             $http.get(`../../api/DataMasterApi/GetMostSaleProducts/${fecha_d}/${fecha_h}/5/0`)
                 .then(function (response) {
 
@@ -378,34 +393,45 @@ h5.no-data {
 
                     }, function (error) { console.log("Ha ocurrido un error (MAS-S) ->"); console.log(error); });
             }
+
+            // SUBLINEAS MAS VENDIDAS
+            $http.get(`../../api/DataMasterApi/GetMostSubLines/${fecha_d}/${fecha_h}/5/0`)
+                .then(function (response) {
+
+                    $scope.all_mss = response.data.Result;
+                    $scope.mss = $scope.all_mss;
+                    $scope.validate('mss');
+
+                }, function (error) { console.log("Ha ocurrido un error (MSS) ->"); console.log(error); });
+
+            // SUCURSAL
+            if (sucur != null && sucur.trim() != "") {
+                $http.get(`../../api/DataMasterApi/GetMostSubLines/${fecha_d}/${fecha_h}/5/1`)
+                    .then(function (response) {
+
+                        $scope.suc_mss = response.data.Result;
+
+                    }, function (error) { console.log("Ha ocurrido un error (MSS-S) ->"); console.log(error); });
+            }
         }
 
 		$scope.validate = function (item) {
-
 			graphs = graphs.filter(x => x != item);
-
 			if (graphs.length == 0) {
-
 				$("#cont-msp").removeAttr("style");
 				$("#cont-mpp").removeAttr("style");
 				$("#cont-mas").removeAttr("style");
+				$("#cont-mss").removeAttr("style");
 				$scope.show_all = true;
 
 				setTimeout(function () {
-
 					initMSP($scope.msp);
 					initMPP($scope.mpp);
 					$("#cont-mac").removeAttr("style");
-					initMAS($scope.mas);
-
-					if (responsive) {
+                    initMAS($scope.mas);
+                    initMSS($scope.mss);
+					if (responsive)
 						$("table.borderless").addClass("table-sm");
-						/*$("table.borderless th").first().remove();
-						$("table.borderless tr").each(function () {
-							$(this).find("td").first().remove();
-						});*/
-					}
-
 				}, 0.05);
 			}
 		}
@@ -471,11 +497,9 @@ h5.no-data {
 </script>
 @* GRAFICA ARTICULOS VENDIDOS (CANTIDAD) *@
 <script>
-
 	function initMSP(msp) {
-
-		var productos = msp;
-		var objects = productos.map(function (x) {
+		var products = msp;
+		var objects = products.map(function (x) {
 			return {
 				name: capitalize(x.art_des),
 				y: parseFloat(x.campo1)
@@ -546,11 +570,9 @@ h5.no-data {
 </script>
 @* GRAFICA ARTICULOS VENDIDOS (PORCENTAJE) *@
 <script>
-
 	function initMPP(mpp) {
-
-		var productos = mpp;
-		var objects = productos.map(function (x) {
+		var products = mpp;
+		var objects = products.map(function (x) {
 			return {
 				name: capitalize(x.art_des),
 				y: parseFloat(x.campo1)
@@ -612,9 +634,7 @@ h5.no-data {
 </script>
 @* GRAFICA VENDEDORES VENTAS *@
 <script>
-
 	function initMAS(mas) {
-
 		var sellers = mas;
         var objects = sellers.map(function (x) {
             return [
@@ -673,6 +693,85 @@ h5.no-data {
         let number = parseFloat(formatted);
 
         return number;
+    }
+
+</script>
+@* GRAFICA SUBLINEAS VENDIDAS *@
+<script>
+    function initMSS(mss) {
+        var sublines = mss;
+        var colors = ['#C73008', '#711C05'];
+        var objects = sublines.map(function (x) {
+            return {
+                name: capitalize(x.subl_des),
+                data: parseFloat(x.campo1),
+            };
+        });
+
+        Highcharts.setOptions({
+            lang: {
+                decimalPoint: ",",
+                thousandsSep: "."
+            }
+        });
+
+        if (objects.length > 0) {
+            Highcharts.chart('container-mss', {
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: 'Sub-Lineas más Vendidas'
+                },
+                xAxis: {
+                    categories: objects.map(o => o.name),
+                    title: {
+                        text: null
+                    },
+                    gridLineWidth: 1,
+                    lineWidth: 0
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'Cantidad',
+                        align: 'middle'
+                    },
+                    labels: {
+                        overflow: 'justify'
+                    },
+                    gridLineWidth: 0
+                },
+                tooltip: {
+                    valueSuffix: ' unds'
+                },
+                exporting: {
+                    enabled: false,
+                },
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            enabled: true
+                        },
+                        groupPadding: 0.1
+                    }
+                },
+                legend: {
+                    enabled: false,
+                },
+                credits: {
+                    enabled: false
+                },
+                series: [{
+                    name: 'Cantidad',
+                    data: objects.map((o, index) => ({
+                        y: o.data,
+                        color: colors[index % colors.length],
+                        name: o.name
+                    }))
+                }]
+            });
+        }
     }
 
 </script>

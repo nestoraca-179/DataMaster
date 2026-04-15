@@ -501,5 +501,32 @@ namespace DataMaster.Controllers
 
 			return response;
 		}
+
+		[HttpGet]
+		[Route("api/DataMasterApi/GetMostSubLines/{fec_d}/{fec_h}/{number}/{suc}")]
+		public DataMasterResponse GetMostSubLines(string fec_d, string fec_h, int number, int suc)
+		{
+			DataMasterResponse response = new DataMasterResponse();
+
+			try
+			{
+				DateTime fecha_d = utils.FormatDate(fec_d);
+				DateTime fecha_h = utils.FormatDate(fec_h);
+				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+
+				List<saSubLinea> sublines = new Product().GetMostSubLines(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
+
+				response.Status = "OK";
+				response.Result = sublines;
+			}
+			catch (Exception ex)
+			{
+				response.Status = "ERROR";
+				response.Message = ex.Message;
+				IncidentController.CreateIncident("ERROR OBTENIENDO SUBLINEAS MAS VENDIDAS", ex);
+			}
+
+			return response;
+		}
 	}
 }

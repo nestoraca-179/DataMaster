@@ -24,15 +24,12 @@ namespace DataMaster.Models
 			{
 				var sp = db.RepTotalVentaxArticulo(fec_d, fec_h, null, null, null, null, null, null, null, null, null, sucur, null, null, null);
 				var enumerator = sp.GetEnumerator();
-
 				while (enumerator.MoveNext())
 				{
 					saArticulo articulo = new saArticulo();
-
 					articulo.co_art = enumerator.Current.co_art.Trim();
 					articulo.art_des = enumerator.Current.art_des.Trim();
 					articulo.campo1 = (enumerator.Current.total_art - enumerator.Current.total_dev).ToString();
-
 					prods.Add(articulo);
 				}
 			}
@@ -40,27 +37,22 @@ namespace DataMaster.Models
 			{
 				var sp = db.RepTotalCompraxArticulo(fec_d, fec_h, null, null, null, null, null, null, null, null, null, sucur, null, null, null);
 				var enumerator = sp.GetEnumerator();
-
 				while (enumerator.MoveNext())
 				{
 					saArticulo articulo = new saArticulo();
-
 					articulo.co_art = enumerator.Current.co_art.Trim();
 					articulo.art_des = enumerator.Current.art_des.Trim();
 					articulo.campo1 = (enumerator.Current.total_art - enumerator.Current.total_dev).ToString();
-
 					prods.Add(articulo);
 				}
 			}
 
 			prods = (from a in prods
 					 group decimal.Parse(a.campo1) by (a.co_art, a.art_des) into g
-					 select new saArticulo
-					 {
+					 select new saArticulo {
 						 co_art = g.Key.co_art,
 						 art_des = g.Key.art_des,
 						 campo1 = Math.Round(g.Sum(), 2).ToString()
-
 					 }).OrderByDescending(x => double.Parse(x.campo1)).ToList();
 
 			if (prods.Count > number)
@@ -77,15 +69,12 @@ namespace DataMaster.Models
 			{
 				var sp = db.RepTotalVentaxArticulo(fec_d, fec_h, null, null, null, null, null, null, null, null, null, sucur, null, null, null);
 				var enumerator = sp.GetEnumerator();
-
 				while (enumerator.MoveNext())
 				{
 					saArticulo articulo = new saArticulo();
-
 					articulo.co_art = enumerator.Current.co_art.Trim();
 					articulo.art_des = enumerator.Current.art_des.Trim();
 					articulo.campo1 = (enumerator.Current.total_art - enumerator.Current.total_dev).ToString();
-
 					prods.Add(articulo);
 				}
 			}
@@ -93,33 +82,60 @@ namespace DataMaster.Models
 			{
 				var sp = db.RepTotalNotaEntregaxArticulo(fec_d, fec_h, null, null, null, null, null, null, null, null, null, sucur, null, null, null, null);
 				var enumerator = sp.GetEnumerator();
-
 				while (enumerator.MoveNext())
 				{
 					saArticulo articulo = new saArticulo();
-
 					articulo.co_art = enumerator.Current.co_art.Trim();
 					articulo.art_des = GetArtByID(enumerator.Current.co_art).art_des.Trim();
 					articulo.campo1 = enumerator.Current.total_art.ToString();
-
 					prods.Add(articulo);
 				}
 			}
 
 			prods = (from a in prods
 					 group decimal.Parse(a.campo1) by (a.co_art, a.art_des) into g
-					 select new saArticulo
-					 {
+					 select new saArticulo {
 						 co_art = g.Key.co_art,
 						 art_des = g.Key.art_des,
 						 campo1 = Math.Round(g.Sum(), 2).ToString()
-
 					 }).OrderByDescending(x => double.Parse(x.campo1)).ToList();
 
 			if (prods.Count > number)
 				prods.RemoveRange(number, prods.Count - number);
 
 			return prods;
+		}
+
+		public List<saSubLinea> GetMostSubLines(DateTime fec_d, DateTime fec_h, int number, string sucur)
+		{
+			List<saSubLinea> sublines = new List<saSubLinea>();
+
+			var sp = db.RepFacturaVentaxArt2_DM(null, null, fec_d, fec_h, null, null, null, null, null, null, null, null, null, null, null, null, null, 
+				null, null, null, "NOT", sucur, null, null, null);
+			var enumerator = sp.GetEnumerator();
+
+			while (enumerator.MoveNext())
+			{
+				saSubLinea subline = new saSubLinea();
+				subline.co_lin = enumerator.Current.co_lin;
+				subline.co_subl = enumerator.Current.co_subl;
+				subline.subl_des = db.saSubLinea.SingleOrDefault(sl => sl.co_lin == subline.co_lin && sl.co_subl == subline.co_subl).subl_des;
+				subline.campo1 = enumerator.Current.total_art.ToString();
+				sublines.Add(subline);
+			}
+
+			sublines = (from sl in sublines
+						group decimal.Parse(sl.campo1) by (sl.co_subl, sl.subl_des) into g
+						select new saSubLinea {
+							co_subl = g.Key.co_subl,
+							subl_des = g.Key.subl_des,
+							campo1 = Math.Round(g.Sum(), 2).ToString()
+						}).OrderByDescending(x => double.Parse(x.campo1)).ToList();
+
+			if (sublines.Count > number)
+				sublines.RemoveRange(number, sublines.Count - number);
+
+			return sublines;
 		}
 	}
 }
