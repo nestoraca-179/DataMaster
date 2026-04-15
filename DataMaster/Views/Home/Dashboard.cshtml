@@ -284,7 +284,7 @@ h5.no-data {
                         <figure ng-if="mss.length > 0" class="highcharts-figure">
                             <div id="container-mss"></div>
                         </figure>
-                        <h5 ng-if="mss.length == 0" class="text-center no-data">Articulos más vendidos (Sin datos)</h5>
+                        <h5 ng-if="mss.length == 0" class="text-center no-data">Sub-Lineas más Vendidas (Sin datos)</h5>
                     </div>
                 </div>
             </div>
@@ -395,7 +395,7 @@ h5.no-data {
                 .then(function (response) {
 
                     $scope.all_mac = response.data.Result;
-                    $scope.mac = $scope.all_mac;
+                    $scope.mac = $scope.all_mac ?? [];
                     $scope.validate('mac');
 
                 }, function (error) { console.log("Ha ocurrido un error (MAC) ->"); console.log(error); });
@@ -435,7 +435,7 @@ h5.no-data {
                 .then(function (response) {
 
                     $scope.all_mss = response.data.Result;
-                    $scope.mss = $scope.all_mss;
+                    $scope.mss = $scope.all_mss ?? [];
                     $scope.validate('mss');
 
                 }, function (error) { console.log("Ha ocurrido un error (MSS) ->"); console.log(error); });
