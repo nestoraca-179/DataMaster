@@ -35589,6 +35589,7 @@ advertencia 6035: La relación 'FK_stgFacturaVentaExt_stgFactLoteGen' tiene colu
           <Property Type="Decimal" Name="neto" Nullable="true" Precision="38" Scale="10" />
           <Property Type="String" Name="co_subl" Nullable="false" MaxLength="6" />
           <Property Type="String" Name="co_lin" Nullable="false" MaxLength="6" />
+          <Property Type="Decimal" Name="tasa" Nullable="false" Precision="21" Scale="8" />
         </ComplexType>
       </Schema>
     </edmx:ConceptualModels>
@@ -44873,6 +44874,7 @@ advertencia 6035: La relación 'FK_stgFacturaVentaExt_stgFactLoteGen' tiene colu
                 <ScalarProperty Name="neto" ColumnName="neto" />
                 <ScalarProperty Name="co_subl" ColumnName="co_subl" />
                 <ScalarProperty Name="co_lin" ColumnName="co_lin" />
+                <ScalarProperty Name="tasa" ColumnName="tasa" />
               </ComplexTypeMapping>
             </ResultMapping>
           </FunctionImportMapping>

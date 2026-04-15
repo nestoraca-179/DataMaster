@@ -734,7 +734,7 @@ h5.no-data {
                 yAxis: {
                     min: 0,
                     title: {
-                        text: 'Cantidad',
+                        text: 'Totales (USD)',
                         align: 'middle'
                     },
                     labels: {
@@ -743,7 +743,34 @@ h5.no-data {
                     gridLineWidth: 0
                 },
                 tooltip: {
-                    valueSuffix: ' unds'
+                    valueDecimals: 2,  // ← 2 decimales
+                    valuePrefix: '$ ', // ← Símbolo $
+                    backgroundColor: 'rgba(0,0,0,0.9)',
+                    borderRadius: 8,
+                    shadow: true,
+                    style: {
+                        color: '#fff',
+                        fontSize: '14px',
+                        fontWeight: '600'
+                    },
+                    useHTML: true,
+                    formatter: function () {
+                        const formattedValue = this.y.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                        return `
+                            <div style="text-align: center; padding: 8px;">
+                                <div style="font-size: 16px; font-weight: bold; color: ${this.color}">
+                                    ${this.point.name}
+                                </div>
+                                <div style="font-size: 20px; margin: 5px 0;">
+                                    <span style="color: ${this.color}">█</span>
+                                    ${formattedValue}
+                                </div>
+                                <div style="font-size: 12px; opacity: 0.9;">
+                                    ${formattedValue} unds
+                                </div>
+                            </div>
+                        `;
+                    }
                 },
                 exporting: {
                     enabled: false,
@@ -751,7 +778,8 @@ h5.no-data {
                 plotOptions: {
                     bar: {
                         dataLabels: {
-                            enabled: true
+                            enabled: true,
+                            format: '${y:,.2f}'  // ← SOLO ESTO!
                         },
                         groupPadding: 0.1
                     }
@@ -763,7 +791,7 @@ h5.no-data {
                     enabled: false
                 },
                 series: [{
-                    name: 'Cantidad',
+                    name: 'Monto Total',
                     data: objects.map((o, index) => ({
                         y: o.data,
                         color: colors[index % colors.length],

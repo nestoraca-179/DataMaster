@@ -120,7 +120,7 @@ namespace DataMaster.Models
 				subline.co_lin = enumerator.Current.co_lin;
 				subline.co_subl = enumerator.Current.co_subl;
 				subline.subl_des = db.saSubLinea.SingleOrDefault(sl => sl.co_lin == subline.co_lin && sl.co_subl == subline.co_subl).subl_des;
-				subline.campo1 = enumerator.Current.total_art.ToString();
+				subline.campo1 = Math.Round(enumerator.Current.neto.Value / enumerator.Current.tasa, 2).ToString();
 				sublines.Add(subline);
 			}
 

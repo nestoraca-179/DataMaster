@@ -34,5 +34,6 @@ namespace DataMaster.Models
         public Nullable<decimal> neto { get; set; }
         public string co_subl { get; set; }
         public string co_lin { get; set; }
+        public decimal tasa { get; set; }
     }
 }
