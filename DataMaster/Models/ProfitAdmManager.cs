@@ -1,5 +1,8 @@
 ﻿using DataMaster.Controllers;
+using System;
 using System.Data.Entity.Core.EntityClient;
+using System.Data.SqlClient;
+using System.Linq;
 using System.Web;
 
 namespace DataMaster.Models
@@ -32,6 +35,25 @@ namespace DataMaster.Models
 
 			sp.Dispose();
 			return num;
+		}
+
+		public static decimal SaldoCajaAUnaFecha(string codCaja, DateTime fecha)
+		{
+			return db.Database.SqlQuery<decimal>(
+				"SELECT dbo.SaldoCajaAUnaFecha(@codCaja, @fecha)",
+				new SqlParameter("@codCaja", codCaja),
+				new SqlParameter("@fecha", fecha)
+			).FirstOrDefault();
+		}
+
+		public static decimal SaldoBancoAUnaFecha4(string codCta, DateTime fecha, string tipoSaldo)
+		{
+			return db.Database.SqlQuery<decimal>(
+				"SELECT dbo.SaldoBancoAUnaFecha4(@codCta, @fecha, @tipoSaldo)",
+				new SqlParameter("@codCta", codCta),
+				new SqlParameter("@fecha", fecha),
+				new SqlParameter("@tipoSaldo", tipoSaldo)
+			).FirstOrDefault();
 		}
 	}
 }

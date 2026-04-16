@@ -14907,6 +14907,15 @@ advertencia 6035: La relación 'FK_stgFacturaVentaExt_stgFactLoteGen' tiene colu
           <Parameter Name="sDir" Type="varchar" Mode="In" />
           <Parameter Name="bHeaderRep" Type="bit" Mode="In" />
         </Function>
+        <Function Name="SaldoBancoAUnaFecha4" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="decimal">
+          <Parameter Name="Cod_Cta" Type="char" Mode="In" />
+          <Parameter Name="dtFecha" Type="smalldatetime" Mode="In" />
+          <Parameter Name="strTipoSaldo" Type="char" Mode="In" />
+        </Function>
+        <Function Name="SaldoCajaAUnaFecha" Aggregate="false" BuiltIn="false" NiladicFunction="false" IsComposable="true" ParameterTypeSemantics="AllowImplicitConversion" Schema="dbo" ReturnType="decimal">
+          <Parameter Name="Cod_Caja" Type="char" Mode="In" />
+          <Parameter Name="dtFecha" Type="smalldatetime" Mode="In" />
+        </Function>
         <EntityContainer Name="ProfitAdmModelStoreContainer">
           <EntitySet Name="par_emp" EntityType="Self.par_emp" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="pvArticuloExt" EntityType="Self.pvArticuloExt" Schema="dbo" store:Type="Tables" />

@@ -11,9 +11,10 @@ namespace DataMaster.Models
 		public string code { get; set; }
 		public string name { get; set; }
 		public bool isBox { get; set; }
+		public decimal initBalance { get; set; }
 		public decimal totalIncomes { get; set; }
 		public decimal totalOutcomes { get; set; }
-		public decimal balance { get; set; }
+		public decimal totalBalance { get; set; }
 
 		public List<BalanceDetail> GetDetailsBankAccountsAndBoxes(DateTime date)
 		{
@@ -38,9 +39,10 @@ namespace DataMaster.Models
 					detail.code = box.cod_caja;
 					detail.name = db.saCaja.AsNoTracking().SingleOrDefault(c => c.cod_caja == box.cod_caja).descrip;
 					detail.isBox = true;
+					detail.initBalance = SaldoCajaAUnaFecha(box.cod_caja, DateTime.Now.AddDays(-1));
 					detail.totalIncomes = boxMoves.Where(mc => mc.tipo_mov.Trim() == "I").Select(mc => mc.monto_h).Sum();
 					detail.totalOutcomes = boxMoves.Where(mc => mc.tipo_mov.Trim() == "E").Select(mc => mc.monto_d).Sum();
-					detail.balance = detail.totalIncomes - detail.totalOutcomes;
+					detail.totalBalance = detail.totalIncomes - detail.totalOutcomes;
 					
 					details.Add(detail);
 				}
@@ -56,9 +58,10 @@ namespace DataMaster.Models
 					detail.code = bank.cod_cta;
 					detail.name = db.saCuentaBancaria.AsNoTracking().SingleOrDefault(cb => cb.cod_cta == bank.cod_cta).num_cta;
 					detail.isBox = false;
+					detail.initBalance = SaldoBancoAUnaFecha4(bank.cod_cta, DateTime.Now.AddDays(-1), "2");
 					detail.totalIncomes = bankMoves.Where(mc => mc.monto_h > 0 && mc.monto_d == 0).Select(mc => mc.monto_h).Sum();
 					detail.totalOutcomes = bankMoves.Where(mc => mc.monto_h == 0 && mc.monto_d > 0).Select(mc => mc.monto_d).Sum();
-					detail.balance = detail.totalIncomes - detail.totalOutcomes;
+					detail.totalBalance = detail.totalIncomes - detail.totalOutcomes;
 
 					details.Add(detail);
 				}

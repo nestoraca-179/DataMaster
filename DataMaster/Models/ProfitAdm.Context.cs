@@ -14,8 +14,9 @@ namespace DataMaster.Models
     using System.Data.Entity.Infrastructure;
     using System.Data.Entity.Core.Objects;
     using System.Linq;
-    
-    public partial class ProfitAdmEntities : DbContext
+	using System.Data.Entity.Core.Objects.DataClasses;
+
+	public partial class ProfitAdmEntities : DbContext
     {
         public ProfitAdmEntities(string conn) : base(conn)
         {
