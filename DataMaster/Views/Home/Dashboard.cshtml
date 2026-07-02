@@ -103,7 +103,19 @@ h5.no-data {
     justify-content: center;
     align-items: center;
 }
+.cont-data {
+    max-width: 100%;
+}
+.param-dates > * {
+    font-size: 14px;
+}
 @@media (max-width: 575px) {
+    .cont-data {
+        flex-direction: column;
+    }
+    .cont-data > div {
+        flex: 1;
+    }
     .table.borderless th {
         font-size: 13px;
     }
@@ -168,12 +180,21 @@ h5.no-data {
             <div class="d-flex align-items-center">
                 <p class="m-0">Tasa del dia {{ getDate() }}: <b>{{ rate.toFixed(2).toLocaleString('es-ES') }} BSD/USD</b></p>
             </div>
-            <div ng-if="sucur != ''" class="d-flex">
-                <label class="d-flex align-items-center mx-3">Mostrar info. Sucursal actual</label>
-                <label class="switch">
-                    <input type="checkbox" ng-disabled="!show_all" ng-model="bySucur" ng-change="changeSuc(bySucur)">
-                    <span class="slider round"></span>
-                </label>
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 cont-data">
+                <div ng-if="sucur != ''" class="d-flex">
+                    <label class="d-flex align-items-center mx-3">Mostrar info. Sucursal actual</label>
+                    <label class="switch">
+                        <input type="checkbox" ng-disabled="!show_all" ng-model="bySucur" ng-change="changeSuc(bySucur)">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+                <div class="d-flex align-items-center flex-wrap gap-2 param-dates">
+                    <input type="date" id="dateFrom" class="form-control" style="flex: 1;" />
+                    <input type="date" id="dateTo" class="form-control" style="flex: 1;" />
+                    <button type="button" class="btn btn-primary d-flex align-items-center flex-wrap gap-2 justify-content-center" style="flex: 1; min-width: 100px; background: #c0392b; border: 0;" ng-click="searchStats()">
+                        <i class="fa-solid fa-magnifying-glass d-flex align-items-center"></i> Buscar
+                    </button>
+                </div>
             </div>
         </div>
         <!-- End Rounded switch -->
