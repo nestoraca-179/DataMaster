@@ -22,7 +22,7 @@ namespace DataMaster.Models
             List<saVendedor> sellers = new List<saVendedor>();
             List<saVendedor> sellers_temp = new List<saVendedor>();
 
-            var sp = db.RepFacturaVentaxVendedor(null, null, fec_d, fec_h, null, null, null, null, null, null, null, null, sucur, null, "NOT", sucur, null, null, null);
+            var sp = db.RepFacturaVentaxVendedor(null, null, fec_d, fec_h, null, null, null, null, null, null, null, null, null, null, "NOT", sucur, null, null, null);
             var enumerator = sp.GetEnumerator();
 
 			while (enumerator.MoveNext())

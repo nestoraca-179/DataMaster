@@ -29,7 +29,7 @@ namespace DataMaster.Controllers
 				response.Status = "ERROR";
 				response.Message = ex.Message;
 			}
-			
+
 			return response;
 		}
 
@@ -192,7 +192,7 @@ namespace DataMaster.Controllers
 					response.Status = "ERROR";
 					response.Message = $"No se ha encontrado la Factura de Venta Nro. {id}";
 				}
-				else if (invoice.campo8 == "OK") // USED FOR VERIFICATION 
+				else if (invoice.campo8 == "OK") // USED FOR VERIFICATION
 				{
 					response.Status = "ERROR";
 					response.Message = $"La Factura de Venta Nro. {id} ya ha sido verificada";
@@ -349,7 +349,7 @@ namespace DataMaster.Controllers
 			{
 				DateTime fecha_d = utils.FormatDate(fec_d);
 				DateTime fecha_h = utils.FormatDate(fec_h);
-				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+				string sucur = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur.Trim();
 
 				object stats = new Invoice().GetStatsInvoicesWithOrders(fecha_d, fecha_h, sucur);
 
@@ -376,7 +376,7 @@ namespace DataMaster.Controllers
 			{
 				DateTime fecha_d = utils.FormatDate(fec_d);
 				DateTime fecha_h = utils.FormatDate(fec_h);
-				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+				string sucur = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur.Trim();
 
 				List<saArticulo> arts = new Product().GetMostProducts(fecha_d, fecha_h, number, true, suc == 1 ? sucur : null);
 
@@ -403,7 +403,7 @@ namespace DataMaster.Controllers
 			{
 				DateTime fecha_d = utils.FormatDate(fec_d);
 				DateTime fecha_h = utils.FormatDate(fec_h);
-				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+				string sucur = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur.Trim();
 
 				List<saArticulo> arts = new Product().GetMostProductsWithNotes(fecha_d, fecha_h, number, false, suc == 1 ? sucur : null);
 
@@ -430,7 +430,7 @@ namespace DataMaster.Controllers
 			{
 				DateTime fecha_d = utils.FormatDate(fec_d);
 				DateTime fecha_h = utils.FormatDate(fec_h);
-				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+				string sucur = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur.Trim();
 
 				List<saCliente> clients = new Client().GetMostActiveClients(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
 
@@ -457,7 +457,7 @@ namespace DataMaster.Controllers
 			{
 				DateTime fecha_d = utils.FormatDate(fec_d);
 				DateTime fecha_h = utils.FormatDate(fec_h);
-				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+				string sucur = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur.Trim();
 
 				// List<saProveedor> suppliers = new Supplier().GetMostActiveSuppliers(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
 				List<saCliente> clientes = new Client().GetMostActiveClientsWithNotes(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
@@ -485,7 +485,7 @@ namespace DataMaster.Controllers
 			{
 				DateTime fecha_d = utils.FormatDate(fec_d);
 				DateTime fecha_h = utils.FormatDate(fec_h);
-				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+				string sucur = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur.Trim();
 
 				List<saVendedor> sellers = new Seller().GetMostActiveSellers(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
 
@@ -512,7 +512,7 @@ namespace DataMaster.Controllers
 			{
 				DateTime fecha_d = utils.FormatDate(fec_d);
 				DateTime fecha_h = utils.FormatDate(fec_h);
-				string sucur = HttpContext.Current.Session["BRANCH"]?.ToString();
+				string sucur = (HttpContext.Current.Session["BRANCH"] as saSucursal)?.co_sucur.Trim();
 
 				List<saSubLinea> sublines = new Product().GetMostSubLines(fecha_d, fecha_h, number, suc == 1 ? sucur : null);
 

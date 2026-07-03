@@ -184,7 +184,7 @@ h5.no-data {
                 <div ng-if="sucur != ''" class="d-flex">
                     <label class="d-flex align-items-center mx-3">Mostrar info. Sucursal actual</label>
                     <label class="switch">
-                        <input type="checkbox" ng-disabled="!show_all" ng-model="bySucur" ng-change="changeSuc(bySucur)">
+                        <input type="checkbox" id="bySucur" ng-disabled="!vm.show_all" ng-model="vm.bySucur" ng-change="changeSuc(vm.bySucur)">
                         <span class="slider round"></span>
                     </label>
                 </div>
@@ -236,7 +236,7 @@ h5.no-data {
         <div class="row mt-2 mx-2" style="margin: 0;">
             <div class="col-md-12 col-xl-6 col-xxl-8 col-graph">
                 <div class="container-chart shadow-tm">
-                    <i ng-if="!msp || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+                    <i ng-if="!msp || !vm.show_all" class="fa-solid fa-circle-notch fa-spin"></i>
                     <div id="cont-msp" style="display: none;">
                         <figure ng-if="msp.length > 0" class="highcharts-figure">
                             <div id="container-msp"></div>
@@ -247,7 +247,7 @@ h5.no-data {
             </div>
             <div class="col-md-12 col-xl-6 col-xxl-4 col-graph">
                 <div class="container-chart shadow-tm">
-                    <i ng-if="!mpp || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+                    <i ng-if="!mpp || !vm.show_all" class="fa-solid fa-circle-notch fa-spin"></i>
                     <div id="cont-mpp" style="display: none;">
                         <figure ng-if="mpp.length > 0" class="highcharts-figure">
                             <div id="container-mpp"></div>
@@ -260,7 +260,7 @@ h5.no-data {
         <div class="row mt-1 mx-2" style="margin: 0; align-items: stretch;">
             <div class="col-md-12 col-xl-7 col-graph">
                 <div class="container-chart shadow-tm pl-3 pr-3 d-flex" style="height: 100%;">
-                    <i ng-if="!mac || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+                    <i ng-if="!mac || !vm.show_all" class="fa-solid fa-circle-notch fa-spin"></i>
                     <div id="cont-mac" style="display: none;">
                         <h5 ng-if="mac.length > 0" class="text-center mt-3 mb-3" style="font-family: 'Raleway', sans-serif !important;">Clientes más activos</h5>
                         <table ng-if="mac.length > 0" class="table table-hover borderless">
@@ -287,7 +287,7 @@ h5.no-data {
             </div>
             <div class="col-md-12 col-xl-5 col-graph">
                 <div class="container-chart shadow-tm">
-                    <i ng-if="!mas || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+                    <i ng-if="!mas || !vm.show_all" class="fa-solid fa-circle-notch fa-spin"></i>
                     <div id="cont-mas" style="display: none;">
                         <figure ng-if="mas.length > 0" class="highcharts-figure">
                             <div id="container-mas"></div>
@@ -300,7 +300,7 @@ h5.no-data {
         <div class="row mt-1 mx-2" style="margin: 0; align-items: stretch;">
             <div class="col-md-12 col-xl-6 col-graph">
                 <div class="container-chart shadow-tm">
-                    <i ng-if="!mss || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+                    <i ng-if="!mss || !vm.show_all" class="fa-solid fa-circle-notch fa-spin"></i>
                     <div id="cont-mss" style="display: none;">
                         <figure ng-if="mss.length > 0" class="highcharts-figure">
                             <div id="container-mss"></div>
@@ -311,7 +311,7 @@ h5.no-data {
             </div>
             <div class="col-md-12 col-xl-6 col-graph">
                 <div class="container-chart shadow-tm pl-3 pr-3 d-flex">
-                    <i ng-if="!bba || !show_all" class="fa-solid fa-circle-notch fa-spin"></i>
+                    <i ng-if="!bba || !vm.show_all" class="fa-solid fa-circle-notch fa-spin"></i>
                     <div id="cont-bba" style="display: none;">
                         <h5 ng-if="bba.length > 0" class="text-center mt-3 mb-3" style="font-family: 'Raleway', sans-serif !important;">Saldos Cajas/Bancos a la fecha</h5>
                         <table ng-if="bba.length > 0" class="table table-hover borderless">
@@ -348,9 +348,9 @@ h5.no-data {
             </div>
         </div>
         <hr class="mx-3" />
-        </div>
-        <h2 ng-if="!user.admin" class="m-0 mt-2">Bienvenido {{ user.des_usuario }}!</h2>
     </div>
+    <h2 ng-if="!user.admin" class="m-0 mt-2">Bienvenido {{ user.des_usuario }}!</h2>
+</div>
 <script src="~/Scripts/angular-min.js"></script>
 <script>
 	var app = angular.module("DashboardAdmin", []);
@@ -367,19 +367,62 @@ h5.no-data {
 	fec_d.setMinutes(0);
     fec_d.setSeconds(0);
 
-	var fecha_d = parseDate(fec_d); // fec_d.toLocaleDateString().replaceAll("/", "-");
-	var fecha_h = parseDate(fec_h); // fec_h.toLocaleDateString().replaceAll("/", "-");
+	var fecha_d = parseDate(fec_d, false); // fec_d.toLocaleDateString().replaceAll("/", "-");
+    var fecha_h = parseDate(fec_h, false); // fec_h.toLocaleDateString().replaceAll("/", "-");
 
-	app.controller("controller", function ($scope, $http) {
+    $("#dateFrom").val(parseDate(fec_d, true));
+    $("#dateTo").val(parseDate(fec_h, true));
+
+    app.controller("controller", function ($scope, $http) {
 		$scope.user = user;
-		$scope.bySucur = false;
-		$scope.show_all = false;
 		$scope.sucur = sucur;
-		$scope.rate = rate;
+        $scope.rate = rate;
+        $scope.vm = {
+            bySucur: false,
+            show_all: false
+        };
 
-		if ($scope.user.admin) {
+        $scope.init = function () {
+            $scope.vm.bySucur = false;
+            $scope.vm.show_all = false;
+
+            // GENERAL OBJECTS
+            $scope.allStats = null;
+            $scope.stats = null;
+            $scope.all_msp = null;
+            $scope.msp = null;
+            $scope.all_mpp = null;
+            $scope.mpp = null;
+            $scope.all_mac = null;
+            $scope.mac = null;
+            $scope.all_mas = null;
+            $scope.mas = null;
+            $scope.all_mss = null;
+            $scope.mss = null;
+            $scope.all_bba = null;
+            $scope.bba = null;
+
+            // SUCS OBJECTS
+            $scope.suc_msp = null;
+            $scope.suc_mpp = null;
+            $scope.suc_mac = null;
+            $scope.suc_mas = null;
+            $scope.suc_mss = null;
+
+            // VALIDATE GRAPHS
+            $("#cont-msp").prop("style", "display: none;");
+            $("#cont-mpp").prop("style", "display: none;");
+            $("#cont-mac").prop("style", "display: none;");
+            $("#cont-mas").prop("style", "display: none;");
+            $("#cont-mss").prop("style", "display: none;");
+            $("#cont-bba").prop("style", "display: none;");
+            graphs = ['msp', 'mpp', 'mac', 'mas', 'mss', 'bba'];
+        }
+
+        $scope.loadStats = function (from, to) {
+
             // ESTADISTICAS
-            $http.get(`../../api/DataMasterApi/GetStatsInvoices/${fecha_d}/${fecha_h}`)
+            $http.get(`../../api/DataMasterApi/GetStatsInvoices/${from}/${to}`)
                 .then(function (response) {
 
                     $scope.allStats = response.data.Result;
@@ -389,7 +432,7 @@ h5.no-data {
                 }, function (error) { console.log("Ha ocurrido un error (STATS) ->"); console.log(error); });
 
             // ARTICULOS MAS VENDIDOS
-            $http.get(`../../api/DataMasterApi/GetMostSaleProducts/${fecha_d}/${fecha_h}/5/0`)
+            $http.get(`../../api/DataMasterApi/GetMostSaleProducts/${from}/${to}/5/0`)
                 .then(function (response) {
 
                     $scope.all_msp = response.data.Result;
@@ -404,7 +447,7 @@ h5.no-data {
 
             // SUCURSAL
             if (sucur != null && sucur.trim() != "") {
-                $http.get(`../../api/DataMasterApi/GetMostSaleProducts/${fecha_d}/${fecha_h}/5/1`)
+                $http.get(`../../api/DataMasterApi/GetMostSaleProducts/${from}/${to}/5/1`)
                     .then(function (response) {
 
                         $scope.suc_msp = response.data.Result;
@@ -414,7 +457,7 @@ h5.no-data {
             }
 
             // CLIENTES CON MAS VENTAS
-            $http.get(`../../api/DataMasterApi/GetMostActiveClients/${fecha_d}/${fecha_h}/7/0`)
+            $http.get(`../../api/DataMasterApi/GetMostActiveClients/${from}/${to}/7/0`)
                 .then(function (response) {
 
                     $scope.all_mac = response.data.Result;
@@ -425,7 +468,7 @@ h5.no-data {
 
             // SUCURSAL
             if (sucur != null && sucur.trim() != "") {
-                $http.get(`../../api/DataMasterApi/GetMostActiveClients/${fecha_d}/${fecha_h}/7/1`)
+                $http.get(`../../api/DataMasterApi/GetMostActiveClients/${from}/${to}/7/1`)
                     .then(function (response) {
 
                         $scope.suc_mac = response.data.Result;
@@ -434,7 +477,7 @@ h5.no-data {
             }
 
             // VENDEDORES MAS ACTIVOS
-            $http.get(`../../api/DataMasterApi/GetMostActiveSellers/${fecha_d}/${fecha_h}/5/0`)
+            $http.get(`../../api/DataMasterApi/GetMostActiveSellers/${from}/${to}/5/0`)
                 .then(function (response) {
 
                     $scope.all_mas = response.data.Result;
@@ -445,7 +488,7 @@ h5.no-data {
 
             // SUCURSAL
             if (sucur != null && sucur.trim() != "") {
-                $http.get(`../../api/DataMasterApi/GetMostActiveSellers/${fecha_d}/${fecha_h}/5/1`)
+                $http.get(`../../api/DataMasterApi/GetMostActiveSellers/${from}/${to}/5/1`)
                     .then(function (response) {
 
                         $scope.suc_mas = response.data.Result;
@@ -454,7 +497,7 @@ h5.no-data {
             }
 
             // SUBLINEAS MAS VENDIDAS
-            $http.get(`../../api/DataMasterApi/GetMostSubLines/${fecha_d}/${fecha_h}/5/0`)
+            $http.get(`../../api/DataMasterApi/GetMostSubLines/${from}/${to}/5/0`)
                 .then(function (response) {
 
                     $scope.all_mss = response.data.Result;
@@ -465,7 +508,7 @@ h5.no-data {
 
             // SUCURSAL
             if (sucur != null && sucur.trim() != "") {
-                $http.get(`../../api/DataMasterApi/GetMostSubLines/${fecha_d}/${fecha_h}/5/1`)
+                $http.get(`../../api/DataMasterApi/GetMostSubLines/${from}/${to}/5/1`)
                     .then(function (response) {
 
                         $scope.suc_mss = response.data.Result;
@@ -474,7 +517,7 @@ h5.no-data {
             }
 
             // SALDOS CAJAS / BANCOS
-            $http.get(`../../api/DataMasterApi/GetBalances/${fecha_h}`)
+            $http.get(`../../api/DataMasterApi/GetBalances/${to}`)
                 .then(function (response) {
 
                     $scope.all_bba = response.data.Result;
@@ -484,14 +527,23 @@ h5.no-data {
                 }, function (error) { console.log("Ha ocurrido un error (BBA) ->"); console.log(error); });
         }
 
-		$scope.validate = function (item) {
+        $scope.searchStats = function () {
+            const TIME_ZONE = "T00:00";
+            const from = parseDate(new Date(Date.parse($("#dateFrom").val() + TIME_ZONE)), false);
+            const to = parseDate(new Date(Date.parse($("#dateTo").val() + TIME_ZONE)), false);
+
+            $scope.init();
+            $scope.loadStats(from, to);
+        }
+
+        $scope.validate = function (item) {
 			graphs = graphs.filter(x => x != item);
 			if (graphs.length == 0) {
 				$("#cont-msp").removeAttr("style");
 				$("#cont-mpp").removeAttr("style");
 				$("#cont-mas").removeAttr("style");
 				$("#cont-mss").removeAttr("style");
-				$scope.show_all = true;
+                $scope.vm.show_all = true;
 
 				setTimeout(function () {
 					initMSP($scope.msp);
@@ -506,26 +558,29 @@ h5.no-data {
 			}
 		}
 
-		$scope.changeSuc = function (value) {
+        $scope.changeSuc = function (value) {
 
 			if (value) {
 				$scope.stats = $scope.allStats.suc;
 				$scope.msp = $scope.suc_msp;
 				$scope.mpp = $scope.suc_mpp;
 				$scope.mac = $scope.suc_mac;
-				$scope.mas = $scope.suc_mas;
+                $scope.mas = $scope.suc_mas;
+                $scope.mss = $scope.suc_mss;
 			} else {
 				$scope.stats = $scope.allStats.all;
 				$scope.msp = $scope.all_msp;
 				$scope.mpp = $scope.all_mpp;
 				$scope.mac = $scope.all_mac;
-				$scope.mas = $scope.all_mas;
+                $scope.mas = $scope.all_mas;
+                $scope.mss = $scope.all_mss;
 			}
 
 			setTimeout(function () {
 				initMSP($scope.msp);
 				initMPP($scope.mpp);
-				initMAS($scope.mas);
+                initMAS($scope.mas);
+                initMSS($scope.mss);
 			}, 0.05);
 		}
 
@@ -553,15 +608,20 @@ h5.no-data {
 
 			// Formatear el número y retornarlo
 			return formatter.format(number);
-		}
-	});
+        }
 
-	function parseDate(date) {
-		var d = date.getDate();
-		var m = date.getMonth() + 1;
+        if ($scope.user.admin) {
+            $scope.init();
+            $scope.loadStats(fecha_d, fecha_h);
+        }
+    });
+
+	function parseDate(date, inverse) {
+		var d = (date.getDate() < 10 ? '0' : '') + date.getDate();
+		var m = (date.getMonth() + 1 < 10 ? '0' : '') + (date.getMonth() + 1);
 		var y = date.getFullYear();
 
-		return `${d}-${m}-${y}`;
+		return `${inverse ? y : d}-${m}-${inverse ? d : y}`;
     }
 
 </script>
