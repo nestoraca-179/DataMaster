@@ -432,7 +432,7 @@ h5.no-data {
                 }, function (error) { console.log("Ha ocurrido un error (STATS) ->"); console.log(error); });
 
             // ARTICULOS MAS VENDIDOS
-            $http.get(`../../api/DataMasterApi/GetMostSaleProducts/${from}/${to}/5/0`)
+            $http.get(`../../api/DataMasterApi/GetMostSaleProducts/${from}/${to}/15/0`)
                 .then(function (response) {
 
                     $scope.all_msp = response.data.Result;
@@ -447,7 +447,7 @@ h5.no-data {
 
             // SUCURSAL
             if (sucur != null && sucur.trim() != "") {
-                $http.get(`../../api/DataMasterApi/GetMostSaleProducts/${from}/${to}/5/1`)
+                $http.get(`../../api/DataMasterApi/GetMostSaleProducts/${from}/${to}/15/1`)
                     .then(function (response) {
 
                         $scope.suc_msp = response.data.Result;
